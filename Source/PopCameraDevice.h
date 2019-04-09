@@ -1,23 +1,21 @@
 #pragma once
 
-#include "SoyLib\src\SoyTypes.h"
+//	if you're using this header to link to the DLL, you'll probbaly need the lib :)
+//#pragma comment(lib, "PopCameraDevice.lib")
 
-#if defined(TARGET_WINDOWS)
-#include <SDKDDKVer.h>
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
+#include <stdint.h>
 
 
-#include <cstdint>
-#include "Unity/IUnityInterface.h"
+#if !defined(__export)
 
-#if defined(TARGET_WINDOWS)
+#if defined(_MSC_VER) && !defined(TARGET_PS4)
 #define __export			extern "C" __declspec(dllexport)
 #else
 #define __export			extern "C"
 #endif
+
+#endif
+
 
 __export void				EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength);
 __export int32_t			CreateCameraDevice(const char* Name);

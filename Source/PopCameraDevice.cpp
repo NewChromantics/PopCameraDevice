@@ -1,12 +1,12 @@
-#include "PopCameraDevice.hpp"
+#include "PopCameraDevice.h"
 #include <exception>
 #include <stdexcept>
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include "TStringBuffer.hpp"
+#include "TStringBuffer.h"
 #include "SoyLib\src\HeapArray.hpp"
-#include "TestDevice.hpp"
+#include "TestDevice.h"
 #include "MfCapture.h"
 
 #if defined(TARGET_WINDOWS)

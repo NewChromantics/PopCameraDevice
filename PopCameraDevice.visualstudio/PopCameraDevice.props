@@ -22,11 +22,22 @@
     <ClCompile>
       <FloatingPointExceptions>true</FloatingPointExceptions>
       <Optimization>Disabled</Optimization>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>SET PathDll=$(TargetPath)
+SET PathPdb=%PathDll:dll=pdb%
+SET PathLib=%PathDll:dll=lib%
+SET PathHeader=$(ProjectDir)..\source\PopCameraDevice.h
+copy /y %PathDll% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
+copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
+copy /y %PathLib% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
+copy /y %PathHeader% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

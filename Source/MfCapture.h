@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TCameraDevice.hpp"
+#include "TCameraDevice.h"
 #include "MfDecoder.h"
 #include <SoyAutoReleasePtr.h>
 

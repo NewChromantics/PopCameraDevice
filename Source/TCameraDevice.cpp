@@ -1,4 +1,4 @@
-#include "TCameraDevice.hpp"
+#include "TCameraDevice.h"
 #include "SoyLib\src\SoyMedia.h"
 
 

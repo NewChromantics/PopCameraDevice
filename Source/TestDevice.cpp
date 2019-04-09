@@ -1,4 +1,4 @@
-#include "TestDevice.hpp"
+#include "TestDevice.h"
 #include "SoyLib\src\SoyMedia.h"
 
 

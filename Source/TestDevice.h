@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TCameraDevice.hpp"
+#include "TCameraDevice.h"
 
 
 class TestDevice : public TCameraDevice

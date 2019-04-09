@@ -47,7 +47,7 @@
   <ItemGroup>
     <ClInclude Include="..\Source\MfCapture.h" />
     <ClInclude Include="..\Source\MfDecoder.h" />
-    <ClInclude Include="..\Source\PopCameraDevice.hpp" />
+    <ClInclude Include="..\Source\PopCameraDevice.h" />
     <ClInclude Include="..\Source\SoyLib\src\Array.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\BufferArray.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\HeapArray.hpp" />
@@ -70,9 +70,9 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyTypes_Windows.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyWave.h" />
     <ClInclude Include="..\Source\SoyLib\src\string.hpp" />
-    <ClInclude Include="..\Source\TCameraDevice.hpp" />
-    <ClInclude Include="..\Source\TestDevice.hpp" />
-    <ClInclude Include="..\Source\TStringBuffer.hpp" />
+    <ClInclude Include="..\Source\TCameraDevice.h" />
+    <ClInclude Include="..\Source\TestDevice.h" />
+    <ClInclude Include="..\Source\TStringBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs" />
@@ -136,6 +136,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link />
     <Link />
@@ -143,13 +144,7 @@
     <Link>
       <Profile>true</Profile>
     </Link>
-    <PostBuildEvent>
-      <Command>SET PathDll=$(TargetPath)
-SET PathPdb=%PathDll:dll=pdb%
-copy /y $(TargetPath) $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Master|x64'">
     <ClCompile>
@@ -162,19 +157,14 @@ copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
     <Link>
       <Profile>true</Profile>
     </Link>
-    <PostBuildEvent>
-      <Command>SET PathDll=$(TargetPath)
-SET PathPdb=%PathDll:dll=pdb%
-copy /y $(TargetPath) $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <PreprocessorDefinitions>ENABLE_DIRECTX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link />
     <Link />
@@ -182,13 +172,7 @@ copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
     <Link>
       <Profile>true</Profile>
     </Link>
-    <PostBuildEvent>
-      <Command>SET PathDll=$(TargetPath)
-SET PathPdb=%PathDll:dll=pdb%
-copy /y $(TargetPath) $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Master|Win32'">
     <ClCompile>
@@ -202,13 +186,7 @@ copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
     <Link>
       <Profile>true</Profile>
     </Link>
-    <PostBuildEvent>
-      <Command>SET PathDll=$(TargetPath)
-SET PathPdb=%PathDll:dll=pdb%
-copy /y $(TargetPath) $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
-</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
