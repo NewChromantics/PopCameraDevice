@@ -469,7 +469,7 @@ void MediaFoundation::TCamera::PushLatestFrame(size_t StreamIndex)
 	std::shared_ptr<TMediaPacket> LatestPacket;
 	while ( true )
 	{
-		auto NextPacket = StreamBuffer->PopPacket();
+		auto NextPacket = StreamBuffer->PopPacket(true);
 		if ( !NextPacket )
 			break;
 		LatestPacket = NextPacket;

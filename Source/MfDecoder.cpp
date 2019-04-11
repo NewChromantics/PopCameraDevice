@@ -683,6 +683,13 @@ void MediaFoundation::GetSupportedFormats(ArrayBridge<SoyPixelsFormat::Type>&& F
 	Formats.PushBack( SoyPixelsFormat::YYuv_8888_Full );
 	Formats.PushBack( SoyPixelsFormat::YYuv_8888_Ntsc );
 	Formats.PushBack( SoyPixelsFormat::YYuv_8888_Smptec );
+
+	Formats.PushBack( SoyPixelsFormat::Uvy_844_Full );
+	Formats.PushBack( SoyPixelsFormat::Yuv_844_Full );
+	Formats.PushBack( SoyPixelsFormat::Yuv_844_Ntsc );
+	Formats.PushBack( SoyPixelsFormat::Yuv_844_Smptec );
+
+	Formats.PushBack( SoyPixelsFormat::uyvy );
 }
 
 
@@ -811,6 +818,8 @@ void MfExtractor::ConfigureVideoStream(TStreamMeta& Stream)
 			Error << "Decoder codec not found";
 		else if ( Result == MF_E_INVALIDMEDIATYPE )
 			Error << "Decoder found, but cannot convert";
+		else if ( Result == MF_E_HW_MFT_FAILED_START_STREAMING )
+			Error << "Decoder found, but " << Platform::GetErrorString(Result);
 
 		try
 		{
