@@ -1,5 +1,5 @@
 #include "TCameraDevice.h"
-#include "SoyLib\src\SoyMedia.h"
+#include "SoyLib/src/SoyMedia.h"
 
 
 void TCameraDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,const SoyPixelsMeta& Meta)

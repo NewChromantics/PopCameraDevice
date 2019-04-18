@@ -4,10 +4,18 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include "TStringBuffer.h"
-#include "SoyLib\src\HeapArray.hpp"
+#include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
+
+
+#if defined(TARGET_WINDOWS)
 #include "MfCapture.h"
+#endif
+
+#if defined(TARGET_OSX)
+#include "AvfCapture.h"
+#endif
+
 
 #if defined(TARGET_WINDOWS)
 BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
@@ -51,66 +59,6 @@ public:
 };
 
 
-class TWriteContext
-{
-public:
-	TWriteContext(uint8_t* JpegData,size_t JpegDataSize) :
-		mJpegData		( JpegData ),
-		mJpegDataSize	( JpegDataSize ),
-		mDataWritten	( 0 )
-	{
-	}
-	
-	void		Write(const uint8_t* Data,size_t Size);
-
-public:
-	uint8_t*	mJpegData;
-	size_t		mJpegDataSize;
-	size_t		mDataWritten;
-};
-
-
-namespace PopEncodeJpeg
-{
-	std::shared_ptr<TStringBuffer>	gDebugStrings;
-	TStringBuffer&					GetDebugStrings();
-}
-
-
-template<typename STRING>
-void DebugLog(const STRING& String)
-{
-	auto& DebugStrings = PopEncodeJpeg::GetDebugStrings();
-	DebugStrings.Push( String );
-}
-
-
-__export const char* PopDebugString()
-{
-	try
-	{
-		auto& DebugStrings = PopEncodeJpeg::GetDebugStrings();
-		return DebugStrings.Pop();
-	}
-	catch(...)
-	{
-		//	bit recursive if we push one?
-		return nullptr;
-	}
-}
-
-__export void ReleaseDebugString(const char* String)
-{
-	try
-	{
-		auto& DebugStrings = PopEncodeJpeg::GetDebugStrings();
-		DebugStrings.Release( String );
-	}
-	catch(...)
-	{
-	}
-}
-
 
 __export void EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
 {
@@ -124,8 +72,11 @@ __export void EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
 		DeviceNames.PushBack(Name);
 	};
 	TestDevice::EnumDeviceNames(EnumDevice);
+#if defined(TARGET_WINDOWS)
 	MediaFoundation::EnumCaptureDevices(EnumDevice);
-
+#elif defined(TARGET_OSX)
+	Avf::EnumCaptureDevices(EnumDevice);
+#endif
 
 	auto IsCharUsed = [&](char Char)
 	{
@@ -180,9 +131,12 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	}
 
 
+#if defined(TARGET_WINDOWS)
 	try
 	{
 		std::shared_ptr<TCameraDevice> Device(new MediaFoundation::TCamera(Name));
+//#elif defined(TARGET_OSX)
+//		std::shared_ptr<TCameraDevice> Device(new Avf::TCamera(Name));
 		if ( Device )
 			return PopCameraDevice::CreateInstance(Device);
 	}
@@ -190,6 +144,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	{
 		std::Debug << e.what() << std::endl;
 	}
+#endif
 
 
 	throw Soy::AssertException("Failed to create device");
@@ -224,43 +179,6 @@ __export int32_t CreateCameraDevice(const char* Name)
 		return InstanceId;
 	};
 	return SafeCall( Function, __func__, -1 );
-}
-
-
-
-TStringBuffer& PopEncodeJpeg::GetDebugStrings()
-{
-	if ( !gDebugStrings )
-	{
-		gDebugStrings.reset( new TStringBuffer() );
-	}
-	return *gDebugStrings;
-}
-
-
-
-void TWriteContext::Write(const uint8_t* Data,size_t Size)
-{
-	//	gr: keep going so we know how much we need
-	/*
-	if ( mDataWritten + Size > mJpegDataSize )
-	{
-		std::stringstream Error;
-		Error << "Jpeg buffer size not big enough, trying to write " << (mDataWritten + Size) << "/" << mJpegDataSize;
-		throw std::runtime_error::runtime_error( Error.str() );
-	}
-	*/
-	
-	auto SpaceRemaining = mJpegDataSize - mDataWritten;
-	auto WriteLength = std::min( SpaceRemaining, Size );
-	if ( WriteLength > 0 )
-	{
-		auto* Dst = &mJpegData[mDataWritten];
-		auto* Src = Data;
-		memcpy( Dst, Src, WriteLength );
-	}
-	
-	mDataWritten += Size;
 }
 
 

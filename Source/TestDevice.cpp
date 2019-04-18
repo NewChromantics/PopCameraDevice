@@ -1,5 +1,5 @@
 #include "TestDevice.h"
-#include "SoyLib\src\SoyMedia.h"
+#include "SoyLib/src/SoyMedia.h"
 
 
 auto const TestDeviceName = "Test";

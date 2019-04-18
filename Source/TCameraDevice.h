@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mutex>
-#include "SoyLib\src\SoyPixels.h"
+#include "SoyLib/src/SoyPixels.h"
 
 class TPixelBuffer;
 
