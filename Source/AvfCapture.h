@@ -1,11 +1,14 @@
 #pragma once
 
 #include "TCameraDevice.h"
+#include "Avf.h"
+
+
 
 
 namespace Avf
 {
-	void		EnumCaptureDevices(std::function<void(const std::string&)> AppendName);
+	void	EnumCaptureDevices(std::function<void(const std::string&)> AppendName);
 
 	class TCaptureExtractor;
 	class TCamera;

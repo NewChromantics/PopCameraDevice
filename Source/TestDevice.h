@@ -3,7 +3,7 @@
 #include "TCameraDevice.h"
 
 
-class TestDevice : public TCameraDevice
+class TestDevice : public PopCameraDevice::TDevice
 {
 public:
 	TestDevice()
@@ -11,8 +11,9 @@ public:
 		GenerateFrame();
 	}
 
-	static void								EnumDeviceNames(std::function<void(const std::string&)> Enum);
-	static std::shared_ptr<TCameraDevice>	CreateDevice(const std::string& Name);
+	static void											EnumDeviceNames(std::function<void(const std::string&)> Enum);
+	static std::shared_ptr<PopCameraDevice::TDevice>	CreateDevice(const std::string& Name);
 
-	void		GenerateFrame();
+	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
+	void			GenerateFrame();
 };

@@ -32,14 +32,15 @@ BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /*
 }
 #endif
 
-class TDeviceInstance;
 
 namespace PopCameraDevice
 {
-	TCameraDevice&	GetCameraDevice(uint32_t Instance);
-	uint32_t		CreateInstance(std::shared_ptr<TCameraDevice> Device);
+	class TDeviceInstance;
+
+	TDevice&		GetCameraDevice(uint32_t Instance);
+	uint32_t		CreateInstance(std::shared_ptr<TDevice> Device);
 	void			FreeInstance(uint32_t Instance);
-	bool			PopFrame(TCameraDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2);
+	bool			PopFrame(TDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2);
 
 	uint32_t		CreateCameraDevice(const std::string& Name);
 
@@ -49,13 +50,13 @@ namespace PopCameraDevice
 }
 
 
-class TDeviceInstance
+class PopCameraDevice::TDeviceInstance
 {
 public:
-	std::shared_ptr<TCameraDevice>	mDevice;
-	uint32_t						mInstanceId = 0;
+	std::shared_ptr<TDevice>	mDevice;
+	uint32_t					mInstanceId = 0;
 
-	bool							operator==(const uint32_t& InstanceId) const	{	return mInstanceId == InstanceId;	}
+	bool						operator==(const uint32_t& InstanceId) const	{	return mInstanceId == InstanceId;	}
 };
 
 
@@ -63,7 +64,8 @@ public:
 __export void EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
 {
 	//	first char is delin
-	const char PossibleDelin[] = ",;:#!@+=_-&^%*$£?|/ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopoqrstuvwzy0123456789";
+	//	£ gives Illegal character encoding in string literal
+	const char PossibleDelin[] = ",;:#!@+=_-&^%*$?|/ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopoqrstuvwzy0123456789";
 	auto PossibleDelinArray = GetRemoteArray( PossibleDelin );
 
 	Array<std::string> DeviceNames;
@@ -182,7 +184,7 @@ __export int32_t CreateCameraDevice(const char* Name)
 }
 
 
-TCameraDevice& PopCameraDevice::GetCameraDevice(uint32_t Instance)
+PopCameraDevice::TDevice& PopCameraDevice::GetCameraDevice(uint32_t Instance)
 {
 	std::lock_guard<std::mutex> Lock(InstancesLock);
 	auto pInstance = Instances.Find(Instance);
@@ -198,7 +200,7 @@ TCameraDevice& PopCameraDevice::GetCameraDevice(uint32_t Instance)
 }
 
 
-uint32_t PopCameraDevice::CreateInstance(std::shared_ptr<TCameraDevice> Device)
+uint32_t PopCameraDevice::CreateInstance(std::shared_ptr<TDevice> Device)
 {
 	std::lock_guard<std::mutex> Lock(InstancesLock);
 	
@@ -232,7 +234,7 @@ __export void GetMeta(int32_t Instance, int32_t* pMetaValues, int32_t MetaValues
 	auto Function = [&]()
 	{
 		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
-		auto& Meta = Device.GetMeta();
+		auto Meta = Device.GetMeta();
 
 		size_t MetaValuesCounter = 0;
 		auto MetaValues = GetRemoteArray(pMetaValues, MetaValuesCount, MetaValuesCounter);
@@ -263,11 +265,11 @@ __export void FreeCameraDevice(int32_t Instance)
 		PopCameraDevice::FreeInstance(Instance);
 		return 0;
 	};
-	auto x = SafeCall(Function, __func__, 0 );
+	SafeCall(Function, __func__, 0 );
 }
 
 
-bool PopCameraDevice::PopFrame(TCameraDevice& Device,ArrayBridge<uint8_t>&& Plane0,ArrayBridge<uint8_t>&& Plane1,ArrayBridge<uint8_t>&& Plane2)
+bool PopCameraDevice::PopFrame(TDevice& Device,ArrayBridge<uint8_t>&& Plane0,ArrayBridge<uint8_t>&& Plane1,ArrayBridge<uint8_t>&& Plane2)
 {
 	if ( !Device.PopLastFrame(Plane0, Plane1, Plane2) )
 		return false;

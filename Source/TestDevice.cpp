@@ -9,11 +9,11 @@ void TestDevice::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 	Enum(TestDeviceName);
 }
 
-std::shared_ptr<TCameraDevice> TestDevice::CreateDevice(const std::string& Name)
+std::shared_ptr<PopCameraDevice::TDevice> TestDevice::CreateDevice(const std::string& Name)
 {
 	if ( Name == TestDeviceName )
 	{
-		std::shared_ptr<TCameraDevice> Device(new TestDevice);
+		std::shared_ptr<PopCameraDevice::TDevice> Device(new TestDevice);
 		return Device;
 	}
 
@@ -47,5 +47,12 @@ void TestDevice::GenerateFrame()
 
 	this->PushFrame(pPixelBuffer, Pixels.mMeta );
 }
-	
+
+void TestDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
+{
+	std::stringstream Error;
+	Error << "Test device doesn't support feature " << Feature;
+	throw Soy::AssertException(Error.str());
+}
+
 
