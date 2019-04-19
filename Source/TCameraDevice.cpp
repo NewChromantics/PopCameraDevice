@@ -4,9 +4,13 @@
 
 void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,const SoyPixelsMeta& Meta)
 {
-	std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
-	mLastPixelBuffer = FramePixelBuffer;
-	mLastPixelsMeta = Meta;
+	{
+		std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
+		mLastPixelBuffer = FramePixelBuffer;
+		mLastPixelsMeta = Meta;
+	}
+	if ( mOnNewFrame )
+		mOnNewFrame();
 }
 
 

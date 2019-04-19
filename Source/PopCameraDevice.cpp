@@ -60,8 +60,8 @@ public:
 };
 
 
-
-__export void EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
+//	gr: make this safe!
+__export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
 {
 	//	first char is delin
 	//	£ gives Illegal character encoding in string literal
@@ -92,7 +92,7 @@ __export void EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
 		return false;
 	};
 
-	char Delin;
+	char Delin = 0;
 	for ( auto pd=0;	pd<PossibleDelinArray.GetSize();	pd++ )
 	{
 		Delin = PossibleDelin[pd];
@@ -173,7 +173,7 @@ RETURN SafeCall(FUNC Function,const char* FunctionName,RETURN ErrorReturn)
 	}
 }
 
-__export int32_t CreateCameraDevice(const char* Name)
+__export int32_t PopCameraDevice_CreateCameraDevice(const char* Name)
 {
 	auto Function = [&]()
 	{
@@ -229,7 +229,7 @@ void PopCameraDevice::FreeInstance(uint32_t Instance)
 }
 
 
-__export void GetMeta(int32_t Instance, int32_t* pMetaValues, int32_t MetaValuesCount)
+__export void PopCameraDevice_GetMeta(int32_t Instance, int32_t* pMetaValues, int32_t MetaValuesCount)
 {
 	auto Function = [&]()
 	{
@@ -255,10 +255,10 @@ __export void GetMeta(int32_t Instance, int32_t* pMetaValues, int32_t MetaValues
 
 		return 0;
 	};
-	auto x = SafeCall(Function, __func__, 0 );
+	 SafeCall(Function, __func__, 0 );
 }
 
-__export void FreeCameraDevice(int32_t Instance)
+__export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
 {
 	auto Function = [&]()
 	{
@@ -266,6 +266,16 @@ __export void FreeCameraDevice(int32_t Instance)
 		return 0;
 	};
 	SafeCall(Function, __func__, 0 );
+}
+
+__export EXPORTCLASS* PopCameraDevice_GetDevicePtr(int32_t Instance)
+{
+	auto Function = [&]()
+	{
+		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
+		return &Device;
+	};
+	return SafeCall<EXPORTCLASS*>( Function, __func__, nullptr );
 }
 
 
@@ -277,7 +287,7 @@ bool PopCameraDevice::PopFrame(TDevice& Device,ArrayBridge<uint8_t>&& Plane0,Arr
 	return true;
 }
 
-__export int32_t PopFrame(int32_t Instance,uint8_t* Plane0,int32_t Plane0Size,uint8_t* Plane1,int32_t Plane1Size,uint8_t* Plane2,int32_t Plane2Size)
+__export int32_t PopCameraDevice_PopFrame(int32_t Instance,uint8_t* Plane0,int32_t Plane0Size,uint8_t* Plane1,int32_t Plane1Size,uint8_t* Plane2,int32_t Plane2Size)
 {
 	auto Function = [&]()
 	{

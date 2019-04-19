@@ -46,6 +46,9 @@ public:
 protected:
 	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,const SoyPixelsMeta& Meta);
 
+public:
+	std::function<void()>			mOnNewFrame;
+	
 private:
 	//	currently storing just last frame
 	std::mutex						mLastPixelBufferLock;

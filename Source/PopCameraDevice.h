@@ -30,11 +30,11 @@ namespace PopCameraDevice
 
 //	for C++ interfaces, to give access to known types and callbacks
 //	todo: proper shared_ptr sharing, dllexport class etc. this is essentially unsafe, but caller can manage this between CreateInstance and DestroyInstance
-__export EXPORTCLASS*		GetDevicePtr(int32_t Instance);
+__export EXPORTCLASS*		PopCameraDevice_GetDevicePtr(int32_t Instance);
 
-__export void				EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength);
-__export int32_t			CreateCameraDevice(const char* Name);
-__export void				FreeCameraDevice(int32_t Instance);
-__export void				GetMeta(int32_t Instance,int32_t* MetaValues,int32_t MetaValuesCount);
-__export int32_t			PopFrame(int32_t Instance,uint8_t* Plane0,int32_t Plane0Size,uint8_t* Plane1,int32_t Plane1Size,uint8_t* Plane2,int32_t Plane2Size);
+__export void				PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength);
+__export int32_t			PopCameraDevice_CreateCameraDevice(const char* Name);
+__export void				PopCameraDevice_FreeCameraDevice(int32_t Instance);
+__export void				PopCameraDevice_GetMeta(int32_t Instance,int32_t* MetaValues,int32_t MetaValuesCount);
+__export int32_t			PopCameraDevice_PopFrame(int32_t Instance,uint8_t* Plane0,int32_t Plane0Size,uint8_t* Plane1,int32_t Plane1Size,uint8_t* Plane2,int32_t Plane2Size);
 

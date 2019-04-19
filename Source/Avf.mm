@@ -18,6 +18,23 @@ Avf::TDeviceMeta GetMeta(AVCaptureDevice* Device)
 	Meta.mHasVideo = YES == [Device hasMediaType:AVMediaTypeVideo];
 	Meta.mHasAudio = YES == [Device hasMediaType:AVMediaTypeAudio];
 	
+	/*
+	TVideoDeviceMeta Meta;
+	Meta.mName = std::string([[Device localizedName] UTF8String]);
+	Meta.mSerial = std::string([[Device uniqueID] UTF8String]);
+	Meta.mVendor = std::string([[Device manufacturer] UTF8String]);
+	Meta.mConnected = YES == [Device isConnected];
+	Meta.mVideo = YES == [Device hasMediaType:AVMediaTypeVideo];
+	Meta.mAudio = YES == [Device hasMediaType:AVMediaTypeAudio];
+	Meta.mText = YES == [Device hasMediaType:AVMediaTypeText];
+	Meta.mClosedCaption = YES == [Device hasMediaType:AVMediaTypeClosedCaption];
+	Meta.mSubtitle = YES == [Device hasMediaType:AVMediaTypeSubtitle];
+	Meta.mTimecode = YES == [Device hasMediaType:AVMediaTypeTimecode];
+	//		Meta.mTimedMetadata = YES == [Device hasMediaType:AVMediaTypeTimedMetadata];
+	Meta.mMetadata = YES == [Device hasMediaType:AVMediaTypeMetadata];
+	Meta.mMuxed = YES == [Device hasMediaType:AVMediaTypeMuxed];
+*/
+	
 	//	asleep, eg. macbook camera when lid is down
 #if defined(TARGET_IOS)
 	Meta.mIsSuspended = false;
