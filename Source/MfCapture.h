@@ -19,7 +19,8 @@ class MediaFoundation::TCamera : public PopCameraDevice::TDevice
 public:
 	TCamera(const std::string& DeviceName);
 
-	void		PushLatestFrame(size_t StreamIndex);
+	void			PushLatestFrame(size_t StreamIndex);
+	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
 
 	std::shared_ptr<TMediaExtractor>	mExtractor;
 };

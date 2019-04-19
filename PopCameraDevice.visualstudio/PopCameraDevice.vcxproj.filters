@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Source\TStringBuffer.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
       <Filter>SoyLib</Filter>
     </ClCompile>
@@ -73,9 +70,6 @@
       <Filter>SoyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\SoyJson.cpp">
-      <Filter>SoyLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\SoyLib\src\SoyEvent.cpp">
       <Filter>SoyLib</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\SoyWave.cpp">
@@ -149,9 +143,6 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyJson.h">
       <Filter>SoyLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\SoyLib\src\SoyEvent.h">
-      <Filter>SoyLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\SoyWave.h">
       <Filter>SoyLib</Filter>
     </ClInclude>
@@ -164,16 +155,28 @@
     <ClInclude Include="..\Source\PopCameraDevice.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TStringBuffer.h">
+    <ClInclude Include="..\Source\TestDevice.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TestDevice.h">
+    <ClInclude Include="..\Source\AvfCapture.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\AvfVideoCapture.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
       <Filter>Unity Source</Filter>
+    </None>
+    <None Include="..\Source\AvfCapture.mm">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\Source\AvfVideoCapture.mm">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\Source\Avf.mm">
+      <Filter>Source</Filter>
     </None>
   </ItemGroup>
 </Project>

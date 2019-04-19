@@ -480,3 +480,11 @@ void MediaFoundation::TCamera::PushLatestFrame(size_t StreamIndex)
 
 	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta);
 }
+
+void MediaFoundation::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
+{
+	std::stringstream Error;
+	Error << "Todo feature enabling on MediaFoundation " << Feature;
+	throw Soy::AssertException(Error.str());
+
+}

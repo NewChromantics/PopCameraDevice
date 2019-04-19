@@ -32,10 +32,12 @@
 SET PathPdb=%PathDll:dll=pdb%
 SET PathLib=%PathDll:dll=lib%
 SET PathHeader=$(ProjectDir)..\source\PopCameraDevice.h
+SET PathHeader2=$(ProjectDir)..\source\TCameraDevice.h
 copy /y %PathDll% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
 copy /y %PathPdb% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
 copy /y %PathLib% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
 copy /y %PathHeader% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
+copy /y %PathHeader2% $(ProjectDir)..\Unity\PopCameraDevice\Assets\PopCameraDevice
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -4,6 +4,7 @@
 #if defined(ENABLE_DIRECTX)
 #include <SoyDirectx.h>
 #endif
+#include <atomic>
 
 //	compression example:
 //	https://graphics.stanford.edu/~mdfisher/Code/Engine/VideoCompressor.cpp.html
