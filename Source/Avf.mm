@@ -52,9 +52,7 @@ Avf::TDeviceMeta GetMeta(AVCaptureDevice* Device)
 	return Meta;
 }
 
-
-
-void Avf::EnumCaptureDevices(std::function<void(const std::string&)> AppendName)
+void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 {
 	auto Devices = [AVCaptureDevice devices];
 	for ( AVCaptureDevice* Device in Devices )
@@ -65,8 +63,17 @@ void Avf::EnumCaptureDevices(std::function<void(const std::string&)> AppendName)
 		auto Meta = GetMeta( Device );
 		if ( !Meta.mHasVideo )
 			continue;
-
-		AppendName( Meta.mCookie );
+		
+		Enum( Meta );
 	}
+}
+
+void Avf::EnumCaptureDevices(std::function<void(const std::string&)> EnumName)
+{
+	auto EnumMeta = [&](const TDeviceMeta& Meta)
+	{
+		EnumName( Meta.mCookie );
+	};
+	EnumCaptureDevices( EnumMeta );
 }
 

@@ -7,9 +7,10 @@
 
 namespace Avf
 {
-	void	EnumCaptureDevices(std::function<void(const std::string&)> AppendName);
-
 	class TDeviceMeta;
+	
+	void	EnumCaptureDevices(std::function<void(const std::string&)> Enum);
+	void	EnumCaptureDevices(std::function<void(const TDeviceMeta&)> Enum);
 }
 
 

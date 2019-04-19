@@ -133,12 +133,13 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	}
 
 
-#if defined(TARGET_WINDOWS)
 	try
 	{
-		std::shared_ptr<TCameraDevice> Device(new MediaFoundation::TCamera(Name));
-//#elif defined(TARGET_OSX)
-//		std::shared_ptr<TCameraDevice> Device(new Avf::TCamera(Name));
+#if defined(TARGET_WINDOWS)
+		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
+#elif defined(TARGET_OSX)
+		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name));
+#endif
 		if ( Device )
 			return PopCameraDevice::CreateInstance(Device);
 	}
@@ -146,7 +147,6 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	{
 		std::Debug << e.what() << std::endl;
 	}
-#endif
 
 
 	throw Soy::AssertException("Failed to create device");

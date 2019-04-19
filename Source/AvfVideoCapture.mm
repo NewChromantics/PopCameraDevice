@@ -154,9 +154,6 @@ AvfVideoCapture::~AvfVideoCapture()
 	//	stop avf
 	StopStream();
 	
-	//	wait for everything to release
-	TMediaExtractor::WaitToFinish();
-	
 	//	call parent to clear existing data
 	Shutdown();
 
@@ -222,73 +219,6 @@ NSString* GetAVCaptureSessionQuality(TVideoQuality::Type Quality)
 			return AVCaptureSessionPresetHigh;
 	}
 }
-
-
-
-//	gr: make this generic across platforms!
-class TSerialMatch
-{
-public:
-	TSerialMatch() :
-		mSerial				( "<invalid TSerialMatch>" ),
-		mNameExact			( false ),
-		mNameStarts			( false ),
-		mNameContains		( false ),
-		mVendorExact		( false ),
-		mVendorStarts		( false ),
-		mVendorContains		( false ),
-		mSerialExact		( false ),
-		mSerialStarts		( false ),
-		mSerialContains		( false )
-	{
-	}
-	
-	TSerialMatch(const std::string& PartSerial,const std::string& Serial,const std::string& Name,const std::string& Vendor) :
-		mSerial				( Serial ),
-		mNameExact			( Soy::StringMatches( Name, PartSerial, false ) ),
-		mNameStarts			( Soy::StringBeginsWith( Name, PartSerial, false ) ),
-		mNameContains		( Soy::StringContains( Name, PartSerial, false ) ),
-		mVendorExact		( Soy::StringMatches( Vendor, PartSerial, false ) ),
-		mVendorStarts		( Soy::StringBeginsWith( Vendor, PartSerial, false ) ),
-		mVendorContains		( Soy::StringContains( Vendor, PartSerial, false ) ),
-		mSerialExact		( Soy::StringMatches( Serial, PartSerial, false ) ),
-		mSerialStarts		( Soy::StringBeginsWith( Serial, PartSerial, false ) ),
-		mSerialContains		( Soy::StringContains( Serial, PartSerial, false ) )
-	{
-		//	allow matching all serials
-		if ( PartSerial == "*" )
-			mNameContains = true;
-	}
-	
-	size_t		GetScore()
-	{
-		size_t Score = 0;
-		//	shift = priority
-		Score |= mSerialExact << 9;
-		Score |= mNameExact << 8;
-
-		Score |= mSerialStarts << 7;
-		Score |= mNameStarts << 6;
-		Score |= mVendorExact << 5;
-	
-		Score |= mSerialContains << 4;
-		Score |= mNameContains << 3;
-		Score |= mVendorStarts << 2;
-		Score |= mVendorContains << 1;
-		return Score;
-	}
-
-	std::string	mSerial;
-	bool		mNameExact;
-	bool		mNameStarts;
-	bool		mNameContains;
-	bool		mVendorExact;
-	bool		mVendorStarts;
-	bool		mVendorContains;
-	bool		mSerialExact;
-	bool		mSerialStarts;
-	bool		mSerialContains;
-};
 
 
 
@@ -382,8 +312,8 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	for ( int i=0;	i<Qualitys.GetSize();	i++ )
 	{
 		auto Quality = Qualitys[i];
-		//auto QualityString = GetAVCaptureSessionQuality(Quality);
-		auto QualityString = AVCaptureSessionPreset1280x720;
+		auto QualityString = GetAVCaptureSessionQuality(Quality);
+		//auto QualityString = AVCaptureSessionPreset1280x720;
 		
 		if ( ![mSession canSetSessionPreset:QualityString] )
 			continue;
@@ -493,7 +423,7 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	
 	
 	
-
+/*
 	[Session beginConfiguration];
 	auto FrameRate = 60;
 	try
@@ -505,7 +435,7 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 		std::Debug << "Failed to set frame rate to " << FrameRate << ": " << e.what() << std::endl;
 	}
 	[Session commitConfiguration];
-	
+*/
 	
 	//	register for notifications from errors
 	NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
@@ -554,15 +484,6 @@ void AvfVideoCapture::StopStream()
 }
 
 
-void AvfMediaExtractor::GetStreams(ArrayBridge<TStreamMeta>&& StreamMetas)
-{
-	for ( auto& Meta : mStreamMeta )
-	{
-		StreamMetas.PushBack( Meta.second );
-	}
-}
-
-
 TStreamMeta AvfMediaExtractor::GetFrameMeta(CMSampleBufferRef SampleBuffer,size_t StreamIndex)
 {
 	auto Desc = CMSampleBufferGetFormatDescription( SampleBuffer );
@@ -571,21 +492,6 @@ TStreamMeta AvfMediaExtractor::GetFrameMeta(CMSampleBufferRef SampleBuffer,size_
 	
 	//CMTime CmTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBufferRef);
 	//SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
-	
-	//	new stream!
-	if ( mStreamMeta.find(StreamIndex) == mStreamMeta.end() )
-	{
-		try
-		{
-			mStreamMeta[StreamIndex] = Meta;
-			OnStreamsChanged();
-		}
-		catch(...)
-		{
-			mStreamMeta.erase( mStreamMeta.find(StreamIndex) );
-			throw;
-		}
-	}
 	
 	return Meta;
 }
@@ -598,58 +504,51 @@ TStreamMeta AvfMediaExtractor::GetFrameMeta(CVPixelBufferRef SampleBuffer,size_t
 	
 	//CMTime CmTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBufferRef);
 	//SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
-	
-	//	new stream!
-	if ( mStreamMeta.find(StreamIndex) == mStreamMeta.end() )
-	{
-		try
-		{
-			mStreamMeta[StreamIndex] = Meta;
-			OnStreamsChanged();
-		}
-		catch(...)
-		{
-			mStreamMeta.erase( mStreamMeta.find(StreamIndex) );
-			throw;
-		}
-	}
-	
+
 	return Meta;
+}
+
+
+std::shared_ptr<TMediaPacket> AvfMediaExtractor::PopPacket(size_t StreamIndex)
+{
+	if ( mPacketQueue.IsEmpty() )
+		return nullptr;
+
+	//	todo: filter stream indexes!
+	std::lock_guard<std::mutex> Lock( mPacketQueueLock );
+	auto Oldest = mPacketQueue.PopAt(0);
+
+	return Oldest;
 }
 
 
 void AvfMediaExtractor::QueuePacket(std::shared_ptr<TMediaPacket>& Packet)
 {
-	OnPacketExtracted( Packet->mTimecode, Packet->mMeta.mStreamIndex );
+	if ( !Packet )
+		throw Soy::AssertException("Packet expected");
 	
 	{
 		std::lock_guard<std::mutex> Lock( mPacketQueueLock );
 	
 		//	only save latest
 		//	gr: check in case this causes too much stuttering and maybe keep 2
-		if ( mParams.mDiscardOldFrames )
+		//	todo: filter stream indexes!
+		if ( mDiscardOldFrames )
 			mPacketQueue.Clear();
 
 		mPacketQueue.PushBack( Packet );
 	}
-	
-	//	wake up the extractor as we want ReadNextPacket to try again
-	Wake();
+
+	//	callback AFTER packet is queued
+	if ( mOnPacketQueued )
+		mOnPacketQueued( Packet->mTimecode, Packet->mMeta.mStreamIndex );
 }
 
-std::shared_ptr<TMediaPacket> AvfMediaExtractor::ReadNextPacket()
-{
-	if ( mPacketQueue.IsEmpty() )
-		return nullptr;
-	
-	std::lock_guard<std::mutex> Lock( mPacketQueueLock );
-	return mPacketQueue.PopAt(0);
-}
 
 AvfMediaExtractor::AvfMediaExtractor(const TMediaExtractorParams& Params,std::shared_ptr<Opengl::TContext>& OpenglContext) :
-	TMediaExtractor	( Params ),
-	mOpenglContext	( OpenglContext ),
-	mRenderer		( new AvfDecoderRenderer() )
+	mOpenglContext		( OpenglContext ),
+	mRenderer			( new AvfDecoderRenderer() ),
+	mDiscardOldFrames	( Params.mDiscardOldFrames )
 {
 	
 }

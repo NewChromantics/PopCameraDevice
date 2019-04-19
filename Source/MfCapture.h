@@ -14,7 +14,7 @@ namespace MediaFoundation
 }
 
 
-class MediaFoundation::TCamera : public TCameraDevice
+class MediaFoundation::TCamera : public PopCameraDevice::TDevice
 {
 public:
 	TCamera(const std::string& DeviceName);

@@ -11,8 +11,8 @@
 		BF012ABC2268DBF8003AEB55 /* PopCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */; };
 		BF012ABD2268DBF8003AEB55 /* TCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */; };
 		BF012ACF2268DE24003AEB55 /* AvfCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012ACD2268DE24003AEB55 /* AvfCapture.h */; };
-		BF012AD02268DE24003AEB55 /* AvfCapture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.cpp */; };
-		BF012AD12268DE24003AEB55 /* AvfCapture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.cpp */; };
+		BF012AD02268DE24003AEB55 /* AvfCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.mm */; };
+		BF012AD12268DE24003AEB55 /* AvfCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.mm */; };
 		BF012AD22269FAE2003AEB55 /* PopCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */; };
 		BF012AD32269FAE2003AEB55 /* TCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */; };
 		BF012AD42269FAE2003AEB55 /* TestDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */; };
@@ -121,7 +121,7 @@
 		BF012ABE2268DC5C003AEB55 /* PopCameraDevice.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = PopCameraDevice.xcconfig; path = Source/PopCameraDevice.xcconfig; sourceTree = "<group>"; };
 		BF012AC52268DC95003AEB55 /* PopCameraDeviceFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PopCameraDeviceFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF012ACD2268DE24003AEB55 /* AvfCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AvfCapture.h; path = Source/AvfCapture.h; sourceTree = "<group>"; };
-		BF012ACE2268DE24003AEB55 /* AvfCapture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AvfCapture.cpp; path = Source/AvfCapture.cpp; sourceTree = "<group>"; };
+		BF012ACE2268DE24003AEB55 /* AvfCapture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AvfCapture.mm; path = Source/AvfCapture.mm; sourceTree = "<group>"; };
 		BF012AD62269FC83003AEB55 /* SoyPixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoyPixels.h; sourceTree = "<group>"; };
 		BF012AD72269FC83003AEB55 /* SoyAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoyAssert.h; sourceTree = "<group>"; };
 		BF012AD82269FC83003AEB55 /* SoyPixels.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoyPixels.cpp; sourceTree = "<group>"; };
@@ -313,7 +313,7 @@
 			children = (
 				BF012B01226A03C5003AEB55 /* Avf.h */,
 				BF012B02226A047F003AEB55 /* Avf.mm */,
-				BF012ACE2268DE24003AEB55 /* AvfCapture.cpp */,
+				BF012ACE2268DE24003AEB55 /* AvfCapture.mm */,
 				BF012ACD2268DE24003AEB55 /* AvfCapture.h */,
 				BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */,
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
@@ -502,7 +502,7 @@
 				BF012AFF226A0108003AEB55 /* SoyTime.cpp in Sources */,
 				BF012AD32269FAE2003AEB55 /* TCameraDevice.cpp in Sources */,
 				BF012B4A226A270A003AEB55 /* SoyMedia.cpp in Sources */,
-				BF012AD12268DE24003AEB55 /* AvfCapture.cpp in Sources */,
+				BF012AD12268DE24003AEB55 /* AvfCapture.mm in Sources */,
 				BF012B55226A2FCF003AEB55 /* SoyMediaFormat.cpp in Sources */,
 				BF012B3B226A26E9003AEB55 /* SoyOpengl.cpp in Sources */,
 				BF012B40226A26F1003AEB55 /* SoyH264.cpp in Sources */,
@@ -531,7 +531,7 @@
 				BF012B44226A26FB003AEB55 /* SoyThread.cpp in Sources */,
 				BF012B2C226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
 				BF012B63226A30C7003AEB55 /* SoyShader.cpp in Sources */,
-				BF012AD02268DE24003AEB55 /* AvfCapture.cpp in Sources */,
+				BF012AD02268DE24003AEB55 /* AvfCapture.mm in Sources */,
 				BF012ADE2269FC83003AEB55 /* SoyAssert.cpp in Sources */,
 				BF012B58226A2FE0003AEB55 /* SoyWave.cpp in Sources */,
 				BF012ADC2269FC83003AEB55 /* SoyPixels.cpp in Sources */,

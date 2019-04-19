@@ -2,30 +2,30 @@
 
 #include "TCameraDevice.h"
 #include "Avf.h"
-
+#include "SoyMedia.h"
 
 
 
 namespace Avf
 {
-	void	EnumCaptureDevices(std::function<void(const std::string&)> AppendName);
-
 	class TCaptureExtractor;
 	class TCamera;
 }
+class AvfVideoCapture;
 
-/*
-class Avf::TCamera : public TCameraDevice
+
+class Avf::TCamera : public  PopCameraDevice::TDevice
 {
 public:
 	TCamera(const std::string& DeviceName);
 
-	void		PushLatestFrame(size_t StreamIndex);
+	void			PushLatestFrame(size_t StreamIndex);
+	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
 
-	std::shared_ptr<TMediaExtractor>	mExtractor;
+	std::shared_ptr<AvfVideoCapture>	mExtractor;
 };
 
-
+/*
 class Avf::TCaptureExtractor : public MfExtractor
 {
 public:
