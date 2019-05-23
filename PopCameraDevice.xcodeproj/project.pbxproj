@@ -102,6 +102,7 @@
 		BF012B75226A3296003AEB55 /* SoyTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B74226A3296003AEB55 /* SoyTime.mm */; };
 		BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B74226A3296003AEB55 /* SoyTime.mm */; };
 		BF012B78226A3303003AEB55 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
+		BF108A882296F476003DDC5F /* Kinect.h in Headers */ = {isa = PBXBuildFile; fileRef = BF108A862296F476003DDC5F /* Kinect.h */; };
 		BF76106A226B6E5C00762F15 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF76106B226B6E5F00762F15 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B6D226A31F2003AEB55 /* CoreServices.framework */; };
 		BF76106C226B6E6200762F15 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B36226A26AF003AEB55 /* CoreVideo.framework */; };
@@ -191,6 +192,8 @@
 		BF012B74226A3296003AEB55 /* SoyTime.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SoyTime.mm; sourceTree = "<group>"; };
 		BF012B77226A3303003AEB55 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BF0A19C21EA428F4007EBC95 /* Unity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Unity; sourceTree = "<group>"; };
+		BF108A862296F476003DDC5F /* Kinect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kinect.h; path = Source/Kinect.h; sourceTree = "<group>"; };
+		BF108A872296F476003DDC5F /* Kinect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Kinect.cpp; path = Source/Kinect.cpp; sourceTree = "<group>"; };
 		BF4A6A141EA16D7D00613A64 /* PopCameraDevice.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopCameraDevice.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
@@ -329,12 +332,14 @@
 			children = (
 				BF012B01226A03C5003AEB55 /* Avf.h */,
 				BF012B02226A047F003AEB55 /* Avf.mm */,
-				BF012ACE2268DE24003AEB55 /* AvfCapture.mm */,
 				BF012ACD2268DE24003AEB55 /* AvfCapture.h */,
+				BF012ACE2268DE24003AEB55 /* AvfCapture.mm */,
 				BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */,
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF012AAE2268DBF8003AEB55 /* BundleInfo.plist */,
 				BF012AA92268DBF7003AEB55 /* FrameworkInfo.plist */,
+				BF108A872296F476003DDC5F /* Kinect.cpp */,
+				BF108A862296F476003DDC5F /* Kinect.h */,
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
 				BF012AAA2268DBF7003AEB55 /* MfCapture.h */,
 				BF012AAD2268DBF7003AEB55 /* MfDecoder.cpp */,
@@ -381,6 +386,7 @@
 				BF012B6A226A3176003AEB55 /* SoyFilesystem.h in Headers */,
 				BF012AEA2269FCBF003AEB55 /* MemHeap.hpp in Headers */,
 				BF012ACF2268DE24003AEB55 /* AvfCapture.h in Headers */,
+				BF108A882296F476003DDC5F /* Kinect.h in Headers */,
 				BF012B41226A26F1003AEB55 /* SoyH264.h in Headers */,
 				BF012B23226A218F003AEB55 /* SoyScope.h in Headers */,
 				BF012B46226A26FB003AEB55 /* SoyThread.h in Headers */,
