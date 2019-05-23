@@ -1,26 +1,15 @@
 #pragma once
 
-#include "PopMovieDecoder.h"
+#include "TCameraDevice.h"
+#include "SoyMedia.h"
 
-
-//	at some point we may need to support multiple sdk's...
-#if defined(LIBFREENECT)
 //  OSX
 //  to install libusb and libfreenect, get brew from http://brew.sh/
 //  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 //  brew install libfreenect
-//  set LIBUSB_PATH in source trees to /usr/local/Cellar/libusb/1.0.20
-//  set LIBFREENECT_PATH in source trees to /usr/local/Cellar/libfreenect/0.5.1
 //  usually need to restart xcode to recognise new source tree entries
-#include <libusb-1.0/libusb.h>
-#include <libfreenect/libfreenect.h>
-#endif
-
-namespace Opengl
-{
-	class TBlitter;
-	class TShader;
-}
+#include "libusb.h"
+#include "libfreenect.h"
 
 namespace Kinect
 {
@@ -34,22 +23,27 @@ namespace Kinect
 	class TStream;
 	
 	class TDepthPixelBuffer;	//	pixel buffer with some special depth processing
-
-	void	EnumDevices(std::function<void(const std::string&)> Append);
-	void	FreeContext();
+	
+	void			EnumDevices(std::function<void(const std::string&)> Append);
+	void			FreeContext();
+	
+	TContext&		GetContext();
+	
+	void			EnumDeviceNames(std::function<void(const std::string&)> Enum);
 }
 
 
-class Kinect::TContext : public SoyThread
+class Kinect::TContext // : public SoyThread
 {
 public:
 	TContext();
 	~TContext();
-	
+	/*
 	bool							HasFatalError(std::string& Error)		{	Error = mFatalError;	return !mFatalError.empty();	}
 	void							EnumDevices(ArrayBridge<TDeviceMeta>&& Metas,bool AllowInvalidSerial);
-	std::shared_ptr<TDevice>		GetDevice(const std::string& Name,const TVideoDecoderParams& Params);		//	alloc/get device
-	std::shared_ptr<TDevice>		GetDevice(uint32 DeviceId);
+	//std::shared_ptr<TDevice>		GetDevice(const std::string& Name,const TVideoDecoderParams& Params);		//	alloc/get device
+	//std::shared_ptr<TDevice>		GetDevice(uint32 DeviceId);
+	std::shared_ptr<TDevice>		GetDevice(const std::string& Name);
 #if defined(LIBFREENECT)
 	freenect_context*				GetContext()	{	return mContext;	}
 #endif
@@ -74,10 +68,11 @@ private:
 #endif
 	std::string						mFatalError;
 	std::stringstream				mLibError;
+	 */
 };
 
 
-
+/*
 
 class Kinect::TDeviceMeta
 {
@@ -151,7 +146,8 @@ public:
 class Kinect::TDevice
 {
 public:
-	TDevice(const TDeviceMeta& Meta,const TVideoDecoderParams& Params,TContext& Context);
+	TDevice(const std::string& Serial);
+	//TDevice(const TDeviceMeta& Meta,const TVideoDecoderParams& Params,TContext& Context);
 	~TDevice();
 	
 #if defined(LIBFREENECT)
@@ -172,7 +168,7 @@ public:
 	TDeviceMeta				mMeta;
 	std::string				mFatalError;
 	
-	SoyEvent<const TFrame>	mOnNewFrame;
+	std::function<void(const TFrame&)>	mOnNewFrame;
 	
 private:
 	std::shared_ptr<TVideoStream>	mVideoStream;
@@ -187,7 +183,7 @@ private:
 
 
 
-
+/*
 //	gr: now we have multiple stream support, we can revert this back to 1:1 device
 class Kinect::TDeviceDecoder : public TVideoDecoder
 {
@@ -216,7 +212,7 @@ public:
 class Kinect::TDepthPixelBuffer : public TPixelBuffer
 {
 public:
-	TDepthPixelBuffer(const SoyPixelsImpl& Pixels,std::shared_ptr<Opengl::TBlitter>	Blitter,std::shared_ptr<Opengl::TContext> Context);
+	TDepthPixelBuffer(const SoyPixelsImpl& Pixels);
 	~TDepthPixelBuffer();
 	
 	virtual void		Lock(ArrayBridge<Opengl::TTexture>&& Textures,Opengl::TContext& Context,float3x3& Transform) override;
@@ -228,13 +224,18 @@ public:
 public:
 	std::shared_ptr<Opengl::TTexture>	mLockedTexture;		//	output texture
 	SoyPixels							mPixels;
-	std::shared_ptr<Opengl::TContext>	mOpenglContext;
-	std::shared_ptr<Opengl::TBlitter>	mOpenglBlitter;
-	std::shared_ptr<Opengl::TShader>	mShaderDepthConvert;
-	std::shared_ptr<Opengl::TShader>	mShaderNoiseReduction;
 };
 
-
+ 
+ class Kinect::TDevice : public PopCameraDevice::TDevice
+ {
+ public:
+ TDevice(const std::string& Serial);
+ 
+ virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
+ };
+ 
+ */
 
 
 

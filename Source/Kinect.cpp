@@ -1,16 +1,7 @@
-#include "SoyKinect.h"
-#include "TBlitterOpengl.h"
-
-
-//	gr: have this conversion somewhere in the lib
-static auto BlitFragShaderFreenectDepth10mm =
-#include "BlitFreenectDepth10mm.glsl.frag"
-;
+#include "Kinect.h"
 
 
 
-
-#if defined(LIBFREENECT)
 namespace Freenect
 {
 	bool					IsOkay(libusb_error Result,const std::string& Context,bool Throw=true);
@@ -29,7 +20,6 @@ namespace Freenect
 	const size_t			DepthStreamIndex=1;
 	//const size_t			AudioStreamIndex=2;
 }
-#endif
 
 
 namespace Kinect
@@ -52,7 +42,7 @@ uint32 Kinect::AllocDeviceId()
 	return Id++;
 }
 
-#if defined(LIBFREENECT)
+
 SoyTime Freenect::TimestampToMs(uint32_t Timestamp)
 {
 	//	according to here, timestamp is in video clock cycles at 60(59.xx)... or 24hz?
@@ -61,9 +51,8 @@ SoyTime Freenect::TimestampToMs(uint32_t Timestamp)
 	uint64 TimestampMs = Timestamp / HzToMs;
 	return SoyTime( std::chrono::milliseconds(TimestampMs) );
 }
-#endif
 
-#if defined(LIBFREENECT)
+
 const char* Freenect::LogLevelToString(freenect_loglevel level)
 {
 	switch ( level )
@@ -79,10 +68,14 @@ const char* Freenect::LogLevelToString(freenect_loglevel level)
 		default:					return "Libfreenect";
 	}
 }
-#endif
 
 
-#if defined(LIBFREENECT)
+void Kinect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
+{
+	
+}
+
+
 void Freenect::LogCallback(freenect_context *dev, freenect_loglevel level, const char *msg)
 {
 	std::string Message( msg );
@@ -97,47 +90,43 @@ void Freenect::LogCallback(freenect_context *dev, freenect_loglevel level, const
 	{
 		if ( Kinect::gContext )
 		{
-			Kinect::gContext->OnLibError( Message );
+			//Kinect::gContext->OnLibError( Message );
 			return;
 		}
 	}
 	
 	std::Debug << "Freenect: " << Freenect::LogLevelToString(level) << ": " << Message << std::endl;
 }
-#endif
 
-#if defined(LIBFREENECT)
+
+
 std::string	Freenect::GetErrorString(libusb_error Result)
 {
 	return libusb_strerror(Result);
 }
-#endif
+
 
 std::string	Kinect::GetErrorString(int Result)
 {
-#if defined(LIBFREENECT)
 	if ( (Result >= 0 && Result < LIBUSB_ERROR_COUNT) || Result == LIBUSB_ERROR_OTHER )
 	{
 		return Freenect::GetErrorString( static_cast<libusb_error>(Result) );
 	}
-#endif
 
 	std::stringstream Error;
 	Error << "#" << Result << " ";
 	
-	if ( gContext )
-		gContext->FlushLibError( Error );
+	//if ( gContext )
+	//	gContext->FlushLibError( Error );
 	
 	return Error.str();
 }
 
 
-#if defined(LIBFREENECT)
 bool Freenect::IsOkay(libusb_error Result,const std::string& Context,bool Throw)
 {
 	return Kinect::IsOkay( static_cast<int>( Result ), Context, Throw );
 }
-#endif
 
 bool Kinect::IsOkay(int Result,const std::string& Context,bool Throw)
 {
@@ -252,7 +241,7 @@ void Kinect::EnumDevices(std::function<void(const std::string&)> Append)
 	try
 	{
 		auto& Context = LockAutoFreeContext();
-
+/*
 		Array<Kinect::TDeviceMeta> Metas;
 		Context.EnumDevices( GetArrayBridge(Metas), false );
 		
@@ -261,7 +250,7 @@ void Kinect::EnumDevices(std::function<void(const std::string&)> Append)
 			auto& Meta = Metas[i];
 			Append( Meta.mName );
 		}
-		
+		*/
 		ReleaseAutoFreeContext();
 	}
 	catch(std::exception& e)
@@ -269,19 +258,18 @@ void Kinect::EnumDevices(std::function<void(const std::string&)> Append)
 		ReleaseAutoFreeContext();
 		//	don't rethrow
 	}
+
 }
 
 
 
 
 
-
-
-Kinect::TContext::TContext() :
+Kinect::TContext::TContext() /*:
 #if defined(LIBFREENECT)
 	mContext	( nullptr ),
 #endif
-	SoyThread	( "Kinect Context" )
+	SoyThread	( "Kinect Context" )*/
 {
 	//	init context
 #if defined(LIBFREENECT)
@@ -291,6 +279,7 @@ Kinect::TContext::TContext() :
 
 Kinect::TContext::~TContext()
 {
+	/*
 	//	shut down & wait for devices
 	try
 	{
@@ -312,8 +301,9 @@ Kinect::TContext::~TContext()
 #if defined(LIBFREENECT)
 	FreeContext();
 #endif
+	 */
 }
-
+/*
 #if defined(LIBFREENECT)
 void Kinect::TContext::CreateContext()
 {
@@ -1090,48 +1080,6 @@ Kinect::TDepthPixelBuffer::~TDepthPixelBuffer()
 }
 
 
-void Kinect::TDepthPixelBuffer::Lock(ArrayBridge<Opengl::TTexture>&& Textures,Opengl::TContext& Context,float3x3& Transform)
-{
-	//	do depth-processing blits
-	auto pBlitter = mOpenglBlitter;
-	if ( !pBlitter )
-		return;
-	auto& Blitter = *pBlitter;
-
-	mLockedTexture.reset( new Opengl::TTexture( SoyPixelsMeta( mPixels.GetWidth(), mPixels.GetHeight(), SoyPixelsFormat::RGBA ), GL_TEXTURE_2D ) );
-	
-	//	do depth conversion
-	{
-		SoyGraphics::TTextureUploadParams UploadParams;
-
-		
-		//	not fine, only first run works
-		static bool DoDepthProcessing = false;
-		
-		if ( DoDepthProcessing )
-		{
-			BufferArray<const SoyPixelsImpl*,1> Source;
-			Source.PushBack( &mPixels );
-			Blitter.BlitTexture( *mLockedTexture, GetArrayBridge(Source), Context, UploadParams, BlitFragShaderFreenectDepth10mm );
-
-			//	also not fine
-			/*
-			Array<Opengl::TTexture> Temps;
-			auto Temp = Blitter.GetTempTexture( mPixels.GetMeta(), Context, GL_TEXTURE_2D );
-			Temps.PushBack( Temp );
-			Temp.Write( mPixels );
-			Blitter.BlitTexture( *mLockedTexture, GetArrayBridge(Temps), Context, UploadParams, BlitFragShaderFreenectDepth10mm );
-			*/
-		}
-		else
-		{
-			mLockedTexture->Write( mPixels );
-		}
-	}
-	
-	Textures.PushBack( *mLockedTexture );
-}
-
 void Kinect::TDepthPixelBuffer::Lock(ArrayBridge<SoyPixelsImpl*>&& Textures,float3x3& Transform)
 {
 	Textures.PushBack( &mPixels );
@@ -1143,6 +1091,6 @@ void Kinect::TDepthPixelBuffer::Unlock()
 //	mLockedTexture.reset();
 }
 
-
+*/
 
 
