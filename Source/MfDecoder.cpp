@@ -497,7 +497,7 @@ void MediaFoundation::EnumStreams(ArrayBridge<TStreamMeta>& Streams,IMFSourceRea
 
 	//	in case we get stuck in some loop, stream count is large for devices
 	static DWORD MaxStreamIndex = 200;
-	static DWORD MaxMediaType = 200;
+	static DWORD MaxMediaType = 500;
 
 	while ( StreamIndex < MaxStreamIndex && MediaTypeIndex < MaxMediaType )
 	{
