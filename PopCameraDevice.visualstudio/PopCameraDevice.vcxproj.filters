@@ -10,6 +10,12 @@
     <Filter Include="Unity Source">
       <UniqueIdentifier>{38d16710-35c0-4ee2-89fd-1eed7bd8119e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{c88a7747-c295-45e4-904f-27bc45759266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\LibFreenect2">
+      <UniqueIdentifier>{71c18334-6dee-4751-a3bb-e0db88cff137}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
@@ -77,6 +83,15 @@
     </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\SoyH264.cpp">
       <Filter>SoyLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Kinect2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Kinect.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PopCameraDevice_TestApp.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +179,12 @@
     <ClInclude Include="..\Source\AvfVideoCapture.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Kinect.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Kinect2.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
@@ -178,5 +199,13 @@
     <None Include="..\Source\Avf.mm">
       <Filter>Source</Filter>
     </None>
+    <None Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
+      <Filter>Libs\LibFreenect2</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
+      <Filter>Libs\LibFreenect2</Filter>
+    </Library>
   </ItemGroup>
 </Project>

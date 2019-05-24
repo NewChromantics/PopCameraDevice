@@ -5,8 +5,31 @@
 namespace MediaFoundation
 {
 	Soy::AutoReleasePtr<IMFMediaSource>	FindCaptureDevice(const std::string& Match);
+
+	void		Init();
 }
 
+
+void MediaFoundation::Init()
+{
+	static bool Initialised = false;
+	if ( Initialised )
+		return;
+
+	//	https://docs.microsoft.com/en-us/windows/desktop/api/combaseapi/nf-combaseapi-coinitializeex
+	//	CoInitializeEx must be called at least once, and is usually called only once, for each thread that uses the COM library.
+	//	Multiple calls to CoInitializeEx by the same thread are allowed as long as they pass the same concurrency flag, but subsequent
+	//	valid calls return S_FALSE. To close the COM library gracefully on a thread, each successful call to CoInitialize or
+	//	CoInitializeEx, including any call that returns S_FALSE, must be balanced by a corresponding call to CoUninitialize.
+	auto Result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if ( Result != S_OK )
+	{
+		CoUninitialize();
+		Platform::IsOkay(Result, "CoInitializeEx");
+	}
+
+	Initialised = true;
+}
 
 //	gr: remvoe this and use Soy::AutoReleasePtr
 template<typename T>
@@ -31,6 +54,8 @@ std::string GetDeviceName(IMFActivate& Device)
 
 void EnumCaptureDevices(std::function<void(IMFActivate&)> OnFoundDevice,GUID DeviceType)
 {
+	MediaFoundation::Init();
+
 	IMFAttributes* pAttributes = nullptr;
 	auto Result = MFCreateAttributes( &pAttributes, 1 );
 	MediaFoundation::IsOkay( Result, "MFCreateAttributes" );
