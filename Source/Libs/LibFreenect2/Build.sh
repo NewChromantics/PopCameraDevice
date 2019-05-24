@@ -1,0 +1,6 @@
+brew install libusb
+cd $1
+mkdir Build
+cd Build
+cmake ../LibFreenect2 -DENABLE_OPENCL:BOOL=OFF -DBUILD_OPENNI2_DRIVER:BOOL=OFF -DBUILD_SHARED_LIBS:BOOL=OFF -DENABLE_OPENGL:BOOL=OFF
+make

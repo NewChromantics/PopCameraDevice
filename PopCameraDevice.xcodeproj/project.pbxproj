@@ -269,7 +269,7 @@
 		BF108A912296F7D6003DDC5F /* LibFreenect2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LibFreenect2; sourceTree = "<group>"; };
 		BF108A9622970C92003DDC5F /* TestApp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TestApp; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = PopCameraDevice_TestApp.cpp; path = Source/PopCameraDevice_TestApp.cpp; sourceTree = "<group>"; };
-		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = build/lib/libfreenect2.a; sourceTree = "<group>"; };
+		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = lib/libfreenect2.a; sourceTree = "<group>"; };
 		BF108AA6229714F5003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.a"; sourceTree = "<group>"; };
 		BF108ACF229718ED003DDC5F /* HeapArray.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HeapArray.hpp; sourceTree = "<group>"; };
 		BF108AD1229726CE003DDC5F /* libfreenect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfreenect.h; sourceTree = "<group>"; };
@@ -282,6 +282,7 @@
 		BF108AD8229726CE003DDC5F /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		BF108AE922972877003DDC5F /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		BF108AEE22972F23003DDC5F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		BF108AF322980C2C003DDC5F /* Build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = Build.sh; path = Source/Libs/LibFreenect2/Build.sh; sourceTree = SOURCE_ROOT; };
 		BF4A6A141EA16D7D00613A64 /* PopCameraDevice.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopCameraDevice.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
@@ -436,10 +437,12 @@
 		BF108A9D2297136F003DDC5F /* LibFreenect2 */ = {
 			isa = PBXGroup;
 			children = (
+				BF108AF322980C2C003DDC5F /* Build.sh */,
 				BF108AA6229714F5003DDC5F /* libusb-1.0.a */,
 				BF108A9E22971381003DDC5F /* libfreenect2.a */,
 			);
-			path = LibFreenect2;
+			name = LibFreenect2;
+			path = LibFreenect2/Build;
 			sourceTree = "<group>";
 		};
 		BF108AD0229726B9003DDC5F /* LibFreenect */ = {
@@ -570,6 +573,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF012ACC2268DC95003AEB55 /* Build configuration list for PBXNativeTarget "PopCameraDeviceFramework" */;
 			buildPhases = (
+				BF108AF622980DFE003DDC5F /* ShellScript */,
 				BF012AC02268DC95003AEB55 /* Headers */,
 				BF012AC12268DC95003AEB55 /* Sources */,
 				BF012AC22268DC95003AEB55 /* Frameworks */,
@@ -588,6 +592,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF108A9A22970C92003DDC5F /* Build configuration list for PBXNativeTarget "TestApp" */;
 			buildPhases = (
+				BF108AF722980E09003DDC5F /* ShellScript */,
 				BF108A9222970C92003DDC5F /* Sources */,
 				BF108A9322970C92003DDC5F /* Frameworks */,
 				BF108A9422970C92003DDC5F /* CopyFiles */,
@@ -605,6 +610,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF4A6A1A1EA16D7D00613A64 /* Build configuration list for PBXNativeTarget "PopCameraDevice" */;
 			buildPhases = (
+				BF108AF522980C58003DDC5F /* ShellScript */,
 				BF4A6A101EA16D7C00613A64 /* Sources */,
 				BF4A6A111EA16D7C00613A64 /* Frameworks */,
 				BF4A6A121EA16D7C00613A64 /* Resources */,
@@ -678,6 +684,66 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BF108AF522980C58003DDC5F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(LIBFREENECT2_BUILD_PATH)/lib/libfreenect2.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/sh $(LIBFREENECT2_PATH)/Build.sh $(LIBFREENECT2_PATH)";
+			shellScript = "
+";
+		};
+		BF108AF622980DFE003DDC5F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(LIBFREENECT2_BUILD_PATH)/lib/libfreenect2.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/sh $(LIBFREENECT2_PATH)/Build.sh $(LIBFREENECT2_PATH)";
+			shellScript = "
+";
+		};
+		BF108AF722980E09003DDC5F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(LIBFREENECT2_BUILD_PATH)/lib/libfreenect2.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/bin/sh $(LIBFREENECT2_PATH)/Build.sh $(LIBFREENECT2_PATH)";
+			shellScript = "
+";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BF012AC12268DC95003AEB55 /* Sources */ = {
