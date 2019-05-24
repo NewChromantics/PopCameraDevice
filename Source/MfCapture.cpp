@@ -114,39 +114,19 @@ void MediaFoundation::EnumCaptureDevices(std::function<void(const std::string&)>
 }
 
 
-int GetDeviceNameMatchScore(const std::string& Name,const std::string& Match)
-{
-	if ( Match == "*" )
-		return 1;
-
-	int ContainsScore = 100;
-	int StartsWithScore = 10;
-
-	int Score = 0;
-	bool StartsWith = Soy::StringBeginsWith( Name, Match, false );
-	bool Contains = StartsWith ? true : Soy::StringContains( Name, Match, false );
-
-	Score += StartsWith * StartsWithScore;
-	Score += Contains * ContainsScore;
-	return Score;
-}
-
 Soy::AutoReleasePtr<IMFMediaSource> MediaFoundation::FindCaptureDevice(const std::string& Match)
 {
-	//	matching devices & score
-	typedef std::pair<Soy::AutoReleasePtr<IMFActivate>,int> TDeviceAndScore;
-	Array<TDeviceAndScore> DevicesAndScores;
+	Array<Soy::AutoReleasePtr<IMFActivate>> Matches;
 
 	auto OnFoundDevice = [&](IMFActivate& Device)
 	{
 		auto Name = GetDeviceName( Device );
-		int Score = GetDeviceNameMatchScore( Name, Match );
-		if ( Score == 0 )
+		if ( Name != Match )
 			return;
 
 		//	increase refcount on this device as Enum will release them all
 		Soy::AutoReleasePtr<IMFActivate> pDevice( &Device, true );
-		DevicesAndScores.PushBack( std::make_pair( pDevice, Score ) );
+		Matches.PushBack(pDevice);
 	};
 
 	try
@@ -159,23 +139,13 @@ Soy::AutoReleasePtr<IMFMediaSource> MediaFoundation::FindCaptureDevice(const std
 		std::Debug << "Failed to enum capture devices " << e.what() << std::endl;
 	}
 
-	//	find best
-	auto Compare = [](const TDeviceAndScore& a,const TDeviceAndScore& b)
-	{
-		auto Scorea = a.second;
-		auto Scoreb = b.second;
-		if ( Scorea > Scoreb )	return -1;
-		if ( Scorea < Scoreb )	return 1;
-		return 0;
-	};
-	SortArrayLambda<TDeviceAndScore> SortedDevices( GetArrayBridge(DevicesAndScores), Compare );
-	SortedDevices.Sort();
-
-	if ( SortedDevices.IsEmpty() )
+	if ( Matches.IsEmpty() )
 		return Soy::AutoReleasePtr<IMFMediaSource>();
 
+	//	throw if multiple matches?
+
 	//	explcit acquire
-	auto pDevice = SortedDevices[0].first;
+	auto pDevice = Matches[0];
 	IMFMediaSource* pSource = nullptr;
 	IMFMediaSource** ppSource = &pSource;
 	auto Result = pDevice->ActivateObject( IID_PPV_ARGS(ppSource) );
