@@ -16,21 +16,21 @@ public static class PopCameraDevice
 
 	//	use byte as System.Char is a unicode char (2 bytes), then convert to Unicode Char
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void		EnumCameraDevices([In, Out] byte[] StringBuffer,int StringBufferLength);
+	private static extern void PopCameraDevice_EnumCameraDevices([In, Out] byte[] StringBuffer,int StringBufferLength);
 	
 	//	returns instance id
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int		CreateCameraDevice(byte[] Name);
+	private static extern int PopCameraDevice_CreateCameraDevice(byte[] Name);
 
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void		FreeCameraDevice(int Instance);
+	private static extern void PopCameraDevice_FreeCameraDevice(int Instance);
 
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void		GetMeta(int Instance,int[] MetaValues,int MetaValuesCount);
+	private static extern void PopCameraDevice_GetMeta(int Instance,int[] MetaValues,int MetaValuesCount);
 
 	//	returns 0 if no new frame
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int		PopFrame(int Instance,byte[] Plane0,int Plane0Size,byte[] Plane1,int Plane1Size,byte[] Plane2,int Plane2Size);
+	private static extern int PopCameraDevice_PopFrame(int Instance,byte[] Plane0,int Plane0Size,byte[] Plane1,int Plane1Size,byte[] Plane2,int Plane2Size);
 
 	//	copied directly from https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
 	public enum SoyPixelsFormat
@@ -70,15 +70,16 @@ public static class PopCameraDevice
 		Yuv_8_88_Smptec,		//	8 bit Luma, interleaved Chroma uv plane (uv is half size... reflect this somehow in the name!)
 		Yuv_8_8_8_Full,		//	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
 		Yuv_8_8_8_Ntsc,	//	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
-		Yuv_8_8_8_Smptec,	//	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
+		Yuv_8_8_8_Smptec,   //	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
 
 		//	gr: YUY2: LumaX,ChromaU,LumaX+1,ChromaV (4:2:2 ratio, 8 bit)
 		//		we still treat it like a 2 component format so dimensions match original
 		//		(maybe should be renamed YYuv_88 for this reason)
-		YYuv_8888_Full,
-		YYuv_8888_Ntsc,
-		YYuv_8888_Smptec,
-		
+		Uvy_844_Full,
+		Yuv_844_Full,
+		Yuv_844_Ntsc,
+		Yuv_844_Smptec,
+
 		//	https://stackoverflow.com/a/22793325/355753
 		//	4:2:2, apple call this yuvs
 		Yuv_844_Full,
@@ -169,7 +170,7 @@ public static class PopCameraDevice
 	public static List<string> EnumCameraDevices()
 	{
 		var StringBuffer = new byte[1000];
-		EnumCameraDevices( StringBuffer, StringBuffer.Length );
+		PopCameraDevice_EnumCameraDevices( StringBuffer, StringBuffer.Length );
 
 		//	split strings
 		var Delin = StringBuffer[0];
@@ -217,7 +218,7 @@ public static class PopCameraDevice
 		public Device(string DeviceName)
 		{
 			var DeviceNameAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(DeviceName);
-			Instance = CreateCameraDevice(DeviceNameAscii);
+			Instance = PopCameraDevice_CreateCameraDevice(DeviceNameAscii);
 			if ( Instance.Value <= 0 )
 				throw new System.Exception("Failed to create Camera device with name " + DeviceName);
 		}
@@ -229,7 +230,7 @@ public static class PopCameraDevice
 		public void Dispose()
 		{
 			if ( Instance.HasValue )
-				FreeCameraDevice( Instance.Value );
+				PopCameraDevice_FreeCameraDevice( Instance.Value );
 			Instance = null;
 		}
 
@@ -280,7 +281,7 @@ public static class PopCameraDevice
 		public bool GetNextFrame(ref List<Texture2D> Planes,ref List<SoyPixelsFormat> PixelFormats)
 		{
 			var MetaValues = new int[100];
-			GetMeta( Instance.Value, MetaValues, MetaValues.Length );
+			PopCameraDevice_GetMeta( Instance.Value, MetaValues, MetaValues.Length );
 			var PlaneCount = MetaValues[(int)MetaIndex.PlaneCount];
 			if ( PlaneCount <= 0 )
 			{
@@ -316,7 +317,7 @@ public static class PopCameraDevice
 			var Plane0Data = (PlaneCaches.Count >=1 && PlaneCaches[0]!=null) ? PlaneCaches[0] : UnusedBuffer;
 			var Plane1Data = (PlaneCaches.Count >=2 && PlaneCaches[1]!=null) ? PlaneCaches[1] : UnusedBuffer;
 			var Plane2Data = (PlaneCaches.Count >=3 && PlaneCaches[2]!=null) ? PlaneCaches[2] : UnusedBuffer;
-			var PopResult = PopFrame( Instance.Value, Plane0Data, Plane0Data.Length, Plane1Data, Plane1Data.Length, Plane2Data, Plane2Data.Length );
+			var PopResult = PopCameraDevice_PopFrame( Instance.Value, Plane0Data, Plane0Data.Length, Plane1Data, Plane1Data.Length, Plane2Data, Plane2Data.Length );
 			if ( PopResult == 0 )
 				return false;
 			
