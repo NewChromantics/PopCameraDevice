@@ -21,6 +21,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Source\Freenect2.cpp" />
+    <ClCompile Include="..\Source\Kinect2.cpp" />
     <ClCompile Include="..\Source\MfCapture.cpp" />
     <ClCompile Include="..\Source\MfDecoder.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
@@ -62,6 +63,7 @@
     </ClInclude>
     <ClInclude Include="..\Source\Kinect.h" />
     <ClInclude Include="..\Source\Freenect2.h" />
+    <ClInclude Include="..\Source\Kinect2.h" />
     <ClInclude Include="..\Source\MfCapture.h" />
     <ClInclude Include="..\Source\MfDecoder.h" />
     <ClInclude Include="..\Source\PopCameraDevice.h" />
@@ -71,6 +73,7 @@
     <ClInclude Include="..\Source\SoyLib\src\MemHeap.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\SoyArray.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyAssert.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyAutoReleasePtr.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyDebug.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyH264.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyJson.h" />
@@ -144,15 +147,18 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
+    <Import Project="Kinect2.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
+    <Import Project="Kinect2.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Master|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
     <Import Project="Release.props" />
+    <Import Project="Kinect2.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
