@@ -20,7 +20,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\Source\Kinect2.cpp" />
+    <ClCompile Include="..\Source\Freenect2.cpp" />
     <ClCompile Include="..\Source\MfCapture.cpp" />
     <ClCompile Include="..\Source\MfDecoder.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
@@ -61,7 +61,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Source\Kinect.h" />
-    <ClInclude Include="..\Source\Kinect2.h" />
+    <ClInclude Include="..\Source\Freenect2.h" />
     <ClInclude Include="..\Source\MfCapture.h" />
     <ClInclude Include="..\Source\MfDecoder.h" />
     <ClInclude Include="..\Source\PopCameraDevice.h" />

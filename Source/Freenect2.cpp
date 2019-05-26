@@ -1,4 +1,4 @@
-#include "Kinect2.h"
+#include "Freenect2.h"
 #include <libfreenect2/libfreenect2.hpp>
 #include "SoyAssert.h"
 
@@ -11,14 +11,14 @@
 //	make
 //	builds .a
 
-namespace Kinect2
+namespace Freenect2
 {
 	std::shared_ptr<TContext> gContext;
 	const auto DeviceNamePrefix = "Kinect2:";
 }
 
 
-class Kinect2::TContext
+class Freenect2::TContext
 {
 public:
 	TContext();
@@ -31,7 +31,7 @@ public:
 
 
 
-Kinect2::TContext& Kinect2::GetContext()
+Freenect2::TContext& Freenect2::GetContext()
 {
 	if ( !gContext )
 	{
@@ -41,19 +41,19 @@ Kinect2::TContext& Kinect2::GetContext()
 }
 
 
-Kinect2::TContext::TContext()
+Freenect2::TContext::TContext()
 {
 	mFreenect.reset( new libfreenect2::Freenect2() );
 }
 
 
-Kinect2::TContext::~TContext()
+Freenect2::TContext::~TContext()
 {
 	//	may need to stop threads here
 	mFreenect.reset();
 }
 
-void Kinect2::TContext::EnumDevices(std::function<void(const std::string&)>& Enum)
+void Freenect2::TContext::EnumDevices(std::function<void(const std::string&)>& Enum)
 {
 	auto DeviceCount = mFreenect->enumerateDevices();
 	for ( auto d=0;	d<DeviceCount;	d++ )
@@ -67,19 +67,19 @@ void Kinect2::TContext::EnumDevices(std::function<void(const std::string&)>& Enu
 
 
 
-void Kinect2::EnumDeviceNames(std::function<void(const std::string&)> Enum)
+void Freenect2::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 {
 	auto& Context = GetContext();
 	Context.EnumDevices( Enum );
 }
 
 
-Kinect2::TDevice::TDevice(const std::string& Serial)
+Freenect2::TDevice::TDevice(const std::string& Serial)
 {
 	
 }
 
-void Kinect2::TDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
+void Freenect2::TDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
 {
 	throw Soy_AssertException("Feature not supported");
 }

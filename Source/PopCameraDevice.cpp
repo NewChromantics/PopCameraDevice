@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
-#include "Kinect2.h"
+#include "Freenect2.h"
 //#include "Kinect.h"
 
 
@@ -81,7 +81,7 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #elif defined(TARGET_OSX)
 	Avf::EnumCaptureDevices(EnumDevice);
 #endif
-	Kinect2::EnumDeviceNames(EnumDevice);
+	Freenect2::EnumDeviceNames(EnumDevice);
 	//Kinect::EnumDeviceNames(EnumDevice);
 
 	auto IsCharUsed = [&](char Char)

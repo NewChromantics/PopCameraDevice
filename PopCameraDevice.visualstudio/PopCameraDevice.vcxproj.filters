@@ -84,13 +84,13 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyH264.cpp">
       <Filter>SoyLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Kinect2.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Kinect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\PopCameraDevice_TestApp.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Freenect2.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,7 +182,7 @@
     <ClInclude Include="..\Source\Kinect.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Kinect2.h">
+    <ClInclude Include="..\Source\Freenect2.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -199,13 +199,13 @@
     <None Include="..\Source\Avf.mm">
       <Filter>Source</Filter>
     </None>
-    <None Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
-      <Filter>Libs\LibFreenect2</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
       <Filter>Libs\LibFreenect2</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll" />
   </ItemGroup>
 </Project>

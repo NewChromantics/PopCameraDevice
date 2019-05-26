@@ -3,7 +3,7 @@
 #include "TCameraDevice.h"
 
 
-namespace Kinect2
+namespace Freenect2
 {
 	class TDevice;
 	class TContext;
@@ -14,7 +14,7 @@ namespace Kinect2
 }
 
 
-class Kinect2::TDevice : public PopCameraDevice::TDevice
+class Freenect2::TDevice : public PopCameraDevice::TDevice
 {
 public:
 	TDevice(const std::string& Serial);
