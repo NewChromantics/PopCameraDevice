@@ -20,7 +20,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\Source\Freenect2.cpp" />
+    <ClCompile Include="..\Source\Freenect2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Source\Kinect2.cpp" />
     <ClCompile Include="..\Source\MfCapture.cpp" />
     <ClCompile Include="..\Source\MfDecoder.cpp" />
@@ -114,7 +118,11 @@
     <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib" />
+    <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
+    </Library>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{64811728-CD20-4F2C-899B-E3BF3D4B032E}</ProjectGuid>

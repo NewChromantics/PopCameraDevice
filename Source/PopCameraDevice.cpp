@@ -6,8 +6,9 @@
 #include <algorithm>
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
-#include "Freenect2.h"
+//#include "Freenect2.h"
 //#include "Kinect.h"
+#include "Kinect2.h"
 
 
 #if defined(TARGET_WINDOWS)
@@ -81,8 +82,9 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #elif defined(TARGET_OSX)
 	Avf::EnumCaptureDevices(EnumDevice);
 #endif
-	Freenect2::EnumDeviceNames(EnumDevice);
+	//Freenect2::EnumDeviceNames(EnumDevice);
 	//Kinect::EnumDeviceNames(EnumDevice);
+	Kinect2::EnumDeviceNames(EnumDevice);
 
 	auto IsCharUsed = [&](char Char)
 	{
@@ -152,6 +154,16 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 		std::Debug << e.what() << std::endl;
 	}
 
+	try
+	{
+		std::shared_ptr<TDevice> Device(new Kinect2::TDevice(Name));
+		if ( Device )
+			return PopCameraDevice::CreateInstance(Device);
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << e.what() << std::endl;
+	}
 
 	throw Soy::AssertException("Failed to create device");
 }

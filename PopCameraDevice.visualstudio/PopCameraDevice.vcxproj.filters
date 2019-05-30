@@ -215,6 +215,8 @@
     </Library>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll" />
+    <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
+      <Filter>Libs\LibFreenect2</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

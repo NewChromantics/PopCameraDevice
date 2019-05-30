@@ -3,6 +3,9 @@
 #include "SoyDebug.h"
 #include "HeapArray.hpp"
 #include "SoyString.h"
+#include <thread>
+
+
 
 int main(int argc, const char * argv[])
 {
@@ -21,6 +24,22 @@ int main(int argc, const char * argv[])
 		std::Debug << DeviceNames[d] << std::endl;
 	}
 	
+	auto KinectDevice = PopCameraDevice_CreateCameraDevice("Kinect2:Default_Depth");
+
+	//	get 10 frames
+	auto FrameCount = 0;
+	while ( FrameCount < 10 )
+	{
+		auto Result = PopCameraDevice_PopFrame(KinectDevice, nullptr, 0, nullptr, 0, nullptr, 0);
+		if ( Result > 0 )
+		{
+			FrameCount++;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	PopCameraDevice_FreeCameraDevice(KinectDevice);
+
 	//	todo: alloc each one, then free it
 	return 0;
 }
