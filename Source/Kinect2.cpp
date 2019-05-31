@@ -1,5 +1,6 @@
 #include "Kinect2.h"
 #include "SoyAssert.h"
+#include "SoyMedia.h"
 
 
 namespace Kinect2
@@ -10,8 +11,23 @@ namespace Kinect2
 	const std::string DeviceName_Prefix = "Kinect2:";
 	const std::string DeviceName_Colour_Suffix = "_Colour";
 	const std::string DeviceName_Depth_Suffix = "_Depth";
+
+	SoyPixelsFormat::Type GetPixelFormat(int BytesPerPixel);
 }
 
+
+SoyPixelsFormat::Type Kinect2::GetPixelFormat(int BytesPerPixel)
+{
+	if (BytesPerPixel == 1)
+		return SoyPixelsFormat::Greyscale;
+
+	if (BytesPerPixel == 2)
+		return SoyPixelsFormat::KinectDepth;
+
+	std::stringstream Error;
+	Error << "Unhandled kinect pixel format for BytesPerPixel=" << BytesPerPixel;
+	throw Soy_AssertException(Error);
+}
 
 void Kinect2::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 {
@@ -111,7 +127,7 @@ void Kinect2::TDevice::Thread()
 {
 	try
 	{
-		while ( true )
+		while ( IsThreadRunning() )
 		{
 			Iteration();
 		}
@@ -171,42 +187,62 @@ void Kinect2::TDevice::GetNextFrame()
 	}
 	Platform::IsOkay(Result, "AcquireLatestFrame");
 
-	INT64 nTime = 0;
 	Soy::AutoReleasePtr<IFrameDescription> FrameDescription;
-	int nWidth = 0;
-	int nHeight = 0;
-	USHORT nDepthMinReliableDistance = 0;
-	USHORT nDepthMaxDistance = 0;
-	UINT nBufferSize = 0;
-	UINT16 *pBuffer = NULL;
+	TIMESPAN Time = 0;
+	int Width = 0;
+	int Height = 0;
+	uint16_t DepthMinReliableDistance = 0;
+	uint16_t DepthMaxDistance = USHRT_MAX;
+	uint32_t BufferLength = 0;
+	uint16_t* Buffer = NULL;
+	float HorzFov = 0;
+	float VertFov = 0;
+	uint32_t BytesPerPixel = 0;
 
-	Result = Frame->get_RelativeTime(&nTime);
+	Result = Frame->get_RelativeTime(&Time);
 	Platform::IsOkay(Result, "get_RelativeTime");
-	std::Debug << "got frame time " << nTime << std::endl;
+	std::Debug << "got frame time " << Time << std::endl;
 
 	Result = Frame->get_FrameDescription(&FrameDescription.mObject);
 	Platform::IsOkay(Result, "get_FrameDescription");
 
-	Result = FrameDescription->get_Width(&nWidth);
+	Result = FrameDescription->get_Width(&Width);
 	Platform::IsOkay(Result, "get_Width");
 
-	Result = FrameDescription->get_Height(&nHeight);
+	Result = FrameDescription->get_Height(&Height);
 	Platform::IsOkay(Result, "get_Height");
+	
+	Result = FrameDescription->get_HorizontalFieldOfView(&HorzFov);
+	Platform::IsOkay(Result, "get_HorizontalFieldOfView");
 
-	Result = Frame->get_DepthMinReliableDistance(&nDepthMinReliableDistance);
+	Result = FrameDescription->get_VerticalFieldOfView(&VertFov);
+	Platform::IsOkay(Result, "get_VerticalFieldOfView");
+
+	Result = FrameDescription->get_BytesPerPixel(&BytesPerPixel);
+	Platform::IsOkay(Result, "get_BytesPerPixel");
+
+	Result = Frame->get_DepthMinReliableDistance(&DepthMinReliableDistance);
 	Platform::IsOkay(Result, "get_DepthMinReliableDistance");
-
-	// In order to see the full range of depth (including the less reliable far field depth)
-	// we are setting nDepthMaxDistance to the extreme potential depth threshold
-	nDepthMaxDistance = USHRT_MAX;
+		
 
 	// Note:  If you wish to filter by reliable depth distance, uncomment the following line.
-	//// hr = pDepthFrame->get_DepthMaxReliableDistance(&nDepthMaxDistance);
-	
-	Result = Frame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);
-	Platform::IsOkay(Result, "AccessUnderlyingBuffer");
+	Result = Frame->get_DepthMaxReliableDistance(&DepthMaxDistance);
+	Platform::IsOkay(Result, "get_DepthMaxReliableDistance");
 
-	//ProcessDepth(nTime, pBuffer, nWidth, nHeight, nDepthMinReliableDistance, nDepthMaxDistance);
+	//	gr: scope should be with frame, but try and verify
+	Result = Frame->AccessUnderlyingBuffer(&BufferLength, &Buffer);
+	Platform::IsOkay(Result, "AccessUnderlyingBuffer");
+	auto BufferSize = BufferLength * BytesPerPixel;
+	
+	//	make pixels
+	auto* Buffer8 = reinterpret_cast<uint8_t*>(Buffer);
+	auto PixelFormat = GetPixelFormat(BytesPerPixel);
+	SoyPixelsRemote Pixels(Buffer8, Width, Height, BufferSize, PixelFormat);
+
+	//	todo: we should be sending timestamps!
+	float3x3 Transform;
+	std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels,Transform));
+	PushFrame(PixelBuffer, Pixels.GetMeta());
 }
 
 void Kinect2::TDevice::OnError(const std::string& Error)
