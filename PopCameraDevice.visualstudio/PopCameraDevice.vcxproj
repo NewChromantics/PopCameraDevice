@@ -70,7 +70,7 @@
     <ClInclude Include="..\Source\Kinect2.h" />
     <ClInclude Include="..\Source\MfCapture.h" />
     <ClInclude Include="..\Source\MfDecoder.h" />
-    <ClInclude Include="..\Source\PopCameraDevice.h" />
+    <CustomBuild Include="..\Source\PopCameraDevice.h" />
     <ClInclude Include="..\Source\SoyLib\src\Array.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\BufferArray.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\HeapArray.hpp" />

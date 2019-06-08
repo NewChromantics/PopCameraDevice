@@ -43,7 +43,7 @@ namespace PopCameraDevice
 	TDevice&		GetCameraDevice(uint32_t Instance);
 	uint32_t		CreateInstance(std::shared_ptr<TDevice> Device);
 	void			FreeInstance(uint32_t Instance);
-	bool			PopFrame(TDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2);
+	bool			PopFrame(TDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2,std::string& Meta);
 
 	uint32_t		CreateCameraDevice(const std::string& Name);
 
@@ -284,26 +284,27 @@ __export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
 	SafeCall(Function, __func__, 0 );
 }
 
-__export EXPORTCLASS* PopCameraDevice_GetDevicePtr(int32_t Instance)
+__export POPCAMERADEVICE_EXPORTCLASS* PopCameraDevice_GetDevicePtr(int32_t Instance)
 {
 	auto Function = [&]()
 	{
 		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
 		return &Device;
 	};
-	return SafeCall<EXPORTCLASS*>( Function, __func__, nullptr );
+	return SafeCall<POPCAMERADEVICE_EXPORTCLASS*>( Function, __func__, nullptr );
 }
 
 
-bool PopCameraDevice::PopFrame(TDevice& Device,ArrayBridge<uint8_t>&& Plane0,ArrayBridge<uint8_t>&& Plane1,ArrayBridge<uint8_t>&& Plane2)
+bool PopCameraDevice::PopFrame(TDevice& Device,ArrayBridge<uint8_t>&& Plane0,ArrayBridge<uint8_t>&& Plane1,ArrayBridge<uint8_t>&& Plane2, std::string& Meta)
 {
-	if ( !Device.PopLastFrame(Plane0, Plane1, Plane2) )
+	if ( !Device.PopLastFrame(Plane0, Plane1, Plane2, Meta) )
 		return false;
 
 	return true;
 }
 
-__export int32_t PopCameraDevice_PopFrame(int32_t Instance,uint8_t* Plane0,int32_t Plane0Size,uint8_t* Plane1,int32_t Plane1Size,uint8_t* Plane2,int32_t Plane2Size)
+
+__export int32_t PopCameraDevice_PopFrameAndMeta(int32_t Instance, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size,char* MetaBuffer,int32_t MetaBufferLength)
 {
 	auto Function = [&]()
 	{
@@ -311,9 +312,27 @@ __export int32_t PopCameraDevice_PopFrame(int32_t Instance,uint8_t* Plane0,int32
 		auto Plane0Array = GetRemoteArray(Plane0, Plane0Size);
 		auto Plane1Array = GetRemoteArray(Plane1, Plane1Size);
 		auto Plane2Array = GetRemoteArray(Plane2, Plane2Size);
-		auto Result = PopCameraDevice::PopFrame(Device, GetArrayBridge(Plane0Array), GetArrayBridge(Plane1Array), GetArrayBridge(Plane2Array));
+
+		std::string MetaString;
+		auto Result = PopCameraDevice::PopFrame(Device, GetArrayBridge(Plane0Array), GetArrayBridge(Plane1Array), GetArrayBridge(Plane2Array), MetaString );
+
+		//	copy out meta
+		if (MetaBuffer)
+		{
+			for (auto i = 0; i < MetaBufferLength; i++)
+			{
+				auto Char = (i < MetaString.length()) ? MetaString[i] : '\0';
+				MetaBuffer[i] = Char;
+			}
+		}
+
 		return Result ? 1 : 0;
 	};
-	return SafeCall(Function, __func__, 0 );
+	return SafeCall(Function, __func__, 0);
 }
 
+
+__export int32_t PopCameraDevice_PopFrame(int32_t Instance, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size)
+{
+	return PopCameraDevice_PopFrameAndMeta(Instance, Plane0, Plane0Size, Plane1, Plane1Size, Plane2, Plane2Size, nullptr, 0);
+}

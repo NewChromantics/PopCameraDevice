@@ -45,7 +45,7 @@ void TestDevice::GenerateFrame()
 		Plane.SetPixels(GetArrayBridge(Components));
 	}
 
-	this->PushFrame(pPixelBuffer, Pixels.mMeta );
+	this->PushFrame(pPixelBuffer, Pixels.mMeta, "" );
 }
 
 void TestDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)

@@ -1,7 +1,7 @@
 #include "Kinect2.h"
 #include "SoyAssert.h"
 #include "SoyMedia.h"
-
+#include "SoyJson.h"
 
 namespace Kinect2
 {
@@ -187,6 +187,12 @@ void Kinect2::TDevice::GetNextFrame()
 	}
 	Platform::IsOkay(Result, "AcquireLatestFrame");
 
+	//	get time asap
+	SoyTime FrameTime(true);
+
+	TJsonWriter Json;
+	Json.Push("Time", FrameTime.GetMilliSeconds().count());
+
 	Soy::AutoReleasePtr<IFrameDescription> FrameDescription;
 	TIMESPAN Time = 0;
 	int Width = 0;
@@ -197,11 +203,13 @@ void Kinect2::TDevice::GetNextFrame()
 	uint16_t* Buffer = NULL;
 	float HorzFov = 0;
 	float VertFov = 0;
+	float DiagFov = 0;
 	uint32_t BytesPerPixel = 0;
 
+	//	eg: 60893123221 on 8th june 2019
 	Result = Frame->get_RelativeTime(&Time);
 	Platform::IsOkay(Result, "get_RelativeTime");
-	std::Debug << "got frame time " << Time << std::endl;
+	Json.Push("RelativeTime", Time);
 
 	Result = Frame->get_FrameDescription(&FrameDescription.mObject);
 	Platform::IsOkay(Result, "get_FrameDescription");
@@ -214,20 +222,28 @@ void Kinect2::TDevice::GetNextFrame()
 	
 	Result = FrameDescription->get_HorizontalFieldOfView(&HorzFov);
 	Platform::IsOkay(Result, "get_HorizontalFieldOfView");
+	Json.Push("HorizontalFov", HorzFov);
 
 	Result = FrameDescription->get_VerticalFieldOfView(&VertFov);
 	Platform::IsOkay(Result, "get_VerticalFieldOfView");
+	Json.Push("VerticalFov", VertFov);
+
+	Result = FrameDescription->get_DiagonalFieldOfView(&DiagFov);
+	Platform::IsOkay(Result, "get_DiagonalFieldOfView");
+	Json.Push("DiagonalFov", DiagFov);
 
 	Result = FrameDescription->get_BytesPerPixel(&BytesPerPixel);
 	Platform::IsOkay(Result, "get_BytesPerPixel");
 
 	Result = Frame->get_DepthMinReliableDistance(&DepthMinReliableDistance);
 	Platform::IsOkay(Result, "get_DepthMinReliableDistance");
-		
+	Json.Push("MinReliableDistance", DepthMinReliableDistance);
+
 
 	// Note:  If you wish to filter by reliable depth distance, uncomment the following line.
 	Result = Frame->get_DepthMaxReliableDistance(&DepthMaxDistance);
 	Platform::IsOkay(Result, "get_DepthMaxReliableDistance");
+	Json.Push("MaxReliableDistance", DepthMaxDistance);
 
 	//	gr: scope should be with frame, but try and verify
 	Result = Frame->AccessUnderlyingBuffer(&BufferLength, &Buffer);
@@ -239,10 +255,11 @@ void Kinect2::TDevice::GetNextFrame()
 	auto PixelFormat = GetPixelFormat(BytesPerPixel);
 	SoyPixelsRemote Pixels(Buffer8, Width, Height, BufferSize, PixelFormat);
 
-	//	todo: we should be sending timestamps!
+	auto JsonString = Json.GetString();
+
 	float3x3 Transform;
 	std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels,Transform));
-	PushFrame(PixelBuffer, Pixels.GetMeta());
+	PushFrame( PixelBuffer, Pixels.GetMeta(), JsonString );
 }
 
 void Kinect2::TDevice::OnError(const std::string& Error)

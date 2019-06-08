@@ -473,7 +473,7 @@ void MediaFoundation::TCamera::PushLatestFrame(size_t StreamIndex)
 	if ( !LatestPacket )
 		return;
 
-	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta);
+	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, "");
 }
 
 void MediaFoundation::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)

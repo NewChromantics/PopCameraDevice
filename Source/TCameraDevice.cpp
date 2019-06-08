@@ -2,30 +2,35 @@
 #include "SoyLib/src/SoyMedia.h"
 
 
-void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,const SoyPixelsMeta& Meta)
+void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,const SoyPixelsMeta& PixelMeta,const std::string& FrameMeta)
 {
 	{
 		std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
 		mLastPixelBuffer = FramePixelBuffer;
-		mLastPixelsMeta = Meta;
+		mLastPixelsMeta = PixelMeta;
+		mLastFrameMeta = FrameMeta;
 	}
+
 	if ( mOnNewFrame )
 		mOnNewFrame();
 }
 
 
 
-std::shared_ptr<TPixelBuffer> PopCameraDevice::TDevice::PopLastFrame()
+std::shared_ptr<TPixelBuffer> PopCameraDevice::TDevice::PopLastFrame(std::string& Meta)
 {
 	std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
 	auto PixelBuffer = mLastPixelBuffer;
+	Meta = mLastFrameMeta;
+
+	mLastFrameMeta.clear();
 	mLastPixelBuffer.reset();
 	return PixelBuffer;
 }
 
-bool PopCameraDevice::TDevice::PopLastFrame(ArrayBridge<uint8_t>& Plane0, ArrayBridge<uint8_t>& Plane1, ArrayBridge<uint8_t>& Plane2)
+bool PopCameraDevice::TDevice::PopLastFrame(ArrayBridge<uint8_t>& Plane0, ArrayBridge<uint8_t>& Plane1, ArrayBridge<uint8_t>& Plane2,std::string& Meta)
 {
-	auto PixelBuffer = PopLastFrame();
+	auto PixelBuffer = PopLastFrame( Meta );
 	if ( !PixelBuffer )
 		return false;
 
