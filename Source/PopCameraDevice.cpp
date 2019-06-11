@@ -8,7 +8,10 @@
 #include "TestDevice.h"
 //#include "Freenect2.h"
 //#include "Kinect.h"
+#if defined(TARGET_WINDOWS)
 #include "Kinect2.h"
+#define ENABLE_KINECT2
+#endif
 
 
 #if defined(TARGET_WINDOWS)
@@ -84,8 +87,11 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #endif
 	//Freenect2::EnumDeviceNames(EnumDevice);
 	//Kinect::EnumDeviceNames(EnumDevice);
+	
+#if defined(ENABLE_KINECT2)
 	Kinect2::EnumDeviceNames(EnumDevice);
-
+#endif
+	
 	auto IsCharUsed = [&](char Char)
 	{
 		for ( int d=0;	d<DeviceNames.GetSize();	d++ )
@@ -154,6 +160,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 		std::Debug << e.what() << std::endl;
 	}
 
+#if defined(ENABLE_KINECT2)
 	try
 	{
 		std::shared_ptr<TDevice> Device(new Kinect2::TDevice(Name));
@@ -164,6 +171,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	{
 		std::Debug << e.what() << std::endl;
 	}
+#endif
 
 	throw Soy::AssertException("Failed to create device");
 }
