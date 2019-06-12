@@ -111,7 +111,7 @@ public:
 //	because the API needs to sometimes recreate the "hardware" (freenect)
 //	we still need to manage devices that existed etc
 //	so the context, controls the freenect context
-class Freenect::TFreenect
+class Freenect::TFreenect : public SoyThread
 {
 public:
 	TFreenect();
@@ -122,6 +122,9 @@ public:
 	void				OnDepthFrame(freenect_device& Device,const uint8_t* Bytes,SoyTime Timestamp);
 	TDevice&			GetDevice(freenect_device& Device);
 
+private:
+	virtual void		Thread() override;
+	
 public:
 	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnDepthFrame;
 
@@ -356,14 +359,15 @@ void Freenect::TDevice::EnableDepthStream()
 	Freenect::IsOkay( Result, "freenect_set_depth_mode" );
 	
 	mDepthMode = FrameMode;
-	
+
+	freenect_set_depth_callback( mDevice, Freenect::OnDepthFrame );
+
 	//	stop current mode
 	//	gr: this had problems, just start
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_depth( mDevice );
 	Freenect::IsOkay( Result, "freenect_start_depth" );
 	
-	freenect_set_depth_callback( mDevice, Freenect::OnDepthFrame );
 }
 
 SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_const)
@@ -391,7 +395,8 @@ SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_cons
 
 
 
-Freenect::TFreenect::TFreenect()
+Freenect::TFreenect::TFreenect() :
+	SoyThread	("Freenect")
 {
 	freenect_usb_context* UsbContext = nullptr;
 	auto Result = freenect_init( &mContext, UsbContext );
@@ -402,16 +407,56 @@ Freenect::TFreenect::TFreenect()
 	
 	freenect_device_flags flags = (freenect_device_flags)( FREENECT_DEVICE_CAMERA );
 	freenect_select_subdevices( mContext, flags );
+	
+	//	start thread
+	Start();
 }
 
 Freenect::TFreenect::~TFreenect()
 {
+	Stop( true );
+	
 	auto Error = freenect_shutdown( mContext );
 	if ( Error != 0 )
 	{
 		std::Debug << "freenect_shutdown error: "  << Error << std::endl;
 	}
 }
+
+void Freenect::TFreenect::Thread()
+{
+	int TimeoutMs = 30;
+	int TimeoutSecs = 5;
+	int TimeoutMicroSecs = TimeoutMs*1000;
+	timeval Timeout = {TimeoutSecs,TimeoutMicroSecs};
+	//libusb_error Result = static_cast<libusb_error>( freenect_process_events_timeout( mContext, &Timeout ) );
+	libusb_error Result = static_cast<libusb_error>( freenect_process_events( mContext ) );
+	
+	//	should we sleep here
+	if ( Result == LIBUSB_SUCCESS )
+		return;
+	
+	//	handle error
+	std::Debug << Result << std::endl;
+	/*
+
+		//	gr: -1 (also LIB_IO_USB_ERROR) can mean we've lost a device...
+		//	https://github.com/OpenKinect/libfreenect/issues/229
+		if ( Result == -1 )
+		{
+			ReacquireDevices();
+		}
+		else
+		{
+			Freenect::IsOkay( Result, "freenect_process_events_timeout" );
+		}
+	*/
+	
+	//	let thread breath?
+	static size_t SleepMs = 10;
+	std::this_thread::sleep_for( std::chrono::milliseconds(SleepMs) );
+}
+
 
 Freenect::TDevice& Freenect::TFreenect::GetDevice(freenect_device& DeviceRef)
 {
