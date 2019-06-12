@@ -13,11 +13,11 @@ namespace Freenect
 	
 	bool					IsOkay(libusb_error Result,const std::string& Context,bool Throw=true);
 	std::string				GetErrorString(libusb_error Result);
-	freenect_video_format	GetVideoFormat(SoyPixelsFormat::Type Format);
+	freenect_video_format	GetColourFormat(SoyPixelsFormat::Type Format);
 	freenect_depth_format	GetDepthFormat(SoyPixelsFormat::Type Format);
 	SoyPixelsFormat::Type	GetFormat(freenect_video_format Format);
 	SoyPixelsFormat::Type	GetFormat(freenect_depth_format Format);
-	void					OnVideoFrame(freenect_device *dev, void *rgb, uint32_t timestamp);
+	void					OnColourFrame(freenect_device *dev, void *rgb, uint32_t timestamp);
 	void					OnDepthFrame(freenect_device *dev, void *rgb, uint32_t timestamp);
 	void					LogCallback(freenect_context *dev, freenect_loglevel level, const char *msg);
 	const char*				LogLevelToString(freenect_loglevel level);
@@ -79,11 +79,12 @@ public:
 		mDepthMode.is_valid = false;
 	}
 	
-	
-	void			EnableDepthStream();
+	void			EnableDepthStream(SoyPixelsMeta Format);
+	void			EnableColourStream(SoyPixelsMeta Format);
 	void			Close();
 	SoyPixelsRemote	GetDepthPixels(const uint8_t* Pixels);
-	
+	SoyPixelsRemote	GetColourPixels(const uint8_t* Pixels);
+
 	//	todo; can we compare two device pointers?
 	bool			operator==(const std::string& Serial) const	{	return mSerial == Serial;	}
 	bool			operator!=(const std::string& Serial) const	{	return mSerial != Serial;	}
@@ -94,6 +95,7 @@ public:
 
 	
 	freenect_frame_mode	mDepthMode;
+	freenect_frame_mode	mColourMode;
 	freenect_device*	mDevice = nullptr;
 	std::string			mSerial;
 };
@@ -120,6 +122,7 @@ public:
 	void				EnumDevices(std::function<void(const std::string&)>& Enum);
 	TDevice&			OpenDevice(const std::string& Serial);
 	void				OnDepthFrame(freenect_device& Device,const uint8_t* Bytes,SoyTime Timestamp);
+	void				OnColourFrame(freenect_device& Device,const uint8_t* Bytes,SoyTime Timestamp);
 	TDevice&			GetDevice(freenect_device& Device);
 
 private:
@@ -127,6 +130,7 @@ private:
 	
 public:
 	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnDepthFrame;
+	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnColourFrame;
 
 private:
 	Array<TDevice>		mDevices;	//	devices we've opened
@@ -139,10 +143,10 @@ class Freenect::TContext
 public:
 	TFreenect&						GetFreenect();
 	
-	std::shared_ptr<TFrameListener>	CreateListener(const std::string& Serial,TStream::TYPE Stream);
+	std::shared_ptr<TFrameListener>	CreateListener(const std::string& Serial,SoyPixelsMeta Format);
 	
 private:
-	void							OnDepthFrame(TDevice& Device,const SoyPixelsImpl& Pixels,SoyTime Timestamp);
+	void							OnFrame(TDevice& Device,TStream::TYPE Stream,const SoyPixelsImpl& Pixels,SoyTime Timestamp);
 
 public:
 	//	 lock this!
@@ -176,25 +180,25 @@ void Freenect::OnDepthFrame(freenect_device* dev, void *rgb, uint32_t timestamp)
 
 	auto* rgb8 = static_cast<uint8_t*>(rgb);
 	Freenect.OnDepthFrame( *dev, rgb8, Timecode );
-
-	/*
-	//	make pixels array
-	auto* Rgb8 = reinterpret_cast<uint8*>( rgb );
-	size_t RgbSize = Stream->mFrameMode.bytes;
-	auto& PixelsMeta = Stream->GetStreamMeta().mPixelMeta;
-	SoyPixelsRemote Pixels( Rgb8, RgbSize, PixelsMeta );
-	
-	Freenect::TFrame Frame( Pixels, Timecode, Stream->GetStreamMeta().mStreamIndex );
-	try
-	{
-		Device->mOnNewFrame.OnTriggered( Frame );
-	}
-	catch(std::exception&e)
-	{
-		std::Debug << "Exception; " << e.what() << std::endl;
-	}
-	 */
 }
+
+
+void Freenect::OnColourFrame(freenect_device* dev, void *rgb, uint32_t timestamp)
+{
+	if ( !dev )
+	{
+		std::Debug << "OnDepthFrame with null device" << std::endl;
+		return;
+	}
+	
+	auto* FreenectPtr = freenect_get_user(dev);
+	auto& Freenect = *reinterpret_cast<TFreenect*>( FreenectPtr );
+	SoyTime Timecode = Freenect::TimestampToMs( timestamp );
+	
+	auto* rgb8 = static_cast<uint8_t*>(rgb);
+	Freenect.OnColourFrame( *dev, rgb8, Timecode );
+}
+
 
 SoyTime Freenect::TimestampToMs(uint32_t Timestamp)
 {
@@ -231,9 +235,16 @@ void Freenect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 	std::function<void(const std::string&)> EnumDeviceSerial = [&](const std::string& Serial)
 	{
 		//	would be good to know what capabilities it has...
-		std::stringstream Name;
-		Name << DeviceName_Prefix << Serial << TStream::Depth;
-		Enum( Name.str() );
+		{
+			std::stringstream Name;
+			Name << DeviceName_Prefix << Serial << TStream::Depth;
+			Enum( Name.str() );
+		}
+		{
+			std::stringstream Name;
+			Name << DeviceName_Prefix << Serial << TStream::Colour;
+			Enum( Name.str() );
+		}
 	};
 	
 	Freenect.EnumDevices( EnumDeviceSerial );
@@ -252,11 +263,7 @@ void Freenect::LogCallback(freenect_context *dev, freenect_loglevel level, const
 	//	save errors in the context
 	if ( level == FREENECT_LOG_ERROR || level == FREENECT_LOG_FATAL )
 	{
-		if ( Freenect::gContext )
-		{
-			//Freenect::gContext->OnLibError( Message );
-			return;
-		}
+		
 	}
 	
 	std::Debug << "Freenect: " << Freenect::LogLevelToString(level) << ": " << Message << std::endl;
@@ -317,23 +324,46 @@ Freenect::TFreenect& Freenect::TContext::GetFreenect()
 	if ( !mFreenect )
 	{
 		mFreenect.reset( new TFreenect() );
-		mFreenect->mOnDepthFrame = std::bind( &TContext::OnDepthFrame, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 );
+		mFreenect->mOnDepthFrame = std::bind( &TContext::OnFrame, this, std::placeholders::_1, TStream::Depth, std::placeholders::_2, std::placeholders::_3 );
+		mFreenect->mOnColourFrame = std::bind( &TContext::OnFrame, this, std::placeholders::_1, TStream::Colour, std::placeholders::_2, std::placeholders::_3 );
 	}
 	return *mFreenect;
 }
 
+bool IsDepthFormat(SoyPixelsFormat::Type Format)
+{
+	switch ( Format )
+	{
+		case SoyPixelsFormat::FreenectDepthmm:
+		case SoyPixelsFormat::KinectDepth:
+		case SoyPixelsFormat::FreenectDepth10bit:
+		case SoyPixelsFormat::FreenectDepth11bit:
+			return true;
+			
+		default:
+			return false;
+	}
+}
 
-std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(const std::string& Serial,TStream::TYPE Stream)
+std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(const std::string& Serial,SoyPixelsMeta Format)
 {
 	//	try and open the device first, so this will fail the caller
 	auto& Freenect = GetFreenect();
 	auto& Device = Freenect.OpenDevice( Serial );
-	if ( Stream == TStream::Depth )
-		Device.EnableDepthStream();
+
+	TStream::TYPE Stream;
+	if ( IsDepthFormat( Format.GetFormat() ) )
+	{
+		Device.EnableDepthStream( Format );
+		Stream = TStream::Depth;
+	}
 	else
-		throw Soy::AssertException("currently only supporting depth");
-	
-	//
+	{
+		Device.EnableColourStream( Format );
+		Stream = TStream::Colour;
+	}
+
+	//	create the listener
 	std::shared_ptr<TFrameListener> Listener( new TFrameListener );
 	Listener->mSerial = Serial;
 	Listener->mStream = Stream;
@@ -359,18 +389,44 @@ void Freenect::TDevice::Close()
 	mDevice = nullptr;
 }
 
+freenect_resolution GetResolution(SoyPixelsMeta Meta,bool AllowHighResolution)
+{
+#define LOW_WIDTH		320
+#define LOW_HEIGHT		240
+#define MEDIUM_WIDTH	640
+#define MEDIUM_HEIGHT	480
+#define HIGH_WIDTH		1280
+#define HIGH_HEIGHT		1024
 
-void Freenect::TDevice::EnableDepthStream()
+	if ( Meta.GetWidth() == LOW_WIDTH && Meta.GetHeight() == LOW_HEIGHT )
+		return FREENECT_RESOLUTION_LOW;
+
+	if ( Meta.GetWidth() == MEDIUM_WIDTH && Meta.GetHeight() == MEDIUM_HEIGHT )
+		return FREENECT_RESOLUTION_MEDIUM;
+
+	if ( AllowHighResolution )
+		if ( Meta.GetWidth() == HIGH_WIDTH && Meta.GetHeight() == HIGH_HEIGHT )
+			return FREENECT_RESOLUTION_HIGH;
+	
+	std::stringstream Error;
+	Error << "Resolution " << Meta.GetWidth() << "x" << Meta.GetHeight() << " not supported. ";
+	Error << " Low=" << LOW_WIDTH << "x" << LOW_HEIGHT;
+	Error << " Medium=" << MEDIUM_WIDTH << "x" << MEDIUM_HEIGHT;
+	if ( AllowHighResolution )
+		Error << " High=" << HIGH_WIDTH << "x" << HIGH_HEIGHT;
+	throw Soy::AssertException(Error);
+}
+
+void Freenect::TDevice::EnableDepthStream(SoyPixelsMeta Meta)
 {
 	//	if already open, see if we can reconfigure, or doesn't need it
 	if ( mDepthMode.is_valid )
 		throw Soy::AssertException("Depth stream already open on device; todo: reopen/skip etc");
 	
-	auto PixelFormat = SoyPixelsFormat::FreenectDepthmm;
-	auto Format = Freenect::GetDepthFormat( PixelFormat );
-	
-	//	gr: cannot use High for depth
-	auto Resolution = FREENECT_RESOLUTION_MEDIUM;
+	auto Format = Freenect::GetDepthFormat( Meta.GetFormat() );
+	//	high for depth will fail!
+	auto Resolution = GetResolution( Meta, false );
+
 	auto FrameMode = freenect_find_depth_mode( Resolution, Format );
 	auto Result = freenect_set_depth_mode( mDevice, FrameMode );
 	Freenect::IsOkay( Result, "freenect_set_depth_mode" );
@@ -384,7 +440,32 @@ void Freenect::TDevice::EnableDepthStream()
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_depth( mDevice );
 	Freenect::IsOkay( Result, "freenect_start_depth" );
+}
+
+
+void Freenect::TDevice::EnableColourStream(SoyPixelsMeta Meta)
+{
+	//	if already open, see if we can reconfigure, or doesn't need it
+	if ( mColourMode.is_valid )
+		throw Soy::AssertException("Colour stream already open on device; todo: reopen/skip etc");
 	
+	auto Format = Freenect::GetColourFormat( Meta.GetFormat() );
+	//	high for depth will fail!
+	auto Resolution = GetResolution( Meta, true );
+	
+	auto FrameMode = freenect_find_video_mode( Resolution, Format );
+	auto Result = freenect_set_video_mode( mDevice, FrameMode );
+	Freenect::IsOkay( Result, "freenect_set_color_mode" );
+	
+	mColourMode = FrameMode;
+	
+	freenect_set_video_callback( mDevice, Freenect::OnColourFrame );
+	
+	//	stop current mode
+	//	gr: this had problems, just start
+	//freenect_stop_depth( &Device );
+	Result = freenect_start_video( mDevice );
+	Freenect::IsOkay( Result, "freenect_start_color" );
 }
 
 SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_const)
@@ -406,6 +487,27 @@ SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_cons
 	SoyPixelsRemote Pixels( PixelBytes, Width, Height, Size, PixelFormat );
 	return Pixels;
 }
+
+SoyPixelsRemote Freenect::TDevice::GetColourPixels(const uint8_t* PixelBytes_const)
+{
+	auto* PixelBytes = const_cast<uint8_t*>( PixelBytes_const );
+	
+	if ( !mColourMode.is_valid )
+		throw Soy_AssertException("Invalid colour mode");
+	
+	auto PixelFormat = GetFormat( mColourMode.depth_format );
+	auto Width = mColourMode.width;
+	auto Height = mColourMode.height;
+	
+	//	data size not provided!
+	auto Size = SoyPixelsMeta( Width, Height, PixelFormat ).GetDataSize();
+	
+	//	gr: make a transform for this
+	//	mDepthMode.padding_bits_per_pixel
+	SoyPixelsRemote Pixels( PixelBytes, Width, Height, Size, PixelFormat );
+	return Pixels;
+}
+
 
 
 
@@ -571,7 +673,20 @@ void Freenect::TFreenect::OnDepthFrame(freenect_device& DevicePtr,const uint8_t*
 }
 
 
-void Freenect::TContext::OnDepthFrame(TDevice& Device,const SoyPixelsImpl& Pixels,SoyTime Timestamp)
+void Freenect::TFreenect::OnColourFrame(freenect_device& DevicePtr,const uint8_t* Bytes,SoyTime Timestamp)
+{
+	auto& Device = GetDevice( DevicePtr );
+	
+	//	format the bytes
+	auto Pixels = Device.GetColourPixels( Bytes );
+	
+	//	do callback
+	if ( this->mOnColourFrame )
+		this->mOnColourFrame( Device, Pixels, Timestamp );
+}
+
+
+void Freenect::TContext::OnFrame(TDevice& Device,TStream::TYPE Stream,const SoyPixelsImpl& Pixels,SoyTime Timestamp)
 {
 	//	call all listeners
 	//	todo: replace with enum which locks internally
@@ -580,7 +695,7 @@ void Freenect::TContext::OnDepthFrame(TDevice& Device,const SoyPixelsImpl& Pixel
 		auto& Listener = *mListeners[i];
 		if ( Device != Listener.mSerial )
 			continue;
-		if ( Listener.mStream != TStream::Depth )
+		if ( Listener.mStream != Stream )
 			continue;
 		
 		if ( !Listener.mOnFrame )
@@ -1041,7 +1156,7 @@ bool Freenect::TDeviceDecoder::HasFatalError(std::string& Error)
 
 */
 
-freenect_video_format Freenect::GetVideoFormat(SoyPixelsFormat::Type Format)
+freenect_video_format Freenect::GetColourFormat(SoyPixelsFormat::Type Format)
 {
 	switch ( Format )
 	{
@@ -1345,11 +1460,13 @@ Freenect::TSource::TSource(const std::string& DeviceName)
 
 	if ( Soy::StringTrimRight( Serial, DeviceName_Colour_Suffix, true ) )
 	{
-		mListener = Context.CreateListener( Serial, TStream::Colour );
+		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::uyvy );
+		mListener = Context.CreateListener( Serial, Meta );
 	}
 	else if ( Soy::StringTrimRight( Serial, DeviceName_Depth_Suffix, true ) )
 	{
-		mListener = Context.CreateListener( Serial, TStream::Depth );
+		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::FreenectDepthmm );
+		mListener = Context.CreateListener( Serial, Meta );
 	}
 	else
 	{
@@ -1402,6 +1519,11 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 		Meta.Push("DepthInvalid",FREENECT_DEPTH_RAW_NO_VALUE);
 		Meta.Push("HorzFov",DepthHorzFov);
 		Meta.Push("VertFov",DepthVertFov);
+	}
+	else
+	{
+		Meta.Push("HorzFov",ColourHorzFov);
+		Meta.Push("VertFov",ColourVertFov);
 	}
 	
 	auto MetaString = Meta.GetString();
