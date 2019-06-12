@@ -1,9 +1,16 @@
 #include "Freenect.h"
-
+#include "SoyJson.h"
 
 
 namespace Freenect
 {
+	//	we need to recreate the library interface sometimes, so it's wrapped in this
+	class TFreenect;
+	class TContext;
+	
+	class TFrameListener;
+	class TDevice;
+	
 	bool					IsOkay(libusb_error Result,const std::string& Context,bool Throw=true);
 	std::string				GetErrorString(libusb_error Result);
 	freenect_video_format	GetVideoFormat(SoyPixelsFormat::Type Format);
@@ -16,32 +23,175 @@ namespace Freenect
 	const char*				LogLevelToString(freenect_loglevel level);
 	SoyTime					TimestampToMs(uint32_t Timestamp);
 	
-	const size_t			VideoStreamIndex=0;
-	const size_t			DepthStreamIndex=1;
-	//const size_t			AudioStreamIndex=2;
-}
-
-
-namespace Kinect
-{
-	std::shared_ptr<TContext>	gContext;
-	std::shared_ptr<TContext>	AllocContext();
-	void						FreeContext();
-	
 	bool		IsOkay(int Result,const std::string& Context,bool Throw=true);
 	std::string	GetErrorString(int Result);
 
 	//	unfortunetly the libfreenect usr data (void*) seems to mangle addresses... I'm assuming 32bit address internally, not 64. so store an id instead
 	uint32		AllocDeviceId();
+	
+	
+	
+	TContext&					GetContext();
+	std::shared_ptr<TContext>	gContext;
+	
+	const std::string			DeviceName_Prefix = "Freenect:";
+	const std::string			DeviceName_Colour_Suffix = "_Colour";
+	const std::string			DeviceName_Depth_Suffix = "_Depth";
+	
+	
+	namespace TStream
+	{
+		enum TYPE
+		{
+			Depth,
+			Colour,
+		};
+	}
 }
 
 
-uint32 Kinect::AllocDeviceId()
+std::ostream &operator<<(std::ostream &out,const Freenect::TStream::TYPE& Type)
 {
-	static uint32 Id = 1001;
-	return Id++;
+	switch ( Type )
+	{
+		case Freenect::TStream::Depth:	out << Freenect::DeviceName_Depth_Suffix;	break;
+		case Freenect::TStream::Colour:	out << Freenect::DeviceName_Colour_Suffix;	break;
+		default:
+			out << "<?" << static_cast<int>(Type) << ">";
+			break;
+	}
+	return out;
 }
 
+
+//	NOT RAII atm
+class Freenect::TDevice
+{
+public:
+	TDevice()
+	{
+		mDepthMode.is_valid = false;
+	}
+	TDevice(freenect_device& Device,const std::string& Serial)
+	{
+		mDevice = &Device;
+		mSerial = Serial;
+		mDepthMode.is_valid = false;
+	}
+	
+	
+	void			EnableDepthStream();
+	void			Close();
+	SoyPixelsRemote	GetDepthPixels(const uint8_t* Pixels);
+	
+	//	todo; can we compare two device pointers?
+	bool			operator==(const std::string& Serial) const	{	return mSerial == Serial;	}
+	bool			operator!=(const std::string& Serial) const	{	return mSerial != Serial;	}
+	bool			operator==(const TDevice& Device) const		{	return mSerial == Device.mSerial;	}
+	bool			operator!=(const TDevice& Device) const		{	return mSerial != Device.mSerial;	}
+	bool			operator==(const freenect_device& Device) const		{	return mDevice == &Device;	}
+	bool			operator!=(const freenect_device& Device) const		{	return mDevice != &Device;	}
+
+	
+	freenect_frame_mode	mDepthMode;
+	freenect_device*	mDevice = nullptr;
+	std::string			mSerial;
+};
+
+class Freenect::TFrameListener
+{
+public:
+	std::string		mSerial;
+	TStream::TYPE	mStream;
+	std::function<void(const SoyPixelsImpl&,SoyTime)>	mOnFrame;
+};
+
+
+
+//	because the API needs to sometimes recreate the "hardware" (freenect)
+//	we still need to manage devices that existed etc
+//	so the context, controls the freenect context
+class Freenect::TFreenect
+{
+public:
+	TFreenect();
+	~TFreenect();
+	
+	void				EnumDevices(std::function<void(const std::string&)>& Enum);
+	TDevice&			OpenDevice(const std::string& Serial);
+	void				OnDepthFrame(freenect_device& Device,const uint8_t* Bytes,SoyTime Timestamp);
+	TDevice&			GetDevice(freenect_device& Device);
+
+public:
+	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnDepthFrame;
+
+private:
+	Array<TDevice>		mDevices;	//	devices we've opened
+	freenect_context*	mContext = nullptr;
+};
+
+
+class Freenect::TContext
+{
+public:
+	TFreenect&						GetFreenect();
+	
+	std::shared_ptr<TFrameListener>	CreateListener(const std::string& Serial,TStream::TYPE Stream);
+	
+private:
+	void							OnDepthFrame(TDevice& Device,const SoyPixelsImpl& Pixels,SoyTime Timestamp);
+
+public:
+	//	 lock this!
+	Array<std::shared_ptr<TFrameListener>>	mListeners;
+	
+	std::shared_ptr<TFreenect>	mFreenect;	//	library
+};
+
+
+Freenect::TContext& Freenect::GetContext()
+{
+	if ( !gContext )
+	{
+		gContext.reset( new Freenect::TContext() );
+	}
+	return *gContext;
+}
+
+
+void Freenect::OnDepthFrame(freenect_device* dev, void *rgb, uint32_t timestamp)
+{
+	if ( !dev )
+	{
+		std::Debug << "OnDepthFrame with null device" << std::endl;
+		return;
+	}
+	
+	auto* FreenectPtr = freenect_get_user(dev);
+	auto& Freenect = *reinterpret_cast<TFreenect*>( FreenectPtr );
+	SoyTime Timecode = Freenect::TimestampToMs( timestamp );
+
+	auto* rgb8 = static_cast<uint8_t*>(rgb);
+	Freenect.OnDepthFrame( *dev, rgb8, Timecode );
+
+	/*
+	//	make pixels array
+	auto* Rgb8 = reinterpret_cast<uint8*>( rgb );
+	size_t RgbSize = Stream->mFrameMode.bytes;
+	auto& PixelsMeta = Stream->GetStreamMeta().mPixelMeta;
+	SoyPixelsRemote Pixels( Rgb8, RgbSize, PixelsMeta );
+	
+	Freenect::TFrame Frame( Pixels, Timecode, Stream->GetStreamMeta().mStreamIndex );
+	try
+	{
+		Device->mOnNewFrame.OnTriggered( Frame );
+	}
+	catch(std::exception&e)
+	{
+		std::Debug << "Exception; " << e.what() << std::endl;
+	}
+	 */
+}
 
 SoyTime Freenect::TimestampToMs(uint32_t Timestamp)
 {
@@ -70,9 +220,20 @@ const char* Freenect::LogLevelToString(freenect_loglevel level)
 }
 
 
-void Kinect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
+void Freenect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 {
+	auto& Context = GetContext();
+	auto& Freenect = Context.GetFreenect();
 	
+	std::function<void(const std::string&)> EnumDeviceSerial = [&](const std::string& Serial)
+	{
+		//	would be good to know what capabilities it has...
+		std::stringstream Name;
+		Name << DeviceName_Prefix << Serial << TStream::Depth;
+		Enum( Name.str() );
+	};
+	
+	Freenect.EnumDevices( EnumDeviceSerial );
 }
 
 
@@ -88,9 +249,9 @@ void Freenect::LogCallback(freenect_context *dev, freenect_loglevel level, const
 	//	save errors in the context
 	if ( level == FREENECT_LOG_ERROR || level == FREENECT_LOG_FATAL )
 	{
-		if ( Kinect::gContext )
+		if ( Freenect::gContext )
 		{
-			//Kinect::gContext->OnLibError( Message );
+			//Freenect::gContext->OnLibError( Message );
 			return;
 		}
 	}
@@ -106,7 +267,7 @@ std::string	Freenect::GetErrorString(libusb_error Result)
 }
 
 
-std::string	Kinect::GetErrorString(int Result)
+std::string	Freenect::GetErrorString(int Result)
 {
 	if ( (Result >= 0 && Result < LIBUSB_ERROR_COUNT) || Result == LIBUSB_ERROR_OTHER )
 	{
@@ -125,10 +286,10 @@ std::string	Kinect::GetErrorString(int Result)
 
 bool Freenect::IsOkay(libusb_error Result,const std::string& Context,bool Throw)
 {
-	return Kinect::IsOkay( static_cast<int>( Result ), Context, Throw );
+	return Freenect::IsOkay( static_cast<int>( Result ), Context, Throw );
 }
 
-bool Kinect::IsOkay(int Result,const std::string& Context,bool Throw)
+bool Freenect::IsOkay(int Result,const std::string& Context,bool Throw)
 {
 	if ( Result == 0 )
 		return true;
@@ -148,192 +309,221 @@ bool Kinect::IsOkay(int Result,const std::string& Context,bool Throw)
 }
 
 
-
-std::shared_ptr<Kinect::TContext> Kinect::AllocContext()
+Freenect::TFreenect& Freenect::TContext::GetFreenect()
 {
-	if ( !gContext )
+	if ( !mFreenect )
 	{
-		gContext.reset( new TContext() );
+		mFreenect.reset( new TFreenect() );
+		mFreenect->mOnDepthFrame = std::bind( &TContext::OnDepthFrame, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 );
 	}
-	return gContext;
+	return *mFreenect;
 }
 
 
-
-void Kinect::FreeContext()
+std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(const std::string& Serial,TStream::TYPE Stream)
 {
-	//	last one, free it
-	if ( gContext.unique() )
-		gContext.reset();
-}
-
-
-std::shared_ptr<Kinect::TContext>	gAutoFreeingContext;
-std::mutex							gAutoFreeingContextLock;
-Kinect::TContext&					LockAutoFreeContext();
-void								ReleaseAutoFreeContext();
-
-Kinect::TContext& LockAutoFreeContext()
-{
-	gAutoFreeingContextLock.lock();
-	if ( !gAutoFreeingContext )
-		gAutoFreeingContext = Kinect::AllocContext();
-
-	return *gAutoFreeingContext;
-}
-
-/*
-class TDefferedReleaseThread
-{
-public:
-	std::shared_ptr<std::thread>	mThread;
-	std::atomic<bool>				mDelay;
-	
-	void				DelayDeath()
-	{
-		mDelay = true;
-	}
-	
-	static void			AutoReleaseFunc()
-	{
-		StartAgain:
-		do
-		{
-			static auto SleepMs = 3000;
-			mDelay = false;
-			std::this_thread::sleep_for( std::chrono::milliseconds( SleepMs ) );
-		}
-		while ( mDelay );
-
-		if ( !gAutoFreeingContextLock.try_lock() )
-		{
-			//	someone has locked the context since sleep
-			goto StartAgain;
-		}
-		
-		gAutoFreeingContext.reset();
-		gAutoFreeingContextLock.unlock();
-		
-	}
-};
-std::shared_ptr<TDefferedReleaseThread>	gAutoReleaseThread;
-*/
-void ReleaseAutoFreeContext()
-{
-	auto pContext = gAutoFreeingContext;
-	
-	/*
-	//	startup a thread that will free the context
-	if ( gAutoReleaseThread )
-		gAutoReleaseThread->DelayDeath();
+	//	try and open the device first, so this will fail the caller
+	auto& Freenect = GetFreenect();
+	auto& Device = Freenect.OpenDevice( Serial );
+	if ( Stream == TStream::Depth )
+		Device.EnableDepthStream();
 	else
-		gAutoReleaseThread.reset( new std::thread( TDefferedReleaseThread::AutoReleaseFunc) );
-	*/
-	gAutoFreeingContext.reset();
-	gAutoFreeingContextLock.unlock();
-
-	Kinect::FreeContext();
-}
-
-
-void Kinect::EnumDevices(std::function<void(const std::string&)> Append)
-{
-	try
-	{
-		auto& Context = LockAutoFreeContext();
-/*
-		Array<Kinect::TDeviceMeta> Metas;
-		Context.EnumDevices( GetArrayBridge(Metas), false );
-		
-		for ( int i=0;	i<Metas.GetSize();	i++ )
-		{
-			auto& Meta = Metas[i];
-			Append( Meta.mName );
-		}
-		*/
-		ReleaseAutoFreeContext();
-	}
-	catch(std::exception& e)
-	{
-		ReleaseAutoFreeContext();
-		//	don't rethrow
-	}
-
-}
-
-
-
-
-
-Kinect::TContext::TContext() /*:
-#if defined(LIBFREENECT)
-	mContext	( nullptr ),
-#endif
-	SoyThread	( "Kinect Context" )*/
-{
-	//	init context
-#if defined(LIBFREENECT)
-	CreateContext();
-#endif
-}
-
-Kinect::TContext::~TContext()
-{
-	/*
-	//	shut down & wait for devices
-	try
-	{
-		WaitToFinish();
-	}
-	catch(std::exception& e)
-	{
-		std::Debug << "exception during context shutdown" << e.what() << std::endl;
-	}
+		throw Soy::AssertException("currently only supporting depth");
 	
-	//	kill devices
-	for ( int i=0;	i<mDevices.GetSize();	i++ )
-	{
-		auto& Device = mDevices[i];
-		Device.reset();
-	}
-	mDevices.Clear();
+	//
+	std::shared_ptr<TFrameListener> Listener( new TFrameListener );
+	Listener->mSerial = Serial;
+	Listener->mStream = Stream;
 	
-#if defined(LIBFREENECT)
-	FreeContext();
-#endif
-	 */
+	mListeners.PushBack( Listener );
+	return Listener;
 }
-/*
-#if defined(LIBFREENECT)
-void Kinect::TContext::CreateContext()
+
+
+void Freenect::TDevice::EnableDepthStream()
 {
-	if ( mContext )
-		return;
+	//	if already open, see if we can reconfigure, or doesn't need it
+	if ( mDepthMode.is_valid )
+		throw Soy::AssertException("Depth stream already open on device; todo: reopen/skip etc");
 	
+	auto PixelFormat = SoyPixelsFormat::FreenectDepthmm;
+	auto Format = Freenect::GetDepthFormat( PixelFormat );
+	
+	//	gr: cannot use High for depth
+	auto Resolution = FREENECT_RESOLUTION_MEDIUM;
+	auto FrameMode = freenect_find_depth_mode( Resolution, Format );
+	auto Result = freenect_set_depth_mode( mDevice, FrameMode );
+	Freenect::IsOkay( Result, "freenect_set_depth_mode" );
+	
+	mDepthMode = FrameMode;
+	
+	//	stop current mode
+	//	gr: this had problems, just start
+	//freenect_stop_depth( &Device );
+	Result = freenect_start_depth( mDevice );
+	Freenect::IsOkay( Result, "freenect_start_depth" );
+	
+	freenect_set_depth_callback( mDevice, Freenect::OnDepthFrame );
+}
+
+SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_const)
+{
+	auto* PixelBytes = const_cast<uint8_t*>( PixelBytes_const );
+	
+	if ( !mDepthMode.is_valid )
+		throw Soy_AssertException("Invalid depth mode");
+	
+	auto PixelFormat = GetFormat( mDepthMode.depth_format );
+	auto Width = mDepthMode.width;
+	auto Height = mDepthMode.height;
+	
+	//	data size not provided!
+	auto Size = SoyPixelsMeta( Width, Height, PixelFormat ).GetDataSize();
+	
+	//	gr: make a transform for this
+	//	mDepthMode.padding_bits_per_pixel
+	SoyPixelsRemote Pixels( PixelBytes, Width, Height, Size, PixelFormat );
+	return Pixels;
+}
+
+
+
+
+
+
+Freenect::TFreenect::TFreenect()
+{
 	freenect_usb_context* UsbContext = nullptr;
 	auto Result = freenect_init( &mContext, UsbContext );
-	Kinect::IsOkay( Result, "freenect_init" );
+	Freenect::IsOkay( Result, "freenect_init" );
 	
 	freenect_set_log_level( mContext, FREENECT_LOG_NOTICE );
 	freenect_set_log_callback( mContext, Freenect::LogCallback );
 	
 	freenect_device_flags flags = (freenect_device_flags)( FREENECT_DEVICE_CAMERA );
 	freenect_select_subdevices( mContext, flags );
-	
-	Start();
-	
-	//	re-create sub-devices
-	for ( int i=0;	i<mDevices.GetSize();	i++ )
+}
+
+Freenect::TFreenect::~TFreenect()
+{
+	auto Error = freenect_shutdown( mContext );
+	if ( Error != 0 )
 	{
-		auto& Device = *mDevices[i];
-		Device.AcquireDevice();
+		std::Debug << "freenect_shutdown error: "  << Error << std::endl;
 	}
 }
-#endif
 
+Freenect::TDevice& Freenect::TFreenect::GetDevice(freenect_device& DeviceRef)
+{
+	for ( auto d=0;	d<mDevices.GetSize();	d++ )
+	{
+		auto& Device = mDevices[d];
+		if ( Device != DeviceRef )
+			continue;
+		return Device;
+	}
+	
+	throw Soy_AssertException("Couldn't find opened device matching ref");
+}
+
+void Freenect::TFreenect::EnumDevices(std::function<void (const std::string &)>& Enum)
+{
+	struct freenect_device_attributes* DeviceList = nullptr;
+	//	returns <0 on error, or number of devices.
+	auto CountOrError = freenect_list_device_attributes( mContext, &DeviceList );
+	if ( CountOrError < 0 )
+		Freenect::IsOkay( CountOrError, "freenect_list_device_attributes" );
+	
+	try
+	{
+		auto Device = DeviceList;
+		while ( Device )
+		{
+			std::string Serial = Device->camera_serial;
+			Enum( Serial );
+			Device = Device->next;
+		}
+		freenect_free_device_attributes( DeviceList );
+	}
+	catch(...)
+	{
+		freenect_free_device_attributes( DeviceList );
+		throw;
+	}
+}
+
+
+//	gr: this function is returning an object that moves too easily!
+//		switch to RAII TDevice as soon as this goes wrong
+Freenect::TDevice& Freenect::TFreenect::OpenDevice(const std::string& Serial)
+{
+	//	return existing
+	for ( auto d=0;	d<mDevices.GetSize();	d++ )
+	{
+		auto& Device = mDevices[d];
+		if ( Device != Serial )
+			continue;
+		
+		return Device;
+	}
+	
+	freenect_device* Device = nullptr;
+	auto Error = freenect_open_device_by_camera_serial( mContext, &Device, Serial.c_str() );
+	IsOkay( Error, "freenect_open_device_by_camera_serial");
+	if ( !Device )
+		throw Soy::AssertException("freenect_open_device_by_camera_serial success, but null device");
+		
+	//	assign user data back to its owner
+	freenect_set_user( Device, this );
+	
+	TDevice NewDevice( *Device, Serial );
+	auto& NewDevicePtr = mDevices.PushBack( NewDevice );
+	
+	std::Debug << "opened device " << Serial << std::endl;
+	return NewDevicePtr;
+}
+
+
+
+void Freenect::TFreenect::OnDepthFrame(freenect_device& DevicePtr,const uint8_t* Bytes,SoyTime Timestamp)
+{
+	auto& Device = GetDevice( DevicePtr );
+	
+	//	format the bytes
+	auto Pixels = Device.GetDepthPixels( Bytes );
+	
+	//	do callback
+	if ( this->mOnDepthFrame )
+		this->mOnDepthFrame( Device, Pixels, Timestamp );
+}
+
+
+void Freenect::TContext::OnDepthFrame(TDevice& Device,const SoyPixelsImpl& Pixels,SoyTime Timestamp)
+{
+	//	call all listeners
+	//	todo: replace with enum which locks internally
+	for ( auto i=0;	i<mListeners.GetSize();	i++ )
+	{
+		auto& Listener = *mListeners[i];
+		if ( Device != Listener.mSerial )
+			continue;
+		if ( Listener.mStream != TStream::Depth )
+			continue;
+		
+		if ( !Listener.mOnFrame )
+			continue;
+		
+		Listener.mOnFrame( Pixels, Timestamp );
+	}
+}
+
+
+
+/*
+ 
 
 #if defined(LIBFREENECT)
-void Kinect::TContext::ReacquireDevices()
+void Freenect::TContext::ReacquireDevices()
 {
 	//	re-create sub-devices
 	for ( int i=0;	i<mDevices.GetSize();	i++ )
@@ -346,7 +536,7 @@ void Kinect::TContext::ReacquireDevices()
 #endif
 
 #if defined(LIBFREENECT)
-void Kinect::TContext::FreeContext()
+void Freenect::TContext::FreeContext()
 {
 	//	re-create sub-devices
 	for ( int i=0;	i<mDevices.GetSize();	i++ )
@@ -363,7 +553,7 @@ void Kinect::TContext::FreeContext()
 }
 #endif
 
-void Kinect::TContext::Thread()
+void Freenect::TContext::Thread()
 {
 #if defined(LIBFREENECT)
 
@@ -397,7 +587,7 @@ void Kinect::TContext::Thread()
 			}
 			else
 			{
-				Kinect::IsOkay( Result, "freenect_process_events_timeout" );
+				Freenect::IsOkay( Result, "freenect_process_events_timeout" );
 			}
 
 			//	in case any devices are missing, try and acquire
@@ -428,7 +618,7 @@ void Kinect::TContext::Thread()
 
 
 
-std::shared_ptr<Kinect::TDevice> Kinect::TContext::GetDevice(uint32 DeviceId)
+std::shared_ptr<Freenect::TDevice> Freenect::TContext::GetDevice(uint32 DeviceId)
 {
 	for ( int i=0;	i<mDevices.GetSize();	i++ )
 	{
@@ -441,7 +631,7 @@ std::shared_ptr<Kinect::TDevice> Kinect::TContext::GetDevice(uint32 DeviceId)
 }
 
 
-std::shared_ptr<Kinect::TDevice> Kinect::TContext::GetDevice(const std::string& Name,const TVideoDecoderParams& Params)
+std::shared_ptr<Freenect::TDevice> Freenect::TContext::GetDevice(const std::string& Name,const TVideoDecoderParams& Params)
 {
 	std::string MatchName = Name;
 
@@ -508,7 +698,7 @@ std::shared_ptr<Kinect::TDevice> Kinect::TContext::GetDevice(const std::string& 
 	throw Soy::AssertException( Error.str() );
 }
 
-void Kinect::TContext::EnumDevices(ArrayBridge<TDeviceMeta>&& Metas,bool AllowInvalidSerial)
+void Freenect::TContext::EnumDevices(ArrayBridge<TDeviceMeta>&& Metas,bool AllowInvalidSerial)
 {
 	//	always include devices we've found before
 	for ( int d=0;	d<mDevices.GetSize();	d++ )
@@ -517,34 +707,12 @@ void Kinect::TContext::EnumDevices(ArrayBridge<TDeviceMeta>&& Metas,bool AllowIn
 		Metas.PushBackUnique( Device.mMeta );
 	}
 
-#if defined(LIBFREENECT)
-	struct freenect_device_attributes* DeviceList = nullptr;
-	//	returns <0 on error, or number of devices.
-	freenect_list_device_attributes( mContext, &DeviceList );
-	if ( true )
-	{
-		auto Device = DeviceList;
-		while ( Device )
-		{
-			//	seperate devices for seperate content
-			TDeviceMeta Meta( *Device );
-			
-			//	ignore temporarily bad devices
-			if ( AllowInvalidSerial || !Soy::StringBeginsWith( Meta.mName, "000000", true ) )
-			{
-				Metas.PushBackUnique( Meta );
-			}
-			Device = Device->next;
-		}
-		freenect_free_device_attributes( DeviceList );
-	}
-#endif
 	
 }
 
 
 
-Kinect::TDeviceMeta::TDeviceMeta(struct freenect_device_attributes& Device)
+Freenect::TDeviceMeta::TDeviceMeta(struct freenect_device_attributes& Device)
 {
 #if defined(LIBFREENECT)
 	mName = Device.camera_serial;
@@ -554,7 +722,7 @@ Kinect::TDeviceMeta::TDeviceMeta(struct freenect_device_attributes& Device)
 }
 
 
-Kinect::TDevice::TDevice(const TDeviceMeta& Meta,const TVideoDecoderParams& Params,TContext& Context) :
+Freenect::TDevice::TDevice(const TDeviceMeta& Meta,const TVideoDecoderParams& Params,TContext& Context) :
 #if defined(LIBFREENECT)
 	mDevice		( nullptr ),
 	mDeviceOldUserData	( nullptr ),
@@ -572,7 +740,7 @@ Kinect::TDevice::TDevice(const TDeviceMeta& Meta,const TVideoDecoderParams& Para
 }
 
 #if defined(LIBFREENECT)
-void Kinect::TDevice::AcquireDevice()
+void Freenect::TDevice::AcquireDevice()
 {
 	//	already acquired
 	if ( mDevice )
@@ -592,7 +760,7 @@ void Kinect::TDevice::AcquireDevice()
 			auto Result = freenect_open_device_by_camera_serial( mContext.GetContext(), &mDevice, mMeta.mName.c_str() );
 			std::stringstream Error;
 			Error << "freenect_open_device_by_camera_serial(" << mMeta.mName << ")";
-			Kinect::IsOkay( Result, Error.str() );
+			Freenect::IsOkay( Result, Error.str() );
 			Soy::Assert( mDevice, "Device missing after opening");
 		}
 	
@@ -623,7 +791,7 @@ void Kinect::TDevice::AcquireDevice()
 #endif
 
 #if defined(LIBFREENECT)
-void Kinect::TDevice::ReleaseDevice()
+void Freenect::TDevice::ReleaseDevice()
 {
 	if ( mDevice )
 	{
@@ -637,7 +805,7 @@ void Kinect::TDevice::ReleaseDevice()
 #endif
 
 #if defined(LIBFREENECT)
-void Kinect::TDevice::CreateStreams(bool Video, bool Depth)
+void Freenect::TDevice::CreateStreams(bool Video, bool Depth)
 {
 	try
 	{
@@ -660,14 +828,14 @@ void Kinect::TDevice::CreateStreams(bool Video, bool Depth)
 }
 #endif
 
-Kinect::TDevice::~TDevice()
+Freenect::TDevice::~TDevice()
 {
 #if defined(LIBFREENECT)
 	ReleaseDevice();
 #endif
 }
 
-void Kinect::TDevice::GetStreamMeta(ArrayBridge<TStreamMeta>& StreamMetas)
+void Freenect::TDevice::GetStreamMeta(ArrayBridge<TStreamMeta>& StreamMetas)
 {
 	if ( mVideoStream )
 		StreamMetas.PushBack( mVideoStream->GetStreamMeta() );
@@ -680,7 +848,7 @@ void Kinect::TDevice::GetStreamMeta(ArrayBridge<TStreamMeta>& StreamMetas)
 
 
 
-Kinect::TDeviceDecoder::TDeviceDecoder(const TVideoDecoderParams& Params,std::map<size_t,std::shared_ptr<TPixelBufferManager>>& PixelBufferManagers,std::map<size_t,std::shared_ptr<TAudioBufferManager>>& AudioBufferManagers,std::shared_ptr<Opengl::TContext> OpenglContext) :
+Freenect::TDeviceDecoder::TDeviceDecoder(const TVideoDecoderParams& Params,std::map<size_t,std::shared_ptr<TPixelBufferManager>>& PixelBufferManagers,std::map<size_t,std::shared_ptr<TAudioBufferManager>>& AudioBufferManagers,std::shared_ptr<Opengl::TContext> OpenglContext) :
 	TVideoDecoder		( Params, PixelBufferManagers, AudioBufferManagers ),
 	mOpenglContext		( OpenglContext )
 {
@@ -713,7 +881,7 @@ Kinect::TDeviceDecoder::TDeviceDecoder(const TVideoDecoderParams& Params,std::ma
 	mDeviceOnNewFrameListener = Event.AddListener( *this, &TDeviceDecoder::OnNewFrame );
 }
 
-Kinect::TDeviceDecoder::~TDeviceDecoder()
+Freenect::TDeviceDecoder::~TDeviceDecoder()
 {
 	if ( mDevice )
 	{
@@ -726,7 +894,7 @@ Kinect::TDeviceDecoder::~TDeviceDecoder()
 	FreeContext();
 }
 
-void Kinect::TDeviceDecoder::GetStreamMeta(ArrayBridge<TStreamMeta>&& StreamMetas)
+void Freenect::TDeviceDecoder::GetStreamMeta(ArrayBridge<TStreamMeta>&& StreamMetas)
 {
 	if ( !mDevice )
 		return;
@@ -735,13 +903,13 @@ void Kinect::TDeviceDecoder::GetStreamMeta(ArrayBridge<TStreamMeta>&& StreamMeta
 }
 
 
-TVideoMeta Kinect::TDeviceDecoder::GetMeta()
+TVideoMeta Freenect::TDeviceDecoder::GetMeta()
 {
 	TVideoMeta Meta;
 	return Meta;
 }
 
-void Kinect::TDeviceDecoder::OnNewFrame(const Kinect::TFrame& Frame)
+void Freenect::TDeviceDecoder::OnNewFrame(const Freenect::TFrame& Frame)
 {
 	auto& Output = GetPixelBufferManager( Frame.mStreamIndex );
 	
@@ -781,7 +949,7 @@ void Kinect::TDeviceDecoder::OnNewFrame(const Kinect::TFrame& Frame)
 	Output.PushPixelBuffer( PixelBuffer, Block );
 }
 
-bool Kinect::TDeviceDecoder::HasFatalError(std::string& Error)
+bool Freenect::TDeviceDecoder::HasFatalError(std::string& Error)
 {
 	if ( mContext )
 	{
@@ -798,8 +966,8 @@ bool Kinect::TDeviceDecoder::HasFatalError(std::string& Error)
 	return false;
 }
 
+*/
 
-#if defined(LIBFREENECT)
 freenect_video_format Freenect::GetVideoFormat(SoyPixelsFormat::Type Format)
 {
 	switch ( Format )
@@ -814,9 +982,8 @@ freenect_video_format Freenect::GetVideoFormat(SoyPixelsFormat::Type Format)
 	
 	return FREENECT_VIDEO_DUMMY;
 }
-#endif
 
-#if defined(LIBFREENECT)
+
 freenect_depth_format Freenect::GetDepthFormat(SoyPixelsFormat::Type Format)
 {
 	switch ( Format )
@@ -835,10 +1002,8 @@ freenect_depth_format Freenect::GetDepthFormat(SoyPixelsFormat::Type Format)
 
 	return FREENECT_DEPTH_DUMMY;
 }
-#endif
 
 
-#if defined(LIBFREENECT)
 SoyPixelsFormat::Type Freenect::GetFormat(freenect_video_format Format)
 {
 	switch ( Format )
@@ -852,9 +1017,8 @@ SoyPixelsFormat::Type Freenect::GetFormat(freenect_video_format Format)
 	
 	return SoyPixelsFormat::Invalid;
 }
-#endif
 
-#if defined(LIBFREENECT)
+
 SoyPixelsFormat::Type Freenect::GetFormat(freenect_depth_format Format)
 {
 	switch ( Format )
@@ -869,7 +1033,7 @@ SoyPixelsFormat::Type Freenect::GetFormat(freenect_depth_format Format)
 	
 	return SoyPixelsFormat::Invalid;
 }
-#endif
+/*
 
 #if defined(LIBFREENECT)
 void Freenect::OnVideoFrame(freenect_device *dev, void *rgb, uint32_t timestamp)
@@ -879,10 +1043,10 @@ void Freenect::OnVideoFrame(freenect_device *dev, void *rgb, uint32_t timestamp)
 	auto* usr = freenect_get_user(dev);
 	auto DeviceId = reinterpret_cast<uint64>( usr );
 	auto DeviceId32 = size_cast<uint32>( DeviceId );
-	if ( !Kinect::gContext )
+	if ( !Freenect::gContext )
 		return;
 	
-	auto Device = Kinect::gContext->GetDevice( DeviceId32 );
+	auto Device = Freenect::gContext->GetDevice( DeviceId32 );
 	if ( !Device )
 		return;
 
@@ -906,7 +1070,7 @@ void Freenect::OnVideoFrame(freenect_device *dev, void *rgb, uint32_t timestamp)
 	auto& PixelsMeta = Stream->GetStreamMeta().mPixelMeta;
 	SoyPixelsRemote Pixels( Rgb8, RgbSize, PixelsMeta );
 	
-	Kinect::TFrame Frame( Pixels, Timecode, Stream->GetStreamMeta().mStreamIndex );
+	Freenect::TFrame Frame( Pixels, Timecode, Stream->GetStreamMeta().mStreamIndex );
 	try
 	{
 		Device->mOnNewFrame.OnTriggered( Frame );
@@ -927,10 +1091,10 @@ void Freenect::OnDepthFrame(freenect_device *dev, void *rgb, uint32_t timestamp)
 	auto* usr = freenect_get_user(dev);
 	auto DeviceId = reinterpret_cast<uint64>( usr );
 	auto DeviceId32 = size_cast<uint32>( DeviceId );
-	if ( !Kinect::gContext )
+	if ( !Freenect::gContext )
 		return;
 	
-	auto Device = Kinect::gContext->GetDevice( DeviceId32 );
+	auto Device = Freenect::gContext->GetDevice( DeviceId32 );
 	if ( !Device )
 		return;
 
@@ -954,7 +1118,7 @@ void Freenect::OnDepthFrame(freenect_device *dev, void *rgb, uint32_t timestamp)
 	auto& PixelsMeta = Stream->GetStreamMeta().mPixelMeta;
 	SoyPixelsRemote Pixels( Rgb8, RgbSize, PixelsMeta );
 	
-	Kinect::TFrame Frame( Pixels, Timecode, Stream->GetStreamMeta().mStreamIndex );
+	Freenect::TFrame Frame( Pixels, Timecode, Stream->GetStreamMeta().mStreamIndex );
 	try
 	{
 		Device->mOnNewFrame.OnTriggered( Frame );
@@ -967,7 +1131,7 @@ void Freenect::OnDepthFrame(freenect_device *dev, void *rgb, uint32_t timestamp)
 #endif
 
 #if defined(LIBFREENECT)
-Kinect::TStream::TStream(freenect_device& Device,size_t StreamIndex) :
+Freenect::TStream::TStream(freenect_device& Device,size_t StreamIndex) :
 	mDevice			( &Device )
 {
 	memset( &mFrameMode, 0, sizeof(mFrameMode) );
@@ -978,7 +1142,7 @@ Kinect::TStream::TStream(freenect_device& Device,size_t StreamIndex) :
 
 
 #if defined(LIBFREENECT)
-Kinect::TVideoStream::TVideoStream(freenect_device& Device,SoyPixelsFormat::Type PixelFormat,size_t StreamIndex) :
+Freenect::TVideoStream::TVideoStream(freenect_device& Device,SoyPixelsFormat::Type PixelFormat,size_t StreamIndex) :
 	TStream	( Device, StreamIndex )
 {
 	//	get params
@@ -991,7 +1155,7 @@ Kinect::TVideoStream::TVideoStream(freenect_device& Device,SoyPixelsFormat::Type
 	Soy::Assert( mFrameMode.padding_bits_per_pixel == 0, "Don't currently supported mis-aligned pixels formats");
 
 	auto Result = freenect_set_video_mode( &Device, mFrameMode );
-	Kinect::IsOkay( Result, "freenect_set_video_mode" );
+	Freenect::IsOkay( Result, "freenect_set_video_mode" );
 	//freenect_set_video_buffer( mDevice, rgb_back);
 
 	//	stop current mode
@@ -999,7 +1163,7 @@ Kinect::TVideoStream::TVideoStream(freenect_device& Device,SoyPixelsFormat::Type
 	//freenect_stop_video( mDevice );
 
 	Result = freenect_start_video( &Device );
-	Kinect::IsOkay( Result, "freenect_start_video" );
+	Freenect::IsOkay( Result, "freenect_start_video" );
 
 	freenect_set_video_callback( &Device, Freenect::OnVideoFrame );
 	
@@ -1009,7 +1173,7 @@ Kinect::TVideoStream::TVideoStream(freenect_device& Device,SoyPixelsFormat::Type
 }
 #endif
 
-Kinect::TVideoStream::~TVideoStream()
+Freenect::TVideoStream::~TVideoStream()
 {
 #if defined(LIBFREENECT)
 	if ( mDevice )
@@ -1023,7 +1187,7 @@ Kinect::TVideoStream::~TVideoStream()
 
 
 #if defined(LIBFREENECT)
-Kinect::TDepthStream::TDepthStream(freenect_device& Device,SoyPixelsFormat::Type PixelFormat,size_t StreamIndex) :
+Freenect::TDepthStream::TDepthStream(freenect_device& Device,SoyPixelsFormat::Type PixelFormat,size_t StreamIndex) :
 	TStream	( Device, StreamIndex )
 {
 	auto Format = Freenect::GetDepthFormat( PixelFormat );
@@ -1036,12 +1200,12 @@ Kinect::TDepthStream::TDepthStream(freenect_device& Device,SoyPixelsFormat::Type
 	//SoyPixelsFormat::GetFormatFromChannelCount( mVideoMode.data_bits_per_pixel/8 );
 
 	auto Result = freenect_set_depth_mode( &Device, mFrameMode );
-	Kinect::IsOkay( Result, "freenect_set_depth_mode" );
+	Freenect::IsOkay( Result, "freenect_set_depth_mode" );
 
 	//	stop current mode
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_depth( &Device );
-	Kinect::IsOkay( Result, "freenect_start_depth" );
+	Freenect::IsOkay( Result, "freenect_start_depth" );
 
 	freenect_set_depth_callback( &Device, Freenect::OnDepthFrame );
 
@@ -1051,7 +1215,7 @@ Kinect::TDepthStream::TDepthStream(freenect_device& Device,SoyPixelsFormat::Type
 }
 #endif
 
-Kinect::TDepthStream::~TDepthStream()
+Freenect::TDepthStream::~TDepthStream()
 {
 #if defined(LIBFREENECT)
 	if ( mDevice )
@@ -1066,31 +1230,88 @@ Kinect::TDepthStream::~TDepthStream()
 
 
 
-Kinect::TDepthPixelBuffer::TDepthPixelBuffer(const SoyPixelsImpl& Pixels,std::shared_ptr<Opengl::TBlitter> Blitter,std::shared_ptr<Opengl::TContext> Context) :
+Freenect::TDepthPixelBuffer::TDepthPixelBuffer(const SoyPixelsImpl& Pixels,std::shared_ptr<Opengl::TBlitter> Blitter,std::shared_ptr<Opengl::TContext> Context) :
 	mPixels			( Pixels ),
 	mOpenglBlitter	( Blitter ),
 	mOpenglContext	( Context )
 {
 }
 
-Kinect::TDepthPixelBuffer::~TDepthPixelBuffer()
+Freenect::TDepthPixelBuffer::~TDepthPixelBuffer()
 {
 	PopWorker::DeferDelete( mOpenglContext, mLockedTexture, true );
 	PopWorker::DeferDelete( mOpenglContext, mOpenglBlitter, false );
 }
 
 
-void Kinect::TDepthPixelBuffer::Lock(ArrayBridge<SoyPixelsImpl*>&& Textures,float3x3& Transform)
+void Freenect::TDepthPixelBuffer::Lock(ArrayBridge<SoyPixelsImpl*>&& Textures,float3x3& Transform)
 {
 	Textures.PushBack( &mPixels );
 }
 
 
-void Kinect::TDepthPixelBuffer::Unlock()
+void Freenect::TDepthPixelBuffer::Unlock()
 {
 //	mLockedTexture.reset();
 }
 
 */
+
+
+Freenect::TSource::TSource(const std::string& DeviceName)
+{
+	std::string Serial = DeviceName;
+	if ( !Soy::StringTrimLeft( Serial, Freenect::DeviceName_Prefix, true ) )
+	{
+		std::stringstream Error;
+		Error << "Device name (" << DeviceName << ") doesn't begin with " << DeviceName_Prefix;
+		throw Soy_AssertException(Error);
+	}
+
+	auto& Context = GetContext();
+
+	if ( Soy::StringTrimRight( Serial, DeviceName_Colour_Suffix, true ) )
+	{
+		mListener = Context.CreateListener( Serial, TStream::Colour );
+	}
+	else if ( Soy::StringTrimRight( Serial, DeviceName_Depth_Suffix, true ) )
+	{
+		mListener = Context.CreateListener( Serial, TStream::Depth );
+	}
+	else
+	{
+		std::stringstream Error;
+		Error << "Device name (" << DeviceName << ") doesn't end with " << DeviceName_Colour_Suffix << " or " << DeviceName_Depth_Suffix;
+		throw Soy_AssertException(Error);
+	}
+	
+	mListener->mOnFrame = [&](const SoyPixelsImpl& Frame,SoyTime Timestamp)
+	{
+		this->OnFrame( Frame, Timestamp );
+	};
+}
+
+Freenect::TSource::~TSource()
+{
+}
+
+	
+void Freenect::TSource::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
+{
+	throw Soy::AssertException("Freenect device doesn't support feature");
+}
+
+void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
+{
+	float3x3 Transform;
+	std::shared_ptr<TPixelBuffer> PixelBuffer( new TDumbPixelBuffer( Frame, Transform ) );
+	
+	TJsonWriter Meta;
+	Meta.Push("Time", Timestamp.GetMilliSeconds().count() );
+	auto MetaString = Meta.GetString();
+	
+	this->PushFrame( PixelBuffer, Frame.GetMeta(), MetaString );
+}
+
 
 

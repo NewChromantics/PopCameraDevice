@@ -102,9 +102,6 @@
 		BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B74226A3296003AEB55 /* SoyTime.mm */; };
 		BF012B78226A3303003AEB55 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF108A9922970C92003DDC5F /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
-		BF108A9F22971381003DDC5F /* libfreenect2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108A9E22971381003DDC5F /* libfreenect2.a */; };
-		BF108AA022971381003DDC5F /* libfreenect2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108A9E22971381003DDC5F /* libfreenect2.a */; };
-		BF108AA122971381003DDC5F /* libfreenect2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108A9E22971381003DDC5F /* libfreenect2.a */; };
 		BF108AA32297147F003DDC5F /* PopCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */; };
 		BF108AA422971485003DDC5F /* TCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */; };
 		BF108AA522971487003DDC5F /* TestDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */; };
@@ -147,9 +144,6 @@
 		BF108ACE22971817003DDC5F /* AvfVideoCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */; };
 		BF108AE4229726CF003DDC5F /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = BF108AD8229726CE003DDC5F /* Readme.md */; };
 		BF108AE5229726CF003DDC5F /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = BF108AD8229726CE003DDC5F /* Readme.md */; };
-		BF108AEA22972DC7003DDC5F /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
-		BF108AEC22972DC8003DDC5F /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
-		BF108AED22972DCA003DDC5F /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
 		BF108AEF22972F23003DDC5F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AEE22972F23003DDC5F /* IOKit.framework */; };
 		BF108AF022972F29003DDC5F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AEE22972F23003DDC5F /* IOKit.framework */; };
 		BF108AF122972F2F003DDC5F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AEE22972F23003DDC5F /* IOKit.framework */; };
@@ -161,6 +155,19 @@
 		BF76106F226B6E6800762F15 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B30226A2665003AEB55 /* VideoToolbox.framework */; };
 		BF761070226B6E6A00762F15 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B2E226A263E003AEB55 /* CoreMedia.framework */; };
 		BF761071226B6E6C00762F15 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B06226A09EC003AEB55 /* AVFoundation.framework */; };
+		BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
+		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
+		BFEE8DF122B0097C00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
+		BFEE8DF522B0139000F89A39 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD5229726CE003DDC5F /* libfreenect.a */; };
+		BFEE8DF622B0139300F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
+		BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
+		BFEE8DF822B013A800F89A39 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD5229726CE003DDC5F /* libfreenect.a */; };
+		BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
+		BFEE8DFA22B013AF00F89A39 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD5229726CE003DDC5F /* libfreenect.a */; };
+		BFEE8DFD22B125AA00F89A39 /* SoyJson.h in Headers */ = {isa = PBXBuildFile; fileRef = BFEE8DFB22B125AA00F89A39 /* SoyJson.h */; };
+		BFEE8DFE22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
+		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
+		BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -254,8 +261,8 @@
 		BF012B74226A3296003AEB55 /* SoyTime.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SoyTime.mm; sourceTree = "<group>"; };
 		BF012B77226A3303003AEB55 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BF0A19C21EA428F4007EBC95 /* Unity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Unity; sourceTree = "<group>"; };
-		BF108A862296F476003DDC5F /* Kinect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kinect.h; path = Source/Kinect.h; sourceTree = "<group>"; };
-		BF108A872296F476003DDC5F /* Kinect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Kinect.cpp; path = Source/Kinect.cpp; sourceTree = "<group>"; };
+		BF108A862296F476003DDC5F /* Freenect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Freenect.h; path = Source/Freenect.h; sourceTree = "<group>"; };
+		BF108A872296F476003DDC5F /* Freenect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Freenect.cpp; path = Source/Freenect.cpp; sourceTree = "<group>"; };
 		BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Kinect2.cpp; path = Source/Kinect2.cpp; sourceTree = "<group>"; };
 		BF108A8C2296F4BE003DDC5F /* Kinect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kinect2.h; path = Source/Kinect2.h; sourceTree = "<group>"; };
 		BF108A912296F7D6003DDC5F /* LibFreenect2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LibFreenect2; sourceTree = "<group>"; };
@@ -285,6 +292,8 @@
 		BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Freenect2.cpp; path = Source/Freenect2.cpp; sourceTree = "<group>"; };
 		BFEE8DE922B006CE00F89A39 /* Freenect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Freenect2.h; path = Source/Freenect2.h; sourceTree = "<group>"; };
 		BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyAutoReleasePtr.h; sourceTree = "<group>"; };
+		BFEE8DFB22B125AA00F89A39 /* SoyJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoyJson.h; sourceTree = "<group>"; };
+		BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoyJson.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,16 +302,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF108AF022972F29003DDC5F /* IOKit.framework in Frameworks */,
-				BF108AA022971381003DDC5F /* libfreenect2.a in Frameworks */,
 				BF012B78226A3303003AEB55 /* AppKit.framework in Frameworks */,
 				BF012B6E226A31F3003AEB55 /* CoreServices.framework in Frameworks */,
 				BF012B37226A26B0003AEB55 /* CoreVideo.framework in Frameworks */,
-				BF108AED22972DCA003DDC5F /* libusb-1.0.a in Frameworks */,
 				BF012B35226A2696003AEB55 /* CoreGraphics.framework in Frameworks */,
 				BF012B33226A267B003AEB55 /* OpenGL.framework in Frameworks */,
 				BF012B31226A2665003AEB55 /* VideoToolbox.framework in Frameworks */,
 				BF012B2F226A263E003AEB55 /* CoreMedia.framework in Frameworks */,
 				BF012B07226A09EC003AEB55 /* AVFoundation.framework in Frameworks */,
+				BFEE8DFA22B013AF00F89A39 /* libfreenect.a in Frameworks */,
+				BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,12 +324,12 @@
 				BF108AAE2297175A003DDC5F /* CoreGraphics.framework in Frameworks */,
 				BF108AB22297175A003DDC5F /* AVFoundation.framework in Frameworks */,
 				BF108AAB22971759003DDC5F /* AppKit.framework in Frameworks */,
-				BF108AEC22972DC8003DDC5F /* libusb-1.0.a in Frameworks */,
 				BF108AB12297175A003DDC5F /* CoreMedia.framework in Frameworks */,
 				BF108AAF2297175A003DDC5F /* OpenGL.framework in Frameworks */,
-				BF108AA122971381003DDC5F /* libfreenect2.a in Frameworks */,
 				BF108AAC22971759003DDC5F /* CoreServices.framework in Frameworks */,
 				BF108AAD2297175A003DDC5F /* CoreVideo.framework in Frameworks */,
+				BFEE8DF522B0139000F89A39 /* libfreenect.a in Frameworks */,
+				BFEE8DF622B0139300F89A39 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,16 +338,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF108AF122972F2F003DDC5F /* IOKit.framework in Frameworks */,
-				BF108A9F22971381003DDC5F /* libfreenect2.a in Frameworks */,
 				BF761071226B6E6C00762F15 /* AVFoundation.framework in Frameworks */,
 				BF76106D226B6E6400762F15 /* CoreGraphics.framework in Frameworks */,
 				BF76106A226B6E5C00762F15 /* AppKit.framework in Frameworks */,
-				BF108AEA22972DC7003DDC5F /* libusb-1.0.a in Frameworks */,
 				BF76106F226B6E6800762F15 /* VideoToolbox.framework in Frameworks */,
 				BF76106B226B6E5F00762F15 /* CoreServices.framework in Frameworks */,
 				BF76106E226B6E6600762F15 /* OpenGL.framework in Frameworks */,
 				BF76106C226B6E6200762F15 /* CoreVideo.framework in Frameworks */,
 				BF761070226B6E6A00762F15 /* CoreMedia.framework in Frameworks */,
+				BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */,
+				BFEE8DF822B013A800F89A39 /* libfreenect.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,13 +359,13 @@
 			children = (
 				BF012B1A226A1FD3003AEB55 /* AvfPixelBuffer.h */,
 				BF012B1B226A1FD3003AEB55 /* AvfPixelBuffer.mm */,
+				BF108ACF229718ED003DDC5F /* HeapArray.hpp */,
 				BF012AE92269FCBF003AEB55 /* memheap.cpp */,
 				BF012AE82269FCBF003AEB55 /* MemHeap.hpp */,
 				BF012B24226A21AF003AEB55 /* RemoteArray.h */,
-				BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */,
-				BF108ACF229718ED003DDC5F /* HeapArray.hpp */,
 				BF012AD92269FC83003AEB55 /* SoyAssert.cpp */,
 				BF012AD72269FC83003AEB55 /* SoyAssert.h */,
+				BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */,
 				BF012B25226A21C0003AEB55 /* SoyAvf.h */,
 				BF012B26226A21C0003AEB55 /* SoyAvf.mm */,
 				BF012AEF2269FE13003AEB55 /* SoyDebug.cpp */,
@@ -369,6 +378,8 @@
 				BF012B4D226A2726003AEB55 /* SoyGraphics.h */,
 				BF012B3D226A26F0003AEB55 /* SoyH264.cpp */,
 				BF012B3E226A26F0003AEB55 /* SoyH264.h */,
+				BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */,
+				BFEE8DFB22B125AA00F89A39 /* SoyJson.h */,
 				BF012B47226A270A003AEB55 /* SoyMedia.cpp */,
 				BF012B48226A270A003AEB55 /* SoyMedia.h */,
 				BF012B52226A2FCF003AEB55 /* SoyMediaFormat.cpp */,
@@ -491,8 +502,8 @@
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF012AAE2268DBF8003AEB55 /* BundleInfo.plist */,
 				BF012AA92268DBF7003AEB55 /* FrameworkInfo.plist */,
-				BF108A872296F476003DDC5F /* Kinect.cpp */,
-				BF108A862296F476003DDC5F /* Kinect.h */,
+				BF108A872296F476003DDC5F /* Freenect.cpp */,
+				BF108A862296F476003DDC5F /* Freenect.h */,
 				BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */,
 				BF108A8C2296F4BE003DDC5F /* Kinect2.h */,
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
@@ -538,6 +549,7 @@
 				BF012B53226A2FCF003AEB55 /* SoyMediaFormat.h in Headers */,
 				BF012B3C226A26E9003AEB55 /* SoyOpengl.h in Headers */,
 				BF012B62226A30C7003AEB55 /* SoyShader.h in Headers */,
+				BFEE8DFD22B125AA00F89A39 /* SoyJson.h in Headers */,
 				BF012B5A226A2FE0003AEB55 /* SoyWave.h in Headers */,
 				BF012B6A226A3176003AEB55 /* SoyFilesystem.h in Headers */,
 				BF108AB322971762003DDC5F /* AvfPixelBuffer.h in Headers */,
@@ -750,6 +762,7 @@
 				BF012B22226A218F003AEB55 /* SoyScope.cpp in Sources */,
 				BF012AE62269FCA4003AEB55 /* SoyString.cpp in Sources */,
 				BF012B1E226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */,
+				BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */,
 				BF012B4F226A2726003AEB55 /* SoyGraphics.cpp in Sources */,
 				BF012B69226A3176003AEB55 /* SoyFilesystem.cpp in Sources */,
 				BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */,
@@ -771,6 +784,7 @@
 				BF012B3B226A26E9003AEB55 /* SoyOpengl.cpp in Sources */,
 				BF012B40226A26F1003AEB55 /* SoyH264.cpp in Sources */,
 				BF012AD42269FAE2003AEB55 /* TestDevice.cpp in Sources */,
+				BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */,
 				BF012AF12269FE13003AEB55 /* SoyDebug.mm in Sources */,
 				BF012B5E226A30A6003AEB55 /* SoyVector.cpp in Sources */,
 				BF012AE42269FCA4003AEB55 /* SoyString.mm in Sources */,
@@ -797,6 +811,7 @@
 				BF108AC52297178F003DDC5F /* SoyString.mm in Sources */,
 				BF108ACE22971817003DDC5F /* AvfVideoCapture.mm in Sources */,
 				BF108ABB2297177D003DDC5F /* SoyGraphics.cpp in Sources */,
+				BFEE8DF122B0097C00F89A39 /* Freenect.cpp in Sources */,
 				BF108ABF2297177D003DDC5F /* SoyOpengl.cpp in Sources */,
 				BF108AC02297177D003DDC5F /* SoyOpenglContext.cpp in Sources */,
 				BF108ACB2297178F003DDC5F /* SoyWave.cpp in Sources */,
@@ -812,6 +827,7 @@
 				BF108AB92297177D003DDC5F /* SoyFilesystem.cpp in Sources */,
 				BF108AB72297177D003DDC5F /* SoyDebug.cpp in Sources */,
 				BF108A9922970C92003DDC5F /* PopCameraDevice_TestApp.cpp in Sources */,
+				BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */,
 				BF108AA422971485003DDC5F /* TCameraDevice.cpp in Sources */,
 				BF108AA522971487003DDC5F /* TestDevice.cpp in Sources */,
 				BF108AB62297177D003DDC5F /* SoyAvf.mm in Sources */,
@@ -827,6 +843,7 @@
 				BF012B21226A218F003AEB55 /* SoyScope.cpp in Sources */,
 				BF012AE52269FCA4003AEB55 /* SoyString.cpp in Sources */,
 				BF012B1D226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */,
+				BFEE8DFE22B125AA00F89A39 /* SoyJson.cpp in Sources */,
 				BF012B4E226A2726003AEB55 /* SoyGraphics.cpp in Sources */,
 				BF012B68226A3176003AEB55 /* SoyFilesystem.cpp in Sources */,
 				BF012B75226A3296003AEB55 /* SoyTime.mm in Sources */,
@@ -848,6 +865,7 @@
 				BF012B3A226A26E9003AEB55 /* SoyOpengl.cpp in Sources */,
 				BF012B3F226A26F1003AEB55 /* SoyH264.cpp in Sources */,
 				BF012ABD2268DBF8003AEB55 /* TCameraDevice.cpp in Sources */,
+				BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */,
 				BF012AF02269FE13003AEB55 /* SoyDebug.mm in Sources */,
 				BF012B5D226A30A6003AEB55 /* SoyVector.cpp in Sources */,
 				BF012AE32269FCA4003AEB55 /* SoyString.mm in Sources */,

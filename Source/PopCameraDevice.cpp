@@ -6,13 +6,16 @@
 #include <algorithm>
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
-//#include "Freenect2.h"
-//#include "Kinect.h"
+
 #if defined(TARGET_WINDOWS)
 #include "Kinect2.h"
 #define ENABLE_KINECT2
 #endif
 
+#if defined(TARGET_OSX)
+#include "Freenect.h"
+#define ENABLE_FREENECT
+#endif
 
 #if defined(TARGET_WINDOWS)
 #include "MfCapture.h"
@@ -43,6 +46,7 @@ namespace PopCameraDevice
 {
 	class TDeviceInstance;
 
+	TDevice&		GetCameraDevice(int32_t Instance);
 	TDevice&		GetCameraDevice(uint32_t Instance);
 	uint32_t		CreateInstance(std::shared_ptr<TDevice> Device);
 	void			FreeInstance(uint32_t Instance);
@@ -87,6 +91,10 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #endif
 	//Freenect2::EnumDeviceNames(EnumDevice);
 	//Kinect::EnumDeviceNames(EnumDevice);
+	
+#if defined(ENABLE_FREENECT)
+	Freenect::EnumDeviceNames(EnumDevice);
+#endif
 	
 #if defined(ENABLE_KINECT2)
 	Kinect2::EnumDeviceNames(EnumDevice);
@@ -173,6 +181,20 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	}
 #endif
 
+	
+#if defined(ENABLE_FREENECT)
+	try
+	{
+		std::shared_ptr<TDevice> Device(new Freenect::TSource(Name));
+		if ( Device )
+			return PopCameraDevice::CreateInstance(Device);
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << e.what() << std::endl;
+	}
+#endif
+
 	throw Soy::AssertException("Failed to create device");
 }
 
@@ -207,6 +229,17 @@ __export int32_t PopCameraDevice_CreateCameraDevice(const char* Name)
 	return SafeCall( Function, __func__, -1 );
 }
 
+
+PopCameraDevice::TDevice& PopCameraDevice::GetCameraDevice(int32_t Instance)
+{
+	if ( Instance < 0 )
+	{
+		std::stringstream Error;
+		Error << "Invalid instance identifier " << Instance;
+		throw Soy::AssertException(Error.str());
+	}
+	return GetCameraDevice( static_cast<uint32_t>( Instance ) );
+}
 
 PopCameraDevice::TDevice& PopCameraDevice::GetCameraDevice(uint32_t Instance)
 {

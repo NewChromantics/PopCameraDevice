@@ -24,7 +24,9 @@ int main(int argc, const char * argv[])
 		std::Debug << DeviceNames[d] << std::endl;
 	}
 	
-	auto KinectDevice = PopCameraDevice_CreateCameraDevice("Kinect2:Default_Depth");
+	auto Name = "Freenect:A22595W00862214A_Depth";
+	//auto Name = "Kinect2:Default_Depth";
+	auto KinectDevice = PopCameraDevice_CreateCameraDevice(Name);
 
 	//	get 10 frames
 	auto FrameCount = 0;

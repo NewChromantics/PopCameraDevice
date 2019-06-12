@@ -11,65 +11,32 @@
 #include "libusb.h"
 #include "libfreenect.h"
 
-namespace Kinect
+namespace Freenect
 {
-	class TContext;
-	class TDevice;
-	class TDeviceMeta;	//	make this generic
-	class TDeviceDecoder;	//	subdevice -> TVideoDecoder interface
-	class TFrame;
-	class TVideoStream;
-	class TDepthStream;
-	class TStream;
-	
-	class TDepthPixelBuffer;	//	pixel buffer with some special depth processing
-	
-	void			EnumDevices(std::function<void(const std::string&)> Append);
-	void			FreeContext();
-	
-	TContext&		GetContext();
+	class TSource;
+	class TFrameListener;
 	
 	void			EnumDeviceNames(std::function<void(const std::string&)> Enum);
 }
 
 
-class Kinect::TContext // : public SoyThread
+
+class Freenect::TSource : public PopCameraDevice::TDevice
 {
 public:
-	TContext();
-	~TContext();
-	/*
-	bool							HasFatalError(std::string& Error)		{	Error = mFatalError;	return !mFatalError.empty();	}
-	void							EnumDevices(ArrayBridge<TDeviceMeta>&& Metas,bool AllowInvalidSerial);
-	//std::shared_ptr<TDevice>		GetDevice(const std::string& Name,const TVideoDecoderParams& Params);		//	alloc/get device
-	//std::shared_ptr<TDevice>		GetDevice(uint32 DeviceId);
-	std::shared_ptr<TDevice>		GetDevice(const std::string& Name);
-#if defined(LIBFREENECT)
-	freenect_context*				GetContext()	{	return mContext;	}
-#endif
-
-	//	store lib errors
-	void							OnLibError(const std::string& Error)	{	mLibError << Error;	}
-	void							FlushLibError(std::stringstream& Error)	{	Error << mLibError.str();			Soy::StringStreamClear(mLibError);	}
+	TSource(const std::string& Serial);
+	~TSource();
 	
-protected:
-	virtual void					Thread() override;
-
-#if defined(LIBFREENECT)
-	void							CreateContext();
-	void							FreeContext();
-	void							ReacquireDevices();
-#endif
-
+	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
+	
 private:
-	Array<std::shared_ptr<TDevice>>	mDevices;	//	allocated/active devices
-#if defined(LIBFREENECT)
-	freenect_context*				mContext;
-#endif
-	std::string						mFatalError;
-	std::stringstream				mLibError;
-	 */
+	void			OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp);
+	
+private:
+	std::shared_ptr<TFrameListener>	mListener;
 };
+
+
 
 
 /*
