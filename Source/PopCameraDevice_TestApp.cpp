@@ -32,9 +32,11 @@ int main(int argc, const char * argv[])
 	auto FrameCount = 0;
 	while ( FrameCount < 10 )
 	{
-		auto Result = PopCameraDevice_PopFrame(KinectDevice, nullptr, 0, nullptr, 0, nullptr, 0);
+		char Meta[1000];
+		auto Result = PopCameraDevice_PopFrameAndMeta(KinectDevice, nullptr, 0, nullptr, 0, nullptr, 0, Meta, sizeof(Meta) );
 		if ( Result > 0 )
 		{
+			std::Debug << "Got frame, meta=" << Meta << std::endl;
 			FrameCount++;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));

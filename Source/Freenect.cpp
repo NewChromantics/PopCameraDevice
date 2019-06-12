@@ -342,6 +342,23 @@ std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(con
 	return Listener;
 }
 
+void Freenect::TDevice::Close()
+{
+	if ( !mDevice )
+		return;
+	
+	//	stop streams
+	auto Result = freenect_stop_depth( mDevice );
+	mDepthMode.is_valid = false;
+	
+	Result = freenect_stop_video( mDevice );
+
+	Result = freenect_close_device( mDevice );
+	IsOkay( Result, "freenect_close_device" );
+	
+	mDevice = nullptr;
+}
+
 
 void Freenect::TDevice::EnableDepthStream()
 {
@@ -416,21 +433,32 @@ Freenect::TFreenect::~TFreenect()
 {
 	Stop( true );
 	
-	auto Error = freenect_shutdown( mContext );
-	if ( Error != 0 )
+	try
 	{
-		std::Debug << "freenect_shutdown error: "  << Error << std::endl;
+		//	close all devicse
+		for ( auto d=0;	d<mDevices.GetSize();	d++ )
+		{
+			auto& Device = mDevices[d];
+			Device.Close();
+		}
+		
+		auto Error = freenect_shutdown( mContext );
+		IsOkay( Error, "freenect_shutdown" );
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << "Freenect cleanup error: "  << e.what() << std::endl;
 	}
 }
 
 void Freenect::TFreenect::Thread()
 {
+	//	include timeout so we can shutdown without blocking thread
 	int TimeoutMs = 30;
-	int TimeoutSecs = 5;
+	int TimeoutSecs = 1;
 	int TimeoutMicroSecs = TimeoutMs*1000;
 	timeval Timeout = {TimeoutSecs,TimeoutMicroSecs};
-	//libusb_error Result = static_cast<libusb_error>( freenect_process_events_timeout( mContext, &Timeout ) );
-	libusb_error Result = static_cast<libusb_error>( freenect_process_events( mContext ) );
+	libusb_error Result = static_cast<libusb_error>( freenect_process_events_timeout( mContext, &Timeout ) );
 	
 	//	should we sleep here
 	if ( Result == LIBUSB_SUCCESS )
