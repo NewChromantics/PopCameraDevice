@@ -1381,6 +1381,29 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	
 	TJsonWriter Meta;
 	Meta.Push("Time", Timestamp.GetMilliSeconds().count() );
+	
+	//	would like a more official source from libfreenect, but there isn't one :)
+	//	http://smeenk.com/kinect-field-of-view-comparison/
+	//	this source is from the offiical kinect sdk, but verify it ourselves some day
+	float DepthHorzFov = 58.5f;
+	float DepthVertFov = 46.6f;
+	float ColourHorzFov = 62;
+	float ColourVertFov = 48.6f;
+	if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepthmm )
+	{
+		Meta.Push("DepthMax",FREENECT_DEPTH_MM_MAX_VALUE);
+		Meta.Push("DepthInvalid",FREENECT_DEPTH_MM_NO_VALUE);
+		Meta.Push("HorzFov",DepthHorzFov);
+		Meta.Push("VertFov",DepthVertFov);
+	}
+	else if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepth10bit || Frame.GetFormat() == SoyPixelsFormat::FreenectDepth11bit )
+	{
+		Meta.Push("DepthMax",FREENECT_DEPTH_RAW_MAX_VALUE);
+		Meta.Push("DepthInvalid",FREENECT_DEPTH_RAW_NO_VALUE);
+		Meta.Push("HorzFov",DepthHorzFov);
+		Meta.Push("VertFov",DepthVertFov);
+	}
+	
 	auto MetaString = Meta.GetString();
 	
 	this->PushFrame( PixelBuffer, Frame.GetMeta(), MetaString );
