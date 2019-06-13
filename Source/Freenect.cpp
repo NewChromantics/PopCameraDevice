@@ -478,9 +478,7 @@ SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_cons
 	auto PixelFormat = GetFormat( mDepthMode.depth_format );
 	auto Width = mDepthMode.width;
 	auto Height = mDepthMode.height;
-	
-	//	data size not provided!
-	auto Size = SoyPixelsMeta( Width, Height, PixelFormat ).GetDataSize();
+	auto Size = mDepthMode.bytes;
 	
 	//	gr: make a transform for this
 	//	mDepthMode.padding_bits_per_pixel
@@ -495,13 +493,11 @@ SoyPixelsRemote Freenect::TDevice::GetColourPixels(const uint8_t* PixelBytes_con
 	if ( !mColourMode.is_valid )
 		throw Soy_AssertException("Invalid colour mode");
 	
-	auto PixelFormat = GetFormat( mColourMode.depth_format );
+	auto PixelFormat = GetFormat( mColourMode.video_format );
 	auto Width = mColourMode.width;
 	auto Height = mColourMode.height;
-	
-	//	data size not provided!
-	auto Size = SoyPixelsMeta( Width, Height, PixelFormat ).GetDataSize();
-	
+	auto Size = mColourMode.bytes;
+
 	//	gr: make a transform for this
 	//	mDepthMode.padding_bits_per_pixel
 	SoyPixelsRemote Pixels( PixelBytes, Width, Height, Size, PixelFormat );
