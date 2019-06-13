@@ -7,9 +7,8 @@
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
 
-#if defined(TARGET_WINDOWS)
+#if defined(ENABLE_KINECT2)
 #include "Kinect2.h"
-#define ENABLE_KINECT2
 #endif
 
 #if defined(TARGET_OSX)

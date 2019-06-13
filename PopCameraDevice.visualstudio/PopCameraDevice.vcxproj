@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -15,6 +15,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Freenect.cpp" />
     <ClCompile Include="..\Source\Kinect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
@@ -26,6 +27,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Source\Kinect2.cpp" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\audio.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\core.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\loader.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\tilt.c" />
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.c" />
     <ClCompile Include="..\Source\MfCapture.cpp" />
     <ClCompile Include="..\Source\MfDecoder.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
@@ -65,9 +74,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Source\Freenect.h" />
     <ClInclude Include="..\Source\Kinect.h" />
     <ClInclude Include="..\Source\Freenect2.h" />
     <ClInclude Include="..\Source\Kinect2.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\platform\windows\unistd.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\freenect_internal.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\loader.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.h" />
+    <ClInclude Include="..\Source\Libs\LibFreenect\libusb.h" />
     <ClInclude Include="..\Source\MfCapture.h" />
     <ClInclude Include="..\Source\MfDecoder.h" />
     <CustomBuild Include="..\Source\PopCameraDevice.h" />
@@ -115,6 +133,8 @@
     <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
       <FileType>Document</FileType>
     </CustomBuild>
+    <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\fwfetcher.py" />
+    <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in" />
     <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -123,29 +143,32 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
     </Library>
+    <Library Include="..\Source\Libs\LibFreenect\libusb-1.0.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Source\Libs\LibFreenect\LibFreenect\src\CMakeLists.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{64811728-CD20-4F2C-899B-E3BF3D4B032E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>PopMoveiTexture</RootNamespace>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Master|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -156,11 +179,13 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
     <Import Project="Kinect2.props" />
+    <Import Project="Libfreenect.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
     <Import Project="Kinect2.props" />
+    <Import Project="Libfreenect.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Master|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -176,7 +201,6 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link />
     <Link />

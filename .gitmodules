@@ -4,3 +4,6 @@
 [submodule "Source/Libs/LibFreenect2"]
 	path = Source/Libs/LibFreenect2/LibFreenect2
 	url = https://github.com/OpenKinect/libfreenect2.git
+[submodule "Source/Libs/LibFreenect/LibFreenect"]
+	path = Source/Libs/LibFreenect/LibFreenect
+	url = https://github.com/OpenKinect/libfreenect.git

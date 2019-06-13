@@ -2,6 +2,22 @@
 #include "SoyJson.h"
 
 
+#if defined(TARGET_WINDOWS)
+//	libusb uses some stdio functions which are now inlined. This library provides a function to link to
+//	https://stackoverflow.com/a/32418900
+#pragma comment(lib,"legacy_stdio_definitions.lib")
+//	this define apparently might resolve the same thing, but doesnt seem to work 
+//	_NO_CRT_STDIO_INLINE
+
+//	linking with libusb also is missing "iob"
+//	so here's a replacement
+//https://stackoverflow.com/a/32449318
+//	this gives warning LNK4049: locally defined symbol _iob imported
+//	maybe I can get around that with dllspec(IMPORT) ?
+extern "C" FILE _iob[] = { *stdin, *stdout, *stderr };
+#endif
+
+
 namespace Freenect
 {
 	//	we need to recreate the library interface sometimes, so it's wrapped in this
@@ -517,6 +533,8 @@ SoyPixelsRemote Freenect::TDevice::GetColourPixels(const uint8_t* PixelBytes_con
 Freenect::TFreenect::TFreenect() :
 	SoyThread	("Freenect")
 {
+	//	gr: windows requires libusb 1.0.22 minimum. Check this!
+
 	freenect_usb_context* UsbContext = nullptr;
 	auto Result = freenect_init( &mContext, UsbContext );
 	Freenect::IsOkay( Result, "freenect_init" );
