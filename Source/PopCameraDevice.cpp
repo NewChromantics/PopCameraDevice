@@ -11,10 +11,9 @@
 #include "Kinect2.h"
 #endif
 
-#if defined(TARGET_OSX)
+
 #include "Freenect.h"
 #define ENABLE_FREENECT
-#endif
 
 #if defined(TARGET_WINDOWS)
 #include "MfCapture.h"

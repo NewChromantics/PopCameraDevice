@@ -1,5 +1,7 @@
 #include "Freenect.h"
 #include "SoyJson.h"
+#include "libusb.h"
+#include "libfreenect.h"
 
 
 #if defined(TARGET_WINDOWS)

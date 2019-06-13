@@ -8,8 +8,8 @@
 //  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 //  brew install libfreenect
 //  usually need to restart xcode to recognise new source tree entries
-#include "libusb.h"
-#include "libfreenect.h"
+//#include "libusb.h"
+//#include "libfreenect.h"
 
 namespace Freenect
 {

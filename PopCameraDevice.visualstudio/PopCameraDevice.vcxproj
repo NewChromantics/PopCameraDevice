@@ -192,6 +192,7 @@
     <Import Project="PopCameraDevice.props" />
     <Import Project="Release.props" />
     <Import Project="Kinect2.props" />
+    <Import Project="Libfreenect.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
@@ -214,7 +215,6 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link />
     <Link />
