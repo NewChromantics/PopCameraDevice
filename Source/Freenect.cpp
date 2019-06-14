@@ -1620,20 +1620,20 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	{
 		Meta.Push("DepthMax",FREENECT_DEPTH_MM_MAX_VALUE);
 		Meta.Push("DepthInvalid",FREENECT_DEPTH_MM_NO_VALUE);
-		Meta.Push("HorzFov",DepthHorzFov);
-		Meta.Push("VertFov",DepthVertFov);
+		Meta.Push("HorizontalFov",DepthHorzFov);
+		Meta.Push("VerticalFov",DepthVertFov);
 	}
 	else if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepth10bit || Frame.GetFormat() == SoyPixelsFormat::FreenectDepth11bit )
 	{
 		Meta.Push("DepthMax",FREENECT_DEPTH_RAW_MAX_VALUE);
 		Meta.Push("DepthInvalid",FREENECT_DEPTH_RAW_NO_VALUE);
-		Meta.Push("HorzFov",DepthHorzFov);
-		Meta.Push("VertFov",DepthVertFov);
+		Meta.Push("HorizontalFov",DepthHorzFov);
+		Meta.Push("VerticalFov",DepthVertFov);
 	}
 	else
 	{
-		Meta.Push("HorzFov",ColourHorzFov);
-		Meta.Push("VertFov",ColourVertFov);
+		Meta.Push("HorizontalFov",ColourHorzFov);
+		Meta.Push("VerticalFov",ColourVertFov);
 	}
 	
 	auto MetaString = Meta.GetString();
