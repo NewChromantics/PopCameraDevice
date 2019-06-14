@@ -155,15 +155,36 @@
 		BF76106F226B6E6800762F15 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B30226A2665003AEB55 /* VideoToolbox.framework */; };
 		BF761070226B6E6A00762F15 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B2E226A263E003AEB55 /* CoreMedia.framework */; };
 		BF761071226B6E6C00762F15 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B06226A09EC003AEB55 /* AVFoundation.framework */; };
+		BF8534CD22B3FE370049C01B /* registration.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BB22B3FE360049C01B /* registration.c */; };
+		BF8534CE22B3FE370049C01B /* registration.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BB22B3FE360049C01B /* registration.c */; };
+		BF8534CF22B3FE370049C01B /* registration.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BB22B3FE360049C01B /* registration.c */; };
+		BF8534D122B3FE370049C01B /* audio.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BD22B3FE360049C01B /* audio.c */; };
+		BF8534D222B3FE370049C01B /* audio.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BD22B3FE360049C01B /* audio.c */; };
+		BF8534D322B3FE370049C01B /* audio.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BD22B3FE360049C01B /* audio.c */; };
+		BF8534D622B3FE370049C01B /* flags.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C022B3FE370049C01B /* flags.c */; };
+		BF8534D722B3FE370049C01B /* flags.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C022B3FE370049C01B /* flags.c */; };
+		BF8534D822B3FE370049C01B /* flags.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C022B3FE370049C01B /* flags.c */; };
+		BF8534D922B3FE370049C01B /* usb_libusb10.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C122B3FE370049C01B /* usb_libusb10.c */; };
+		BF8534DA22B3FE370049C01B /* usb_libusb10.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C122B3FE370049C01B /* usb_libusb10.c */; };
+		BF8534DB22B3FE370049C01B /* usb_libusb10.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C122B3FE370049C01B /* usb_libusb10.c */; };
+		BF8534DC22B3FE370049C01B /* cameras.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C222B3FE370049C01B /* cameras.c */; };
+		BF8534DD22B3FE370049C01B /* cameras.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C222B3FE370049C01B /* cameras.c */; };
+		BF8534DE22B3FE370049C01B /* cameras.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C222B3FE370049C01B /* cameras.c */; };
+		BF8534DF22B3FE370049C01B /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C322B3FE370049C01B /* core.c */; };
+		BF8534E022B3FE370049C01B /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C322B3FE370049C01B /* core.c */; };
+		BF8534E122B3FE370049C01B /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C322B3FE370049C01B /* core.c */; };
+		BF8534E222B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
+		BF8534E322B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
+		BF8534E422B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
+		BF8534E922B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
+		BF8534EA22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
+		BF8534EB22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF122B0097C00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
-		BFEE8DF522B0139000F89A39 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD5229726CE003DDC5F /* libfreenect.a */; };
 		BFEE8DF622B0139300F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
 		BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
-		BFEE8DF822B013A800F89A39 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD5229726CE003DDC5F /* libfreenect.a */; };
 		BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
-		BFEE8DFA22B013AF00F89A39 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD5229726CE003DDC5F /* libfreenect.a */; };
 		BFEE8DFD22B125AA00F89A39 /* SoyJson.h in Headers */ = {isa = PBXBuildFile; fileRef = BFEE8DFB22B125AA00F89A39 /* SoyJson.h */; };
 		BFEE8DFE22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
@@ -283,6 +304,23 @@
 		BF108AEE22972F23003DDC5F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BF108AF322980C2C003DDC5F /* Build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = Build.sh; path = Source/Libs/LibFreenect2/Build.sh; sourceTree = SOURCE_ROOT; };
 		BF4A6A141EA16D7D00613A64 /* PopCameraDevice.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopCameraDevice.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF8534B922B3FE360049C01B /* fwfetcher.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = fwfetcher.py; path = LibFreenect/src/fwfetcher.py; sourceTree = "<group>"; };
+		BF8534BA22B3FE360049C01B /* registration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = registration.h; path = LibFreenect/src/registration.h; sourceTree = "<group>"; };
+		BF8534BB22B3FE360049C01B /* registration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = registration.c; path = LibFreenect/src/registration.c; sourceTree = "<group>"; };
+		BF8534BC22B3FE360049C01B /* usb_libusb10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = usb_libusb10.h; path = LibFreenect/src/usb_libusb10.h; sourceTree = "<group>"; };
+		BF8534BD22B3FE360049C01B /* audio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = audio.c; path = LibFreenect/src/audio.c; sourceTree = "<group>"; };
+		BF8534BE22B3FE370049C01B /* freenect_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = freenect_internal.h; path = LibFreenect/src/freenect_internal.h; sourceTree = "<group>"; };
+		BF8534BF22B3FE370049C01B /* cameras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cameras.h; path = LibFreenect/src/cameras.h; sourceTree = "<group>"; };
+		BF8534C022B3FE370049C01B /* flags.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flags.c; path = LibFreenect/src/flags.c; sourceTree = "<group>"; };
+		BF8534C122B3FE370049C01B /* usb_libusb10.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = usb_libusb10.c; path = LibFreenect/src/usb_libusb10.c; sourceTree = "<group>"; };
+		BF8534C222B3FE370049C01B /* cameras.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cameras.c; path = LibFreenect/src/cameras.c; sourceTree = "<group>"; };
+		BF8534C322B3FE370049C01B /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = core.c; path = LibFreenect/src/core.c; sourceTree = "<group>"; };
+		BF8534C422B3FE370049C01B /* tilt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tilt.c; path = LibFreenect/src/tilt.c; sourceTree = "<group>"; };
+		BF8534C522B3FE370049C01B /* libfreenect.pc.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = libfreenect.pc.in; path = LibFreenect/src/libfreenect.pc.in; sourceTree = "<group>"; };
+		BF8534C622B3FE370049C01B /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = LibFreenect/src/CMakeLists.txt; sourceTree = "<group>"; };
+		BF8534C722B3FE370049C01B /* loader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = loader.c; path = LibFreenect/src/loader.c; sourceTree = "<group>"; };
+		BF8534C822B3FE370049C01B /* loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = loader.h; path = LibFreenect/src/loader.h; sourceTree = "<group>"; };
+		BF8534C922B3FE370049C01B /* flags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flags.h; path = LibFreenect/src/flags.h; sourceTree = "<group>"; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
 		BFD607761EA16F0A0035C814 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D11.h; path = Source/Unity/IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
@@ -310,7 +348,6 @@
 				BF012B31226A2665003AEB55 /* VideoToolbox.framework in Frameworks */,
 				BF012B2F226A263E003AEB55 /* CoreMedia.framework in Frameworks */,
 				BF012B07226A09EC003AEB55 /* AVFoundation.framework in Frameworks */,
-				BFEE8DFA22B013AF00F89A39 /* libfreenect.a in Frameworks */,
 				BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,7 +365,6 @@
 				BF108AAF2297175A003DDC5F /* OpenGL.framework in Frameworks */,
 				BF108AAC22971759003DDC5F /* CoreServices.framework in Frameworks */,
 				BF108AAD2297175A003DDC5F /* CoreVideo.framework in Frameworks */,
-				BFEE8DF522B0139000F89A39 /* libfreenect.a in Frameworks */,
 				BFEE8DF622B0139300F89A39 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -347,7 +383,6 @@
 				BF76106C226B6E6200762F15 /* CoreVideo.framework in Frameworks */,
 				BF761070226B6E6A00762F15 /* CoreMedia.framework in Frameworks */,
 				BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */,
-				BFEE8DF822B013A800F89A39 /* libfreenect.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,6 +490,7 @@
 		BF108AD0229726B9003DDC5F /* LibFreenect */ = {
 			isa = PBXGroup;
 			children = (
+				BF8534B822B3FE250049C01B /* src */,
 				BF108AE922972877003DDC5F /* libusb.h */,
 				BF108AD7229726CE003DDC5F /* libfreenect_audio.h */,
 				BF108AD3229726CE003DDC5F /* libfreenect_registration.h */,
@@ -487,6 +523,30 @@
 				BF108A9622970C92003DDC5F /* TestApp */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BF8534B822B3FE250049C01B /* src */ = {
+			isa = PBXGroup;
+			children = (
+				BF8534BD22B3FE360049C01B /* audio.c */,
+				BF8534C222B3FE370049C01B /* cameras.c */,
+				BF8534BF22B3FE370049C01B /* cameras.h */,
+				BF8534C622B3FE370049C01B /* CMakeLists.txt */,
+				BF8534C322B3FE370049C01B /* core.c */,
+				BF8534C022B3FE370049C01B /* flags.c */,
+				BF8534C922B3FE370049C01B /* flags.h */,
+				BF8534BE22B3FE370049C01B /* freenect_internal.h */,
+				BF8534B922B3FE360049C01B /* fwfetcher.py */,
+				BF8534C522B3FE370049C01B /* libfreenect.pc.in */,
+				BF8534C722B3FE370049C01B /* loader.c */,
+				BF8534C822B3FE370049C01B /* loader.h */,
+				BF8534BB22B3FE360049C01B /* registration.c */,
+				BF8534BA22B3FE360049C01B /* registration.h */,
+				BF8534C422B3FE370049C01B /* tilt.c */,
+				BF8534C122B3FE370049C01B /* usb_libusb10.c */,
+				BF8534BC22B3FE360049C01B /* usb_libusb10.h */,
+			);
+			name = src;
 			sourceTree = "<group>";
 		};
 		BFD6076D1EA16ED20035C814 /* Source */ = {
@@ -760,12 +820,16 @@
 			files = (
 				BF012AF42269FE13003AEB55 /* SoyDebug.cpp in Sources */,
 				BF012B22226A218F003AEB55 /* SoyScope.cpp in Sources */,
+				BF8534CE22B3FE370049C01B /* registration.c in Sources */,
 				BF012AE62269FCA4003AEB55 /* SoyString.cpp in Sources */,
 				BF012B1E226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */,
 				BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */,
 				BF012B4F226A2726003AEB55 /* SoyGraphics.cpp in Sources */,
+				BF8534EA22B3FE370049C01B /* loader.c in Sources */,
 				BF012B69226A3176003AEB55 /* SoyFilesystem.cpp in Sources */,
+				BF8534DD22B3FE370049C01B /* cameras.c in Sources */,
 				BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */,
+				BF8534D722B3FE370049C01B /* flags.c in Sources */,
 				BF012B17226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */,
 				BF012B45226A26FB003AEB55 /* SoyThread.cpp in Sources */,
 				BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
@@ -775,16 +839,20 @@
 				BF012B59226A2FE0003AEB55 /* SoyWave.cpp in Sources */,
 				BF012ADD2269FC83003AEB55 /* SoyPixels.cpp in Sources */,
 				BF012B04226A047F003AEB55 /* Avf.mm in Sources */,
+				BF8534E322B3FE370049C01B /* tilt.c in Sources */,
 				BF012AFA2269FE3F003AEB55 /* SoyTypes.cpp in Sources */,
 				BF012AFF226A0108003AEB55 /* SoyTime.cpp in Sources */,
 				BF012AD32269FAE2003AEB55 /* TCameraDevice.cpp in Sources */,
 				BF012B4A226A270A003AEB55 /* SoyMedia.cpp in Sources */,
 				BF012AD12268DE24003AEB55 /* AvfCapture.mm in Sources */,
 				BF012B55226A2FCF003AEB55 /* SoyMediaFormat.cpp in Sources */,
+				BF8534E022B3FE370049C01B /* core.c in Sources */,
 				BF012B3B226A26E9003AEB55 /* SoyOpengl.cpp in Sources */,
 				BF012B40226A26F1003AEB55 /* SoyH264.cpp in Sources */,
 				BF012AD42269FAE2003AEB55 /* TestDevice.cpp in Sources */,
+				BF8534DA22B3FE370049C01B /* usb_libusb10.c in Sources */,
 				BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */,
+				BF8534D222B3FE370049C01B /* audio.c in Sources */,
 				BF012AF12269FE13003AEB55 /* SoyDebug.mm in Sources */,
 				BF012B5E226A30A6003AEB55 /* SoyVector.cpp in Sources */,
 				BF012AE42269FCA4003AEB55 /* SoyString.mm in Sources */,
@@ -798,12 +866,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF8534E122B3FE370049C01B /* core.c in Sources */,
 				BF108ABC2297177D003DDC5F /* SoyH264.cpp in Sources */,
 				BF108AB82297177D003DDC5F /* SoyDebug.mm in Sources */,
+				BF8534DB22B3FE370049C01B /* usb_libusb10.c in Sources */,
 				BF108AC32297178F003DDC5F /* SoyShader.cpp in Sources */,
 				BF108AC222971781003DDC5F /* SoyScope.cpp in Sources */,
 				BF108AAA2297174B003DDC5F /* AvfPixelBuffer.mm in Sources */,
 				BF108ACC22971812003DDC5F /* Avf.mm in Sources */,
+				BF8534DE22B3FE370049C01B /* cameras.c in Sources */,
 				BF108ACD22971815003DDC5F /* AvfCapture.mm in Sources */,
 				BF108AC42297178F003DDC5F /* SoyString.cpp in Sources */,
 				BF108ACA2297178F003DDC5F /* SoyVector.cpp in Sources */,
@@ -814,20 +885,25 @@
 				BFEE8DF122B0097C00F89A39 /* Freenect.cpp in Sources */,
 				BF108ABF2297177D003DDC5F /* SoyOpengl.cpp in Sources */,
 				BF108AC02297177D003DDC5F /* SoyOpenglContext.cpp in Sources */,
+				BF8534CF22B3FE370049C01B /* registration.c in Sources */,
 				BF108ACB2297178F003DDC5F /* SoyWave.cpp in Sources */,
 				BF108AC12297177D003DDC5F /* SoyPixels.cpp in Sources */,
+				BF8534EB22B3FE370049C01B /* loader.c in Sources */,
 				BF108ABE2297177D003DDC5F /* SoyMediaFormat.cpp in Sources */,
 				BF108AA32297147F003DDC5F /* PopCameraDevice.cpp in Sources */,
 				BF108AC82297178F003DDC5F /* SoyTime.mm in Sources */,
 				BF108AB422971767003DDC5F /* memheap.cpp in Sources */,
 				BF108AB52297176C003DDC5F /* SoyAssert.cpp in Sources */,
+				BF8534D822B3FE370049C01B /* flags.c in Sources */,
 				BF108AC92297178F003DDC5F /* SoyTypes.cpp in Sources */,
 				BF108ABD2297177D003DDC5F /* SoyMedia.cpp in Sources */,
 				BF108ABA2297177D003DDC5F /* SoyFilesystem.mm in Sources */,
 				BF108AB92297177D003DDC5F /* SoyFilesystem.cpp in Sources */,
 				BF108AB72297177D003DDC5F /* SoyDebug.cpp in Sources */,
 				BF108A9922970C92003DDC5F /* PopCameraDevice_TestApp.cpp in Sources */,
+				BF8534D322B3FE370049C01B /* audio.c in Sources */,
 				BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */,
+				BF8534E422B3FE370049C01B /* tilt.c in Sources */,
 				BF108AA422971485003DDC5F /* TCameraDevice.cpp in Sources */,
 				BF108AA522971487003DDC5F /* TestDevice.cpp in Sources */,
 				BF108AB62297177D003DDC5F /* SoyAvf.mm in Sources */,
@@ -841,12 +917,16 @@
 			files = (
 				BF012AF32269FE13003AEB55 /* SoyDebug.cpp in Sources */,
 				BF012B21226A218F003AEB55 /* SoyScope.cpp in Sources */,
+				BF8534CD22B3FE370049C01B /* registration.c in Sources */,
 				BF012AE52269FCA4003AEB55 /* SoyString.cpp in Sources */,
 				BF012B1D226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */,
 				BFEE8DFE22B125AA00F89A39 /* SoyJson.cpp in Sources */,
 				BF012B4E226A2726003AEB55 /* SoyGraphics.cpp in Sources */,
+				BF8534E922B3FE370049C01B /* loader.c in Sources */,
 				BF012B68226A3176003AEB55 /* SoyFilesystem.cpp in Sources */,
+				BF8534DC22B3FE370049C01B /* cameras.c in Sources */,
 				BF012B75226A3296003AEB55 /* SoyTime.mm in Sources */,
+				BF8534D622B3FE370049C01B /* flags.c in Sources */,
 				BF012B16226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */,
 				BF012B44226A26FB003AEB55 /* SoyThread.cpp in Sources */,
 				BF012B2C226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
@@ -856,16 +936,20 @@
 				BF012B58226A2FE0003AEB55 /* SoyWave.cpp in Sources */,
 				BF012ADC2269FC83003AEB55 /* SoyPixels.cpp in Sources */,
 				BF012B03226A047F003AEB55 /* Avf.mm in Sources */,
+				BF8534E222B3FE370049C01B /* tilt.c in Sources */,
 				BF012AF92269FE3F003AEB55 /* SoyTypes.cpp in Sources */,
 				BF012AFE226A0108003AEB55 /* SoyTime.cpp in Sources */,
 				BF012ABC2268DBF8003AEB55 /* PopCameraDevice.cpp in Sources */,
 				BF012B49226A270A003AEB55 /* SoyMedia.cpp in Sources */,
 				BF012AB82268DBF8003AEB55 /* TestDevice.cpp in Sources */,
 				BF012B54226A2FCF003AEB55 /* SoyMediaFormat.cpp in Sources */,
+				BF8534DF22B3FE370049C01B /* core.c in Sources */,
 				BF012B3A226A26E9003AEB55 /* SoyOpengl.cpp in Sources */,
 				BF012B3F226A26F1003AEB55 /* SoyH264.cpp in Sources */,
 				BF012ABD2268DBF8003AEB55 /* TCameraDevice.cpp in Sources */,
+				BF8534D922B3FE370049C01B /* usb_libusb10.c in Sources */,
 				BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */,
+				BF8534D122B3FE370049C01B /* audio.c in Sources */,
 				BF012AF02269FE13003AEB55 /* SoyDebug.mm in Sources */,
 				BF012B5D226A30A6003AEB55 /* SoyVector.cpp in Sources */,
 				BF012AE32269FCA4003AEB55 /* SoyString.mm in Sources */,
@@ -880,6 +964,7 @@
 /* Begin XCBuildConfiguration section */
 		BF012ACA2268DC95003AEB55 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -965,6 +1050,7 @@
 		};
 		BF108A9B22970C92003DDC5F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1024,7 +1110,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -1072,7 +1157,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -1111,6 +1195,7 @@
 		};
 		BF4A6A1B1EA16D7D00613A64 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/BundleInfo.plist";
