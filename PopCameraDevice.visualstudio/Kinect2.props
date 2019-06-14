@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
+    <IncludePath>$(KINECTSDK20_DIR)\inc;$(ProjectDir)..\Source\Libs\LibFreenect2\Build\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(KINECTSDK20_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>

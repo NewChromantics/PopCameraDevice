@@ -1,5 +1,23 @@
 #include "Freenect.h"
 #include "SoyJson.h"
+#include "libusb.h"
+#include "libfreenect.h"
+
+
+#if defined(TARGET_WINDOWS)
+//	libusb uses some stdio functions which are now inlined. This library provides a function to link to
+//	https://stackoverflow.com/a/32418900
+#pragma comment(lib,"legacy_stdio_definitions.lib")
+//	this define apparently might resolve the same thing, but doesnt seem to work 
+//	_NO_CRT_STDIO_INLINE
+
+//	linking with libusb also is missing "iob"
+//	so here's a replacement
+//https://stackoverflow.com/a/32449318
+//	this gives warning LNK4049: locally defined symbol _iob imported
+//	maybe I can get around that with dllspec(IMPORT) ?
+extern "C" FILE _iob[] = { *stdin, *stdout, *stderr };
+#endif
 
 
 namespace Freenect
@@ -72,16 +90,28 @@ public:
 	{
 		mDepthMode.is_valid = false;
 	}
+	/*
 	TDevice(freenect_device& Device,const std::string& Serial)
 	{
 		mDevice = &Device;
 		mSerial = Serial;
 		mDepthMode.is_valid = false;
+		mColourMode.is_valid = false;
+	}
+	*/
+	TDevice(std::function<freenect_device*(const std::string&)> OpenFunc,const std::string& Serial)
+	{
+		mOpenFunc = OpenFunc;
+		mSerial = Serial;
+		mDepthMode.is_valid = false;
+		mColourMode.is_valid = false;
+		Open();
 	}
 	
 	void			EnableDepthStream(SoyPixelsMeta Format);
 	void			EnableColourStream(SoyPixelsMeta Format);
 	void			Close();
+	void			Open();			//	if there's no device, re-open given our known serial
 	SoyPixelsRemote	GetDepthPixels(const uint8_t* Pixels);
 	SoyPixelsRemote	GetColourPixels(const uint8_t* Pixels);
 
@@ -94,10 +124,16 @@ public:
 	bool			operator!=(const freenect_device& Device) const		{	return mDevice != &Device;	}
 
 	
+	std::function<freenect_device*(const std::string&)>	mOpenFunc;
 	freenect_frame_mode	mDepthMode;
 	freenect_frame_mode	mColourMode;
 	freenect_device*	mDevice = nullptr;
 	std::string			mSerial;
+
+private:
+	//	these are for re-opening
+	SoyPixelsMeta		mDepthFormat;
+	SoyPixelsMeta		mColourFormat;
 };
 
 class Freenect::TFrameListener
@@ -127,12 +163,14 @@ public:
 
 private:
 	virtual void		Thread() override;
+	void				ReacquireDevices();
 	
 public:
 	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnDepthFrame;
 	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnColourFrame;
 
 private:
+	std::mutex			mDeviceLock;
 	Array<TDevice>		mDevices;	//	devices we've opened
 	freenect_context*	mContext = nullptr;
 };
@@ -389,6 +427,24 @@ void Freenect::TDevice::Close()
 	mDevice = nullptr;
 }
 
+
+void Freenect::TDevice::Open()
+{
+	//	already open
+	if (mDevice)
+		return;
+
+	mDevice = mOpenFunc(mSerial);
+
+	//	re-enable streaming
+	if (mDepthFormat.IsValid())
+		EnableDepthStream(mDepthFormat);
+
+	if (mColourFormat.IsValid())
+		EnableColourStream(mColourFormat);
+}
+
+
 freenect_resolution GetResolution(SoyPixelsMeta Meta,bool AllowHighResolution)
 {
 #define LOW_WIDTH		320
@@ -440,6 +496,8 @@ void Freenect::TDevice::EnableDepthStream(SoyPixelsMeta Meta)
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_depth( mDevice );
 	Freenect::IsOkay( Result, "freenect_start_depth" );
+
+	mDepthFormat = Meta;
 }
 
 
@@ -466,6 +524,8 @@ void Freenect::TDevice::EnableColourStream(SoyPixelsMeta Meta)
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_video( mDevice );
 	Freenect::IsOkay( Result, "freenect_start_color" );
+
+	mColourFormat = Meta;
 }
 
 SoyPixelsRemote Freenect::TDevice::GetDepthPixels(const uint8_t* PixelBytes_const)
@@ -513,6 +573,8 @@ SoyPixelsRemote Freenect::TDevice::GetColourPixels(const uint8_t* PixelBytes_con
 Freenect::TFreenect::TFreenect() :
 	SoyThread	("Freenect")
 {
+	//	gr: windows requires libusb 1.0.22 minimum. Check this!
+
 	freenect_usb_context* UsbContext = nullptr;
 	auto Result = freenect_init( &mContext, UsbContext );
 	Freenect::IsOkay( Result, "freenect_init" );
@@ -533,7 +595,9 @@ Freenect::TFreenect::~TFreenect()
 	
 	try
 	{
-		//	close all devicse
+		std::lock_guard<std::mutex> Lock(mDeviceLock);
+
+		//	close all devices
 		for ( auto d=0;	d<mDevices.GetSize();	d++ )
 		{
 			auto& Device = mDevices[d];
@@ -551,6 +615,24 @@ Freenect::TFreenect::~TFreenect()
 
 void Freenect::TFreenect::Thread()
 {
+	if (mDeviceLock.try_lock())
+	{
+		try
+		{
+			//	re-open any devices we need to
+			for (auto d = 0; d < mDevices.GetSize(); d++)
+			{
+				auto& Device = mDevices[d];
+				Device.Open();
+			}
+		}
+		catch (std::exception& e)
+		{
+			std::Debug << e.what() << std::endl;
+		}
+		mDeviceLock.unlock();
+	}
+
 	//	include timeout so we can shutdown without blocking thread
 	int TimeoutMs = 30;
 	int TimeoutSecs = 1;
@@ -562,6 +644,14 @@ void Freenect::TFreenect::Thread()
 	if ( Result == LIBUSB_SUCCESS )
 		return;
 	
+
+	if (Result == LIBUSB_ERROR_IO)
+	{
+		//	close and re-open devices
+		ReacquireDevices();
+	}
+
+
 	//	handle error
 	std::Debug << Result << std::endl;
 	/*
@@ -584,8 +674,23 @@ void Freenect::TFreenect::Thread()
 }
 
 
+
+void Freenect::TFreenect::ReacquireDevices()
+{
+	std::lock_guard<std::mutex> Lock(mDeviceLock);
+
+	//	don't delete devices, but close them... make thread try and re-open
+	for (auto d = 0; d < mDevices.GetSize(); d++)
+	{
+		auto& Device = mDevices[d];
+		Device.Close();
+	}
+}
+
 Freenect::TDevice& Freenect::TFreenect::GetDevice(freenect_device& DeviceRef)
 {
+	std::lock_guard<std::mutex> Lock(mDeviceLock);
+
 	for ( auto d=0;	d<mDevices.GetSize();	d++ )
 	{
 		auto& Device = mDevices[d];
@@ -628,6 +733,8 @@ void Freenect::TFreenect::EnumDevices(std::function<void (const std::string &)>&
 //		switch to RAII TDevice as soon as this goes wrong
 Freenect::TDevice& Freenect::TFreenect::OpenDevice(const std::string& Serial)
 {
+	std::lock_guard<std::mutex> Lock(mDeviceLock);
+	
 	//	return existing
 	for ( auto d=0;	d<mDevices.GetSize();	d++ )
 	{
@@ -635,19 +742,26 @@ Freenect::TDevice& Freenect::TFreenect::OpenDevice(const std::string& Serial)
 		if ( Device != Serial )
 			continue;
 		
+		Device.Open();
 		return Device;
 	}
 	
-	freenect_device* Device = nullptr;
-	auto Error = freenect_open_device_by_camera_serial( mContext, &Device, Serial.c_str() );
-	IsOkay( Error, "freenect_open_device_by_camera_serial");
-	if ( !Device )
-		throw Soy::AssertException("freenect_open_device_by_camera_serial success, but null device");
-		
-	//	assign user data back to its owner
-	freenect_set_user( Device, this );
-	
-	TDevice NewDevice( *Device, Serial );
+	auto OpenFunc = [this](const std::string& Serial)
+	{
+		freenect_device* Device = nullptr;
+
+		auto Error = freenect_open_device_by_camera_serial( mContext, &Device, Serial.c_str());
+		IsOkay(Error, "freenect_open_device_by_camera_serial");
+		if (!Device)
+			throw Soy::AssertException("freenect_open_device_by_camera_serial success, but null device");
+
+		//	assign user data back to its owner
+		freenect_set_user(Device, this);
+		return Device;
+	};
+
+	//	make a new device, if it doesn't throw, keep it
+	TDevice NewDevice( OpenFunc, Serial );
 	auto& NewDevicePtr = mDevices.PushBack( NewDevice );
 	
 	std::Debug << "opened device " << Serial << std::endl;

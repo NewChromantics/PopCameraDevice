@@ -16,6 +16,9 @@
     <Filter Include="Libs\LibFreenect2">
       <UniqueIdentifier>{71c18334-6dee-4751-a3bb-e0db88cff137}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs\LibFreenect">
+      <UniqueIdentifier>{f27846a8-fdaf-4c0a-80c8-4d32ef36c6cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
@@ -96,6 +99,33 @@
     <ClCompile Include="..\Source\Kinect2.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Freenect.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\audio.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\core.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\loader.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\tilt.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.c">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\SoyLib\src\Array.hpp">
@@ -170,9 +200,6 @@
     <ClInclude Include="..\Source\TCameraDevice.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\PopCameraDevice.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\TestDevice.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -194,6 +221,33 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyAutoReleasePtr.h">
       <Filter>SoyLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Freenect.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\libusb.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\freenect_internal.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\loader.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\platform\windows\unistd.h">
+      <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
@@ -208,15 +262,30 @@
     <None Include="..\Source\Avf.mm">
       <Filter>Source</Filter>
     </None>
+    <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\fwfetcher.py">
+      <Filter>Libs\LibFreenect</Filter>
+    </None>
+    <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in">
+      <Filter>Libs\LibFreenect</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
       <Filter>Libs\LibFreenect2</Filter>
+    </Library>
+    <Library Include="..\Source\Libs\LibFreenect\libusb-1.0.lib">
+      <Filter>Libs\LibFreenect</Filter>
     </Library>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
       <Filter>Libs\LibFreenect2</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\Source\PopCameraDevice.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Source\Libs\LibFreenect\LibFreenect\src\CMakeLists.txt">
+      <Filter>Libs\LibFreenect</Filter>
+    </Text>
   </ItemGroup>
 </Project>
