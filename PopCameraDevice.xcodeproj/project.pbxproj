@@ -292,13 +292,7 @@
 		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = lib/libfreenect2.a; sourceTree = "<group>"; };
 		BF108AA6229714F5003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.a"; sourceTree = "<group>"; };
 		BF108ACF229718ED003DDC5F /* HeapArray.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HeapArray.hpp; sourceTree = "<group>"; };
-		BF108AD1229726CE003DDC5F /* libfreenect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfreenect.h; sourceTree = "<group>"; };
 		BF108AD2229726CE003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
-		BF108AD3229726CE003DDC5F /* libfreenect_registration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfreenect_registration.h; sourceTree = "<group>"; };
-		BF108AD4229726CE003DDC5F /* libfreenect.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = libfreenect.hpp; sourceTree = "<group>"; };
-		BF108AD5229726CE003DDC5F /* libfreenect.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreenect.a; sourceTree = "<group>"; };
-		BF108AD6229726CE003DDC5F /* libfreenect_sync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfreenect_sync.h; sourceTree = "<group>"; };
-		BF108AD7229726CE003DDC5F /* libfreenect_audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libfreenect_audio.h; sourceTree = "<group>"; };
 		BF108AD8229726CE003DDC5F /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		BF108AE922972877003DDC5F /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		BF108AEE22972F23003DDC5F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -321,6 +315,9 @@
 		BF8534C722B3FE370049C01B /* loader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = loader.c; path = LibFreenect/src/loader.c; sourceTree = "<group>"; };
 		BF8534C822B3FE370049C01B /* loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = loader.h; path = LibFreenect/src/loader.h; sourceTree = "<group>"; };
 		BF8534C922B3FE370049C01B /* flags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flags.h; path = LibFreenect/src/flags.h; sourceTree = "<group>"; };
+		BF8534F022B402600049C01B /* libfreenect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect.h; sourceTree = "<group>"; };
+		BF8534F122B402600049C01B /* libfreenect_audio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect_audio.h; sourceTree = "<group>"; };
+		BF8534F222B402600049C01B /* libfreenect_registration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect_registration.h; sourceTree = "<group>"; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
 		BFD607761EA16F0A0035C814 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D11.h; path = Source/Unity/IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
@@ -490,14 +487,9 @@
 		BF108AD0229726B9003DDC5F /* LibFreenect */ = {
 			isa = PBXGroup;
 			children = (
+				BF8534EF22B402600049C01B /* include */,
 				BF8534B822B3FE250049C01B /* src */,
 				BF108AE922972877003DDC5F /* libusb.h */,
-				BF108AD7229726CE003DDC5F /* libfreenect_audio.h */,
-				BF108AD3229726CE003DDC5F /* libfreenect_registration.h */,
-				BF108AD6229726CE003DDC5F /* libfreenect_sync.h */,
-				BF108AD5229726CE003DDC5F /* libfreenect.a */,
-				BF108AD1229726CE003DDC5F /* libfreenect.h */,
-				BF108AD4229726CE003DDC5F /* libfreenect.hpp */,
 				BF108AD2229726CE003DDC5F /* libusb-1.0.a */,
 				BF108AD8229726CE003DDC5F /* Readme.md */,
 			);
@@ -547,6 +539,17 @@
 				BF8534BC22B3FE360049C01B /* usb_libusb10.h */,
 			);
 			name = src;
+			sourceTree = "<group>";
+		};
+		BF8534EF22B402600049C01B /* include */ = {
+			isa = PBXGroup;
+			children = (
+				BF8534F022B402600049C01B /* libfreenect.h */,
+				BF8534F122B402600049C01B /* libfreenect_audio.h */,
+				BF8534F222B402600049C01B /* libfreenect_registration.h */,
+			);
+			name = include;
+			path = LibFreenect/include;
 			sourceTree = "<group>";
 		};
 		BFD6076D1EA16ED20035C814 /* Source */ = {
