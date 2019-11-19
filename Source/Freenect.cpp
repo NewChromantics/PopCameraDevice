@@ -1593,6 +1593,8 @@ Freenect::TSource::TSource(const std::string& DeviceName)
 
 Freenect::TSource::~TSource()
 {
+	//	clean up listener (this should be atomic, or locked or something)
+	mListener->mOnFrame = nullptr;
 }
 
 	

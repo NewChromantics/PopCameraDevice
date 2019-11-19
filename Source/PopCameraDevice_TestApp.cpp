@@ -24,8 +24,8 @@ int main(int argc, const char * argv[])
 		std::Debug << DeviceNames[d] << std::endl;
 	}
 	
-	auto Name = "Freenect:0000000000000000_Depth";
-	//auto Name = "Freenect:A22595W00862214A_Depth";
+	//auto Name = "Freenect:0000000000000000_Depth";
+	auto Name = "Freenect:A22595W00862214A_Depth";
 	//auto Name = "Freenect:A22595W00862214A_Colour";
 	
 	//auto Name = "Kinect2:Default_Depth";
