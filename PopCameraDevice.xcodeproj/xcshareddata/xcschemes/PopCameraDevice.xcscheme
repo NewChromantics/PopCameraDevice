@@ -29,8 +29,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BF012AC42268DC95003AEB55"
-               BuildableName = "PopCameraDeviceFramework.framework"
-               BlueprintName = "PopCameraDeviceFramework"
+               BuildableName = "PopCameraDevice_Osx.framework"
+               BlueprintName = "PopCameraDevice_Osx"
                ReferencedContainer = "container:PopCameraDevice.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -48,6 +48,20 @@
                ReferencedContainer = "container:PopCameraDevice.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BF15200F2384861D00A70EBF"
+               BuildableName = "PopCameraDevice_Ios.framework"
+               BlueprintName = "PopCameraDevice_Ios"
+               ReferencedContainer = "container:PopCameraDevice.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -60,9 +74,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF012AC42268DC95003AEB55"
-            BuildableName = "PopCameraDeviceFramework.framework"
-            BlueprintName = "PopCameraDeviceFramework"
+            BlueprintIdentifier = "BF108A9522970C92003DDC5F"
+            BuildableName = "TestApp"
+            BlueprintName = "TestApp"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -102,8 +116,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF012AC42268DC95003AEB55"
-            BuildableName = "PopCameraDeviceFramework.framework"
-            BlueprintName = "PopCameraDeviceFramework"
+            BuildableName = "PopCameraDevice_Osx.framework"
+            BlueprintName = "PopCameraDevice_Osx"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

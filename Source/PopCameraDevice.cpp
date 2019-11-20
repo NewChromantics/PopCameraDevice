@@ -11,15 +11,16 @@
 #include "Kinect2.h"
 #endif
 
-
+#if !defined(TARGET_IOS)
 #include "Freenect.h"
 #define ENABLE_FREENECT
+#endif
 
 #if defined(TARGET_WINDOWS)
 #include "MfCapture.h"
 #endif
 
-#if defined(TARGET_OSX)
+#if defined(TARGET_OSX) || defined(TARGET_IOS)
 #include "AvfCapture.h"
 #endif
 
@@ -155,7 +156,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 	{
 #if defined(TARGET_WINDOWS)
 		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
-#elif defined(TARGET_OSX)
+#elif defined(TARGET_OSX) || defined(TARGET_IOS)
 		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name));
 #endif
 		if ( Device )
