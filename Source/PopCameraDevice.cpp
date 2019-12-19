@@ -11,9 +11,8 @@
 #include "Kinect2.h"
 #endif
 
-#if !defined(TARGET_IOS)
+#if defined(ENABLE_FREENECT)
 #include "Freenect.h"
-#define ENABLE_FREENECT
 #endif
 
 #if defined(TARGET_WINDOWS)

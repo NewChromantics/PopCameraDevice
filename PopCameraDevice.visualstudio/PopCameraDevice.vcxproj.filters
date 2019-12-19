@@ -126,6 +126,9 @@
     <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.c">
       <Filter>Libs\LibFreenect</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\SoyLib\src\SoyFourcc.cpp">
+      <Filter>SoyLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\SoyLib\src\Array.hpp">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\platform\windows\unistd.h">
       <Filter>Libs\LibFreenect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\SoyFourcc.h">
+      <Filter>SoyLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_NoKinect|x64">
+      <Configuration>Debug_NoKinect</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
@@ -15,31 +19,54 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Source\Freenect.cpp" />
+    <ClCompile Include="..\Source\Freenect.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Source\Kinect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Source\Freenect2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\Source\Kinect2.cpp" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\audio.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\core.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\loader.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\tilt.c" />
-    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.c" />
+    <ClCompile Include="..\Source\Kinect2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\audio.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\core.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\loader.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\tilt.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Source\MfCapture.cpp" />
     <ClCompile Include="..\Source\MfDecoder.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice_TestApp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -47,6 +74,7 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyArray.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyAssert.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyDebug.cpp" />
+    <ClCompile Include="..\Source\SoyLib\src\SoyFourcc.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyH264.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyJson.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyMath.cpp" />
@@ -66,11 +94,13 @@
   <ItemGroup>
     <ClInclude Include="..\Source\AvfCapture.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Source\AvfVideoCapture.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -97,6 +127,7 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyAssert.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyAutoReleasePtr.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyDebug.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyFourcc.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyH264.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyJson.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyMath.h" />
@@ -117,16 +148,19 @@
   <ItemGroup>
     <None Include="..\Source\Avf.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="..\Source\AvfCapture.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="..\Source\AvfVideoCapture.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
     </None>
@@ -140,6 +174,7 @@
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">true</ExcludedFromBuild>
     </Library>
@@ -156,6 +191,11 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -181,6 +221,10 @@
     <Import Project="Kinect2.props" />
     <Import Project="Libfreenect.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PopCameraDevice.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
@@ -196,9 +240,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Master|x64'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+    </ClCompile>
+    <Link />
+    <Link />
+    <PostBuildEvent />
+    <Link>
+      <Profile>true</Profile>
+      <DelayLoadDLLs>kinect20.dll</DelayLoadDLLs>
+    </Link>
+    <PostBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
