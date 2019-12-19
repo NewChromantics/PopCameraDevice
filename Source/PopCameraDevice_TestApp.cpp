@@ -24,15 +24,22 @@ int main(int argc, const char * argv[])
 		std::Debug << DeviceNames[d] << std::endl;
 	}
 	
-	auto KinectDevice = PopCameraDevice_CreateCameraDevice("Kinect2:Default_Depth");
+	//auto Name = "Freenect:0000000000000000_Depth";
+	auto Name = "Freenect:A22595W00862214A_Depth";
+	//auto Name = "Freenect:A22595W00862214A_Colour";
+	
+	//auto Name = "Kinect2:Default_Depth";
+	auto KinectDevice = PopCameraDevice_CreateCameraDevice(Name);
 
 	//	get 10 frames
 	auto FrameCount = 0;
 	while ( FrameCount < 10 )
 	{
-		auto Result = PopCameraDevice_PopFrame(KinectDevice, nullptr, 0, nullptr, 0, nullptr, 0);
+		char Meta[1000];
+		auto Result = PopCameraDevice_PopFrameAndMeta(KinectDevice, nullptr, 0, nullptr, 0, nullptr, 0, Meta, sizeof(Meta) );
 		if ( Result > 0 )
 		{
+			std::Debug << "Got frame, meta=" << Meta << std::endl;
 			FrameCount++;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));

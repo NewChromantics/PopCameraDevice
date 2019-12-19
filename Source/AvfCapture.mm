@@ -52,7 +52,9 @@ void Avf::TCamera::PushLatestFrame(size_t StreamIndex)
 	if ( !LatestPacket )
 		return;
 	
-	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta);
+	//	todo: get all the frame meta
+	std::string Meta;
+	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, Meta );
 }
 
 void Avf::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
