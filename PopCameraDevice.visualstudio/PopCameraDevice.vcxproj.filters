@@ -170,9 +170,6 @@
     <ClInclude Include="..\Source\TCameraDevice.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\PopCameraDevice.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\TestDevice.h">
       <Filter>Source</Filter>
     </ClInclude>
@@ -218,5 +215,6 @@
     <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
       <Filter>Libs\LibFreenect2</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\Source\PopCameraDevice.h" />
   </ItemGroup>
 </Project>
