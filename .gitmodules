@@ -1,6 +1,6 @@
 [submodule "Source/SoyLib"]
 	path = Source/SoyLib
 	url = https://github.com/SoylentGraham/SoyLib.git
-[submodule "Source/Libs/LibFreenect2"]
-	path = Source/Libs/LibFreenect2/LibFreenect2
+[submodule "Source/Libs/LibFreenect2x"]
+	path = Source/Libs/LibFreenect2/LibFreenect2x
 	url = https://github.com/OpenKinect/libfreenect2.git
