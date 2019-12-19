@@ -10,6 +10,9 @@
     <ClCompile>
       <PreprocessorDefinitions>ENABLE_KINECT2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <DelayLoadDLLs>kinect20.dll</DelayLoadDLLs>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
