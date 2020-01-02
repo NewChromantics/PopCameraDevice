@@ -3,14 +3,15 @@ name: Build Windows
 env:
   BuildSolution: PopCameraDevice.visualstudio\PopCameraDevice.sln
   BuildPlatform: x64
-  BuildConfiguration: Master
+  BuildConfiguration: Debug_NoKinect
 # would be nice to extract this from visual studio
-  BuildDirectory: PopCoreml.visualstudio\x64\Master
+  BuildDirectory: PopCoreml.visualstudio\x64\Debug_NoKinect
 
 on: 
   push:
     branches:
       - master
+      - CI_*
 
 jobs:
   buildwindows:
