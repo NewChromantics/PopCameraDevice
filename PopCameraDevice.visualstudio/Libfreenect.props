@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>$(ProjectDir)..\Source\Libs\LibFreenect;$(ProjectDir)..\Source\Libs\LibFreenect\LibFreenect\platform\windows;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Source\Libs\LibFreenect;$(ProjectDir)..\Source\Libs\LibFreenect\LibFreenect\platform\windows;$(ProjectDir)..\Source\Libs\LibFreenect\\LibFreenect\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

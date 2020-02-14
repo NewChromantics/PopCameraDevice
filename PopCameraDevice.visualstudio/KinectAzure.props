@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <IncludePath>C:\Program Files\Azure Kinect Body Tracking SDK\sdk\include;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\Azure Kinect Body Tracking SDK\sdk\windows-desktop\amd64\release\lib;C:\Program Files\Azure Kinect SDK v1.3.0\sdk\windows-desktop\amd64\release\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>ENABLE_KINECTAZURE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
+      <AdditionalDependencies>k4abt.lib;k4a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>k4a.dll;k4abt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

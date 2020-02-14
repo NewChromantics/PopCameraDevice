@@ -37,6 +37,9 @@
     <ClCompile Include="..\Source\Kinect2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Source\KinectAzure.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Source\Libs\LibFreenect\LibFreenect\src\audio.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -74,6 +77,7 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyArray.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyAssert.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyDebug.cpp" />
+    <ClCompile Include="..\Source\SoyLib\src\SoyFilesystem.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyFourcc.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyH264.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyJson.cpp" />
@@ -83,6 +87,7 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyMediaFoundation.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyPixels.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyPng.cpp" />
+    <ClCompile Include="..\Source\SoyLib\src\SoyRuntimeLibrary.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyString.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyThread.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyTime.cpp" />
@@ -108,6 +113,7 @@
     <ClInclude Include="..\Source\Kinect.h" />
     <ClInclude Include="..\Source\Freenect2.h" />
     <ClInclude Include="..\Source\Kinect2.h" />
+    <ClInclude Include="..\Source\KinectAzure.h" />
     <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\platform\windows\unistd.h" />
     <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\cameras.h" />
     <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\flags.h" />
@@ -127,6 +133,7 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyAssert.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyAutoReleasePtr.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyDebug.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyFilesystem.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyFourcc.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyH264.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyJson.h" />
@@ -136,6 +143,7 @@
     <ClInclude Include="..\Source\SoyLib\src\soymediafoundation.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyPixels.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyPng.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyRuntimeLibrary.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyString.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyThread.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyTypes.h" />
@@ -220,6 +228,7 @@
     <Import Project="PopCameraDevice.props" />
     <Import Project="Kinect2.props" />
     <Import Project="Libfreenect.props" />
+    <Import Project="KinectAzure.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -237,6 +246,7 @@
     <Import Project="Release.props" />
     <Import Project="Kinect2.props" />
     <Import Project="Libfreenect.props" />
+    <Import Project="KinectAzure.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
