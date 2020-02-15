@@ -1,11 +1,11 @@
-name: Build Windows
+name: Build Windows NoKinect
 
 env:
   BuildSolution: PopCameraDevice.visualstudio\PopCameraDevice.sln
   BuildPlatform: x64
-  BuildConfiguration: Debug
+  BuildConfiguration: Debug_NoKinect
 # would be nice to extract this from visual studio
-  BuildDirectory: PopCameraDevice.visualstudio\x64\Debug
+  BuildDirectory: PopCameraDevice.visualstudio\x64\Debug_NoKinect
 
 on: 
   push:
@@ -15,7 +15,7 @@ on:
 
 jobs:
   buildwindows:
-    runs-on: [self-hosted, windows]
+    runs-on: windows-2016
     
     steps:
     - uses: actions/checkout@v1
