@@ -24,6 +24,9 @@ namespace KinectAzure
 	void		InitDebugHandler();
 	void		LoadDll();
 	size_t		GetDeviceIndex(const std::string& Serial);
+
+	SoyPixelsRemote			GetPixels(k4a_image_t Image);
+	SoyPixelsFormat::Type	GetFormat(k4a_image_format_t Format);
 }
 
 
@@ -94,7 +97,7 @@ public:
 
 private:
 	virtual void		PushFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
-	void				PushFrame(std::shared_ptr<SoyPixelsImpl> Frame);
+	void				PushFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
 	virtual k4a_depth_mode_t		GetDepthMode() override { return K4A_DEPTH_MODE_NFOV_UNBINNED; }
 	virtual k4a_color_resolution_t	GetColourMode() override { return K4A_COLOR_RESOLUTION_OFF; }
 
@@ -501,23 +504,63 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 }
 
 
-void KinectAzure::TDepthReader::PushFrame(std::shared_ptr<SoyPixelsImpl> Frame)
+void KinectAzure::TDepthReader::PushFrame(const SoyPixelsImpl& Frame,SoyTime CaptureTime)
 {
 	{
 		std::lock_guard<std::mutex> Lock(mLastFrameLock);
-		mLastFrame = Frame;
+		if (!mLastFrame)
+			mLastFrame.reset(new SoyPixels);
+		mLastFrame->Copy(Frame);
 	}
 
 	//	notify new frame
 	mOnNewFrameSemaphore.OnCompleted();
 }
 
+SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
+{
+	switch (Format)
+	{
+	case K4A_IMAGE_FORMAT_CUSTOM16:
+	case K4A_IMAGE_FORMAT_DEPTH16:
+	case K4A_IMAGE_FORMAT_IR16:
+			return SoyPixelsFormat::FreenectDepthmm;
+
+	case K4A_IMAGE_FORMAT_COLOR_BGRA32:	return SoyPixelsFormat::BGRA;
+	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Nv12;
+	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::Yuv_844_Ntsc;
+	case K4A_IMAGE_FORMAT_CUSTOM8:		return SoyPixelsFormat::Greyscale;
+	
+	default:
+	case K4A_IMAGE_FORMAT_COLOR_MJPG:
+	case K4A_IMAGE_FORMAT_CUSTOM:
+		break;
+	}
+
+	std::stringstream Error;
+	Error << "Unhandled pixel format " << magic_enum::enum_name(Format);
+	throw Soy::AssertException(Error);
+}
+
+//	to minimise copies, we return remote pixels
+SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
+{
+	auto* PixelBuffer = k4a_image_get_buffer(Image);
+	auto PixelBufferSize = k4a_image_get_size(Image);
+	auto Width = k4a_image_get_width_pixels(Image);
+	auto Height = k4a_image_get_height_pixels(Image);
+	auto Format = k4a_image_get_format(Image);
+	auto PixelFormat = GetFormat(Format);
+
+	SoyPixelsRemote ImagePixels(PixelBuffer, Width, Height, PixelBufferSize, PixelFormat);
+	return ImagePixels;
+}
 
 void KinectAzure::TDepthReader::PushFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
 {
-	//	get image
-	std::shared_ptr<SoyPixelsImpl> Pixels(new SoyPixels(SoyPixelsMeta(1, 1, SoyPixelsFormat::RGB)));
-	PushFrame(Pixels);
+	auto DepthImage = k4a_capture_get_depth_image(Frame);
+	auto DepthPixels = GetPixels(DepthImage);
+	PushFrame( DepthPixels, CaptureTime );
 }
 
 
