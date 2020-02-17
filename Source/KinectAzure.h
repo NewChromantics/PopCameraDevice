@@ -16,8 +16,12 @@ class KinectAzure::TCameraDevice : public PopCameraDevice::TDevice
 {
 public:
 	TCameraDevice(const std::string& Serial);
+	~TCameraDevice();
 
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature, bool Enable) override;
+
+private:
+	void			OnFrame(const SoyPixelsImpl& Pixels,SoyTime Time);
 
 private:
 	std::shared_ptr<TDepthReader>	mReader;

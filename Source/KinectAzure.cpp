@@ -6,6 +6,7 @@
 #include "MagicEnum/include/magic_enum.hpp"
 #include "SoyRuntimeLibrary.h"
 #include "SoyThread.h"
+#include "SoyMedia.h"
 
 
 #if !defined(ENABLE_KINECTAZURE)
@@ -38,7 +39,7 @@ public:
 	TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_color_resolution_t ColourMode);
 	~TDevice();
 
-	std::string				GetSerial();
+	std::string			GetSerial();
 
 private:
 	void				Shutdown();
@@ -55,10 +56,12 @@ public:
 	//	gr: because of the current use of the API, we have an option to keep alive here
 	//		todo: pure RAII, but need to fix PopEngine first
 	TFrameReader(size_t DeviceIndex,bool KeepAlive);
+	~TFrameReader();
 
 protected:
-	virtual void		PushFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) = 0;
+	virtual void		OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) = 0;
 	virtual void		OnImuMoved() {}
+	virtual void		OnError(const char* Error) {}
 
 	//	as we keep-alive, we need to know these modes
 	virtual k4a_depth_mode_t		GetDepthMode() = 0;
@@ -66,16 +69,10 @@ protected:
 
 private:
 	void				Iteration(int32_t TimeoutMs);
-	virtual void		Thread() override;
+	virtual bool		ThreadIteration() override;
 	bool				HasImuMoved(k4a_imu_sample_t Imu);	//	check if the device has been moved
 
 	void				Open();
-	
-public:
-	Soy::TSemaphore		mOnNewFrameSemaphore;
-
-protected:
-	std::mutex			mLastFrameLock;
 
 private:
 	std::shared_ptr<KinectAzure::TDevice>	mDevice;
@@ -88,21 +85,19 @@ private:
 class KinectAzure::TDepthReader : public TFrameReader
 {
 public:
-	TDepthReader(size_t DeviceIndex, bool KeepAlive) :
-		TFrameReader(DeviceIndex, KeepAlive)
+	TDepthReader(size_t DeviceIndex, bool KeepAlive,std::function<void(const SoyPixelsImpl&,SoyTime)> OnFrame) :
+		TFrameReader	(DeviceIndex, KeepAlive),
+		mOnNewFrame		( OnFrame )
 	{
 	}
 
-	std::shared_ptr<SoyPixelsImpl>	PopFrame(bool Blocking);
-
 private:
-	virtual void		PushFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
-	void				PushFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
+	virtual void		OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
+	void				OnFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
 	virtual k4a_depth_mode_t		GetDepthMode() override { return K4A_DEPTH_MODE_NFOV_UNBINNED; }
 	virtual k4a_color_resolution_t	GetColourMode() override { return K4A_COLOR_RESOLUTION_OFF; }
 
-public:
-	std::shared_ptr<SoyPixelsImpl>	mLastFrame;
+	std::function<void(const SoyPixelsImpl&, SoyTime)>	mOnNewFrame;
 };
 
 
@@ -152,7 +147,23 @@ void KinectAzure::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 	{
 		try
 		{
-			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_OFF, K4A_COLOR_RESOLUTION_OFF);
+			//	both off will fail
+			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_NFOV_UNBINNED, K4A_COLOR_RESOLUTION_OFF);
+			auto Serial = Device.GetSerial();
+			Enum(Serial);
+		}
+		catch (std::exception& e)
+		{
+			std::Debug << "Error getting kinect device serial: " << e.what() << std::endl;
+		}
+	}
+
+	for (auto i = 0; i < DeviceCount; i++)
+	{
+		try
+		{
+			//	both off will fail
+			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_NFOV_UNBINNED, K4A_COLOR_RESOLUTION_OFF);
 			auto Serial = Device.GetSerial();
 			Enum(Serial);
 		}
@@ -170,6 +181,8 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 	size_t RunningIndex = 0;
 	auto EnumName = [&](const std::string& DeviceSerial)
 	{
+		if (SerialIndex >= 0)
+			return;
 		if (DeviceSerial == Serial)
 			SerialIndex = RunningIndex;
 
@@ -245,11 +258,16 @@ KinectAzure::TDevice::~TDevice()
 
 void KinectAzure::TDevice::Shutdown()
 {
+	if (!mDevice)
+		return;
+	std::Debug << "Shutdown" << std::endl;
+
 	k4a_device_stop_imu(mDevice);
 	k4a_device_stop_cameras(mDevice);
 	//k4abt_tracker_shutdown(mTracker);
 	//k4abt_tracker_destroy(mTracker);
 	k4a_device_close(mDevice);
+	mDevice = nullptr;
 }
 
 
@@ -276,12 +294,30 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial)
 {
 	LoadDll();
 	InitDebugHandler();
-	
-	auto DeviceIndex = GetDeviceIndex(Serial);
+
+		auto DeviceIndex = GetDeviceIndex(Serial);
 	//	todo: remove keep alive when PopEngine/CAPI is fixed
 	auto KeepAlive = true;	//	keep reopening the device in the reader
-	mReader.reset( new TDepthReader(DeviceIndex, KeepAlive) );
+
+	std::function<void(const SoyPixelsImpl&,SoyTime)> OnNewFrame = std::bind(&TCameraDevice::OnFrame, this, std::placeholders::_1, std::placeholders::_2);
+		
+	mReader.reset( new TDepthReader(DeviceIndex, KeepAlive, OnNewFrame) );
 }
+
+KinectAzure::TCameraDevice::~TCameraDevice()
+{
+}
+
+void KinectAzure::TCameraDevice::OnFrame(const SoyPixelsImpl& Pixels,SoyTime Time)
+{
+	auto PixelMeta = Pixels.GetMeta();
+	std::string Meta;
+	float3x3 Transform;
+	std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels, Transform));
+
+	PushFrame(PixelBuffer, PixelMeta, Meta);
+}
+
 
 void KinectAzure::TCameraDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature, bool Enable)
 {
@@ -335,19 +371,26 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 	Start();
 }
 
+KinectAzure::TFrameReader::~TFrameReader()
+{
+	std::Debug << "~TFrameReader" << std::endl;
+}
 
 void KinectAzure::TFrameReader::Open()
 {
 	//	already ready
 	if (mDevice)
 		return;
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
 
+
+	_CrtCheckMemory();
 	auto DepthMode = GetDepthMode();
 	auto ColourMode = GetColourMode();
 	mDevice.reset(new TDevice(mDeviceIndex, DepthMode, ColourMode));
 }
 
-void KinectAzure::TFrameReader::Thread()
+bool KinectAzure::TFrameReader::ThreadIteration()
 {
 	//	gr: have a timeout, so we can abort if the thread is stopped
 	//		5 secs is a good indication something has gone wrong I think...
@@ -367,7 +410,7 @@ void KinectAzure::TFrameReader::Thread()
 		//	gr: for now at least send this in KeepAlive mode, 
 		//		as the caller might send different params in the API (eg. GPU index)
 		//		which may be the reason we're failing to iterate, this lets params change
-		this->mOnNewFrameSemaphore.OnFailed(e.what());
+		OnError(e.what());
 
 		//	pause
 		std::this_thread::sleep_for(std::chrono::milliseconds(SleepMs));
@@ -375,13 +418,16 @@ void KinectAzure::TFrameReader::Thread()
 		if (mKeepAlive)
 		{
 			//	close device and let next iteration reopen
+			std::Debug << "resetting mdevice" << std::endl; 
 			mDevice.reset();
+			std::Debug << "resetting mdevice done" << std::endl;
 		}
 		else
 		{
 			throw;
 		}
 	}
+	return true;
 }
 
 bool KinectAzure::TFrameReader::HasImuMoved(k4a_imu_sample_t Imu)
@@ -478,7 +524,11 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		}
 		//	contents haven't changed, didn't get a result
 		if (ImuSample.gyro_timestamp_usec == 0)
-			throw Soy::AssertException("IMU had no samples");
+		{
+			//	gr: getting this oddly often
+			std::Debug << "AzureKinect got 0 IMU samples in capture" << std::endl;
+			//throw Soy::AssertException("IMU had no samples");
+		}
 
 		if (HasImuMoved(ImuSample))
 		{
@@ -490,11 +540,16 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		}
 	
 		//	extract skeletons
-		PushFrame(Capture, ImuSample, FrameCaptureTime);
+		OnFrame(Capture, ImuSample, FrameCaptureTime);
 
 		//	cleanup
 		//k4abt_frame_release(Frame);
 		FreeCapture();
+	}
+	catch (std::exception& e)
+	{
+		FreeCapture();
+		throw;
 	}
 	catch (...)
 	{
@@ -504,17 +559,9 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 }
 
 
-void KinectAzure::TDepthReader::PushFrame(const SoyPixelsImpl& Frame,SoyTime CaptureTime)
+void KinectAzure::TDepthReader::OnFrame(const SoyPixelsImpl& Frame,SoyTime CaptureTime)
 {
-	{
-		std::lock_guard<std::mutex> Lock(mLastFrameLock);
-		if (!mLastFrame)
-			mLastFrame.reset(new SoyPixels);
-		mLastFrame->Copy(Frame);
-	}
-
-	//	notify new frame
-	mOnNewFrameSemaphore.OnCompleted();
+	mOnNewFrame(Frame, CaptureTime);
 }
 
 SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
@@ -556,26 +603,15 @@ SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
 	return ImagePixels;
 }
 
-void KinectAzure::TDepthReader::PushFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
+void KinectAzure::TDepthReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
 {
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
 	auto DepthPixels = GetPixels(DepthImage);
-	PushFrame( DepthPixels, CaptureTime );
+	
+	OnFrame( DepthPixels, CaptureTime );
+
+	k4a_image_release(DepthImage);
 }
 
 
-std::shared_ptr<SoyPixelsImpl> KinectAzure::TDepthReader::PopFrame(bool Blocking)
-{
-	//	if we're blocking, wait for the reader to say there's a frame waiting
-	if (Blocking)
-	{
-		//mOnNewFrameSemaphore.WaitAndReset("TKinectAzureSkeletonReader::PopFrame");
-		mOnNewFrameSemaphore.WaitAndReset(nullptr);
-	}
-
-	std::lock_guard<std::mutex> Lock(mLastFrameLock);
-	auto Copy = mLastFrame;
-	mLastFrame.reset();
-	return Copy;
-}
 
