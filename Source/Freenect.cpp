@@ -162,7 +162,7 @@ public:
 	TDevice&			GetDevice(freenect_device& Device);
 
 private:
-	virtual void		Thread() override;
+	virtual bool		ThreadIteration() override;
 	void				ReacquireDevices();
 	
 public:
@@ -613,7 +613,7 @@ Freenect::TFreenect::~TFreenect()
 	}
 }
 
-void Freenect::TFreenect::Thread()
+bool Freenect::TFreenect::ThreadIteration()
 {
 	if (mDeviceLock.try_lock())
 	{
@@ -642,7 +642,7 @@ void Freenect::TFreenect::Thread()
 	
 	//	should we sleep here
 	if ( Result == LIBUSB_SUCCESS )
-		return;
+		return true;
 	
 
 	if (Result == LIBUSB_ERROR_IO)
@@ -671,6 +671,7 @@ void Freenect::TFreenect::Thread()
 	//	let thread breath?
 	static size_t SleepMs = 10;
 	std::this_thread::sleep_for( std::chrono::milliseconds(SleepMs) );
+	return true;
 }
 
 

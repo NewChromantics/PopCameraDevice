@@ -123,25 +123,8 @@ void Kinect2::TDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,boo
 	throw Soy_AssertException("Feature not supported");
 }
 
-void Kinect2::TDevice::Thread()
-{
-	try
-	{
-		while ( IsThreadRunning() )
-		{
-			Iteration();
-		}
-	}
-	catch(std::exception& e)
-	{
-		OnError(e.what());
-		Stop(false);
-	}
 
-}
-
-
-void Kinect2::TDevice::Iteration()
+bool Kinect2::TDevice::ThreadIteration()
 {
 	//	block!
 	//auto Waitms = INFINITE;
@@ -153,7 +136,7 @@ void Kinect2::TDevice::Iteration()
 	{
 	case WAIT_OBJECT_0:
 		GetNextFrame();
-		break;
+		return true;
 
 	case WAIT_ABANDONED_0:
 		//	device has broken?
@@ -161,7 +144,7 @@ void Kinect2::TDevice::Iteration()
 
 	case WAIT_TIMEOUT:
 		//throw Soy::AssertException("Event Timeout");
-		return;
+		return true;
 
 	case WAIT_FAILED:
 	default:
@@ -262,12 +245,6 @@ void Kinect2::TDevice::GetNextFrame()
 	PushFrame( PixelBuffer, Pixels.GetMeta(), JsonString );
 }
 
-void Kinect2::TDevice::OnError(const std::string& Error)
-{
-	std::Debug << "Kinect error:" << Error << std::endl;
-	mError = Error;
-	Stop(false);
-}
 
 
 

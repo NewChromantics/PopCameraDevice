@@ -27,17 +27,14 @@ public:
 
 private:
 	void			Release();
-	virtual void	Thread() override;
-	void			Iteration();
+	virtual bool	ThreadIteration() override;
 	void			GetNextFrame();
-	void			OnError(const std::string& Error);
 	
 public:
 	IKinectSensor*			mSensor = nullptr;
 	Soy::AutoReleasePtr<IDepthFrameReader>	mDepthReader;
 	Soy::AutoReleasePtr<IColorFrameReader>	mColourReader;
 	WAITABLE_HANDLE			mSubscribeEvent = 0;
-	std::string				mError;
 };
 
 
