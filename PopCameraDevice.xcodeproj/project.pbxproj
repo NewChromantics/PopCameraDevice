@@ -125,7 +125,6 @@
 		BF108ABB2297177D003DDC5F /* SoyGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B4C226A2726003AEB55 /* SoyGraphics.cpp */; };
 		BF108ABC2297177D003DDC5F /* SoyH264.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B3D226A26F0003AEB55 /* SoyH264.cpp */; };
 		BF108ABD2297177D003DDC5F /* SoyMedia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B47226A270A003AEB55 /* SoyMedia.cpp */; };
-		BF108ABE2297177D003DDC5F /* SoyMediaFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B52226A2FCF003AEB55 /* SoyMediaFormat.cpp */; };
 		BF108ABF2297177D003DDC5F /* SoyOpengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B38226A26E9003AEB55 /* SoyOpengl.cpp */; };
 		BF108AC02297177D003DDC5F /* SoyOpenglContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B2B226A2232003AEB55 /* SoyOpenglContext.cpp */; };
 		BF108AC12297177D003DDC5F /* SoyPixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AD82269FC83003AEB55 /* SoyPixels.cpp */; };
@@ -1032,7 +1031,6 @@
 				BF108ACB2297178F003DDC5F /* SoyWave.cpp in Sources */,
 				BF108AC12297177D003DDC5F /* SoyPixels.cpp in Sources */,
 				BF8534EB22B3FE370049C01B /* loader.c in Sources */,
-				BF108ABE2297177D003DDC5F /* SoyMediaFormat.cpp in Sources */,
 				BF108AA32297147F003DDC5F /* PopCameraDevice.cpp in Sources */,
 				BF108AC82297178F003DDC5F /* SoyTime.mm in Sources */,
 				BF108AB422971767003DDC5F /* memheap.cpp in Sources */,
