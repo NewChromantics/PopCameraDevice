@@ -15,6 +15,10 @@
 #include "Freenect.h"
 #endif
 
+#if defined(ENABLE_KINECTAZURE)
+#include "KinectAzure.h"
+#endif
+
 #if defined(TARGET_WINDOWS)
 #include "MfCapture.h"
 #endif
@@ -93,11 +97,15 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #if defined(ENABLE_FREENECT)
 	Freenect::EnumDeviceNames(EnumDevice);
 #endif
-	
+
 #if defined(ENABLE_KINECT2)
 	Kinect2::EnumDeviceNames(EnumDevice);
 #endif
-	
+
+#if defined(ENABLE_KINECTAZURE)
+	KinectAzure::EnumDeviceNames(EnumDevice);
+#endif
+
 	auto IsCharUsed = [&](char Char)
 	{
 		for ( int d=0;	d<DeviceNames.GetSize();	d++ )
@@ -188,6 +196,20 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
 			return PopCameraDevice::CreateInstance(Device);
 	}
 	catch(std::exception& e)
+	{
+		std::Debug << e.what() << std::endl;
+	}
+#endif
+
+
+#if defined(ENABLE_KINECTAZURE)
+	try
+	{
+		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Name));
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+	catch (std::exception& e)
 	{
 		std::Debug << e.what() << std::endl;
 	}
