@@ -766,7 +766,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BF108A9A22970C92003DDC5F /* Build configuration list for PBXNativeTarget "TestApp" */;
 			buildPhases = (
-				BF108AF722980E09003DDC5F /* ShellScript */,
 				BF108A9222970C92003DDC5F /* Sources */,
 				BF108A9322970C92003DDC5F /* Frameworks */,
 				BF108A9422970C92003DDC5F /* CopyFiles */,
@@ -914,25 +913,6 @@
 ";
 		};
 		BF108AF622980DFE003DDC5F /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(LIBFREENECT2_BUILD_PATH)/lib/libfreenect2.a",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh $(LIBFREENECT2_PATH)/Build.sh $(LIBFREENECT2_PATH)";
-			shellScript = "
-";
-		};
-		BF108AF722980E09003DDC5F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
