@@ -45,7 +45,7 @@ std::string GetDeviceName(IMFActivate& Device)
 {
 	WCHAR Buffer[1024];
 	uint32 BufferSize = 0;
-	auto Result = Device.GetString( MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, Buffer, sizeofarray(Buffer), &BufferSize );
+	auto Result = Device.GetString( MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, Buffer, std::size(Buffer), &BufferSize );
 	auto Name = Soy::WStringToString( Buffer );
 
 	return Name;

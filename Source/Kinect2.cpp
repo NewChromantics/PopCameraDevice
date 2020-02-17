@@ -151,6 +151,8 @@ bool Kinect2::TDevice::ThreadIteration()
 		Platform::ThrowLastError("WaitForMultipleObjects");// WaitResult);
 		break;
 	}
+
+	return true;
 }
 
 void Kinect2::TDevice::GetNextFrame()
