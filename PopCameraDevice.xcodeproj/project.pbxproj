@@ -102,10 +102,6 @@
 		BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B74226A3296003AEB55 /* SoyTime.mm */; };
 		BF012B78226A3303003AEB55 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF108A9922970C92003DDC5F /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
-		BF108AA32297147F003DDC5F /* PopCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */; };
-		BF108AA422971485003DDC5F /* TCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */; };
-		BF108AA522971487003DDC5F /* TestDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */; };
-		BF108AAA2297174B003DDC5F /* AvfPixelBuffer.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B1B226A1FD3003AEB55 /* AvfPixelBuffer.mm */; };
 		BF108AAB22971759003DDC5F /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF108AAC22971759003DDC5F /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B6D226A31F2003AEB55 /* CoreServices.framework */; };
 		BF108AAD2297175A003DDC5F /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B36226A26AF003AEB55 /* CoreVideo.framework */; };
@@ -115,9 +111,6 @@
 		BF108AB12297175A003DDC5F /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B2E226A263E003AEB55 /* CoreMedia.framework */; };
 		BF108AB22297175A003DDC5F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B06226A09EC003AEB55 /* AVFoundation.framework */; };
 		BF108AB322971762003DDC5F /* AvfPixelBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B1A226A1FD3003AEB55 /* AvfPixelBuffer.h */; };
-		BF108AB422971767003DDC5F /* memheap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AE92269FCBF003AEB55 /* memheap.cpp */; };
-		BF108AB52297176C003DDC5F /* SoyAssert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AD92269FC83003AEB55 /* SoyAssert.cpp */; };
-		BF108AB62297177D003DDC5F /* SoyAvf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B26226A21C0003AEB55 /* SoyAvf.mm */; };
 		BF108AB72297177D003DDC5F /* SoyDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AEF2269FE13003AEB55 /* SoyDebug.cpp */; };
 		BF108AB82297177D003DDC5F /* SoyDebug.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012AED2269FE12003AEB55 /* SoyDebug.mm */; };
 		BF108AB92297177D003DDC5F /* SoyFilesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B65226A3176003AEB55 /* SoyFilesystem.cpp */; };
@@ -137,10 +130,6 @@
 		BF108AC82297178F003DDC5F /* SoyTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B74226A3296003AEB55 /* SoyTime.mm */; };
 		BF108AC92297178F003DDC5F /* SoyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AF62269FE3F003AEB55 /* SoyTypes.cpp */; };
 		BF108ACA2297178F003DDC5F /* SoyVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B5B226A30A6003AEB55 /* SoyVector.cpp */; };
-		BF108ACB2297178F003DDC5F /* SoyWave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B56226A2FE0003AEB55 /* SoyWave.cpp */; };
-		BF108ACC22971812003DDC5F /* Avf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B02226A047F003AEB55 /* Avf.mm */; };
-		BF108ACD22971815003DDC5F /* AvfCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.mm */; };
-		BF108ACE22971817003DDC5F /* AvfVideoCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */; };
 		BF108AE4229726CF003DDC5F /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = BF108AD8229726CE003DDC5F /* Readme.md */; };
 		BF108AE5229726CF003DDC5F /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = BF108AD8229726CE003DDC5F /* Readme.md */; };
 		BF108AEF22972F23003DDC5F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AEE22972F23003DDC5F /* IOKit.framework */; };
@@ -191,6 +180,8 @@
 		BF15204F23855BDD00A70EBF /* SoyArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF15204C23855BD500A70EBF /* SoyArray.cpp */; };
 		BF15205123855D8300A70EBF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205023855D8200A70EBF /* CoreGraphics.framework */; };
 		BF15205323855F1F00A70EBF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205223855F1F00A70EBF /* UIKit.framework */; };
+		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
+		BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF76106A226B6E5C00762F15 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF76106B226B6E5F00762F15 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B6D226A31F2003AEB55 /* CoreServices.framework */; };
 		BF76106C226B6E6200762F15 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B36226A26AF003AEB55 /* CoreVideo.framework */; };
@@ -225,7 +216,6 @@
 		BF8534EB22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
-		BFEE8DF122B0097C00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF622B0139300F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
 		BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
 		BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
@@ -234,6 +224,16 @@
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BF5C4ACE23FB04D1007D6393 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF4A6A0C1EA16D7C00613A64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF012AC42268DC95003AEB55;
+			remoteInfo = PopCameraDevice_Osx;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		BF108A9422970C92003DDC5F /* CopyFiles */ = {
@@ -244,6 +244,17 @@
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		BF5C4AD023FB04D1007D6393 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -422,6 +433,7 @@
 				BF108AAC22971759003DDC5F /* CoreServices.framework in Frameworks */,
 				BF108AAD2297175A003DDC5F /* CoreVideo.framework in Frameworks */,
 				BFEE8DF622B0139300F89A39 /* libusb-1.0.a in Frameworks */,
+				BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -769,10 +781,12 @@
 				BF108A9222970C92003DDC5F /* Sources */,
 				BF108A9322970C92003DDC5F /* Frameworks */,
 				BF108A9422970C92003DDC5F /* CopyFiles */,
+				BF5C4AD023FB04D1007D6393 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BF5C4ACF23FB04D1007D6393 /* PBXTargetDependency */,
 			);
 			name = TestApp;
 			productName = TestApp;
@@ -851,6 +865,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = BF4A6A0B1EA16D7C00613A64;
@@ -994,27 +1009,18 @@
 				BF8534DB22B3FE370049C01B /* usb_libusb10.c in Sources */,
 				BF108AC32297178F003DDC5F /* SoyShader.cpp in Sources */,
 				BF108AC222971781003DDC5F /* SoyScope.cpp in Sources */,
-				BF108AAA2297174B003DDC5F /* AvfPixelBuffer.mm in Sources */,
-				BF108ACC22971812003DDC5F /* Avf.mm in Sources */,
 				BF8534DE22B3FE370049C01B /* cameras.c in Sources */,
-				BF108ACD22971815003DDC5F /* AvfCapture.mm in Sources */,
 				BF108AC42297178F003DDC5F /* SoyString.cpp in Sources */,
 				BF108ACA2297178F003DDC5F /* SoyVector.cpp in Sources */,
 				BF108AC72297178F003DDC5F /* SoyTime.cpp in Sources */,
 				BF108AC52297178F003DDC5F /* SoyString.mm in Sources */,
-				BF108ACE22971817003DDC5F /* AvfVideoCapture.mm in Sources */,
 				BF108ABB2297177D003DDC5F /* SoyGraphics.cpp in Sources */,
-				BFEE8DF122B0097C00F89A39 /* Freenect.cpp in Sources */,
 				BF108ABF2297177D003DDC5F /* SoyOpengl.cpp in Sources */,
 				BF108AC02297177D003DDC5F /* SoyOpenglContext.cpp in Sources */,
 				BF8534CF22B3FE370049C01B /* registration.c in Sources */,
-				BF108ACB2297178F003DDC5F /* SoyWave.cpp in Sources */,
 				BF108AC12297177D003DDC5F /* SoyPixels.cpp in Sources */,
 				BF8534EB22B3FE370049C01B /* loader.c in Sources */,
-				BF108AA32297147F003DDC5F /* PopCameraDevice.cpp in Sources */,
 				BF108AC82297178F003DDC5F /* SoyTime.mm in Sources */,
-				BF108AB422971767003DDC5F /* memheap.cpp in Sources */,
-				BF108AB52297176C003DDC5F /* SoyAssert.cpp in Sources */,
 				BF8534D822B3FE370049C01B /* flags.c in Sources */,
 				BF108AC92297178F003DDC5F /* SoyTypes.cpp in Sources */,
 				BF108ABD2297177D003DDC5F /* SoyMedia.cpp in Sources */,
@@ -1025,9 +1031,6 @@
 				BF8534D322B3FE370049C01B /* audio.c in Sources */,
 				BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */,
 				BF8534E422B3FE370049C01B /* tilt.c in Sources */,
-				BF108AA422971485003DDC5F /* TCameraDevice.cpp in Sources */,
-				BF108AA522971487003DDC5F /* TestDevice.cpp in Sources */,
-				BF108AB62297177D003DDC5F /* SoyAvf.mm in Sources */,
 				BF108AC62297178F003DDC5F /* SoyThread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1124,6 +1127,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BF5C4ACF23FB04D1007D6393 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF012AC42268DC95003AEB55 /* PopCameraDevice_Osx */;
+			targetProxy = BF5C4ACE23FB04D1007D6393 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BF012ACA2268DC95003AEB55 /* Debug */ = {
