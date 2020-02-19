@@ -7,9 +7,6 @@
     <Filter Include="SoyLib">
       <UniqueIdentifier>{5fca03a2-531e-4020-b3a7-da724687bfc8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Unity Source">
-      <UniqueIdentifier>{38d16710-35c0-4ee2-89fd-1eed7bd8119e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Libs">
       <UniqueIdentifier>{c88a7747-c295-45e4-904f-27bc45759266}</UniqueIdentifier>
     </Filter>
@@ -274,9 +271,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
-      <Filter>Unity Source</Filter>
-    </None>
     <None Include="..\Source\AvfCapture.mm">
       <Filter>Source</Filter>
     </None>
@@ -291,6 +285,9 @@
     </None>
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in">
       <Filter>Libs\LibFreenect</Filter>
+    </None>
+    <None Include="..\Source\PopCameraDevice.cs">
+      <Filter>Source</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

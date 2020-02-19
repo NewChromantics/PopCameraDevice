@@ -177,7 +177,7 @@
     </CustomBuild>
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\fwfetcher.py" />
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in" />
-    <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs" />
+    <None Include="..\Source\PopCameraDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
