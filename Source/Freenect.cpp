@@ -264,6 +264,12 @@ const char* Freenect::LogLevelToString(freenect_loglevel level)
 	}
 }
 
+void Freenect::Shutdown()
+{
+	//	if this thread is the freenect context thread, we need to tell the thread it's already shutdown
+	gContext.reset();
+}
+
 
 void Freenect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 {
