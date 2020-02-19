@@ -67,12 +67,6 @@
     <ClCompile Include="..\Source\MfCapture.cpp" />
     <ClCompile Include="..\Source\MfDecoder.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
-    <ClCompile Include="..\Source\PopCameraDevice_TestApp.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Master|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestApp|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyArray.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyAssert.cpp" />
@@ -175,6 +169,9 @@
     <CustomBuild Include="..\Source\Libs\LibFreenect2\Build\bin\freenect2.dll">
       <FileType>Document</FileType>
     </CustomBuild>
+    <CopyFileToFolders Include="..\Source\Libs\KinectAzure\k4a.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\fwfetcher.py" />
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in" />
     <None Include="..\Source\PopCameraDevice.cs" />

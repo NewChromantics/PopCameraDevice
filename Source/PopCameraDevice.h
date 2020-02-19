@@ -56,3 +56,6 @@ __export int32_t			PopCameraDevice_GetNextFrame(int32_t Instance, uint8_t* Plane
 //	returns	version integer as A.BBB.CCCCCC (major, minor, patch. Divide by 10's to split)
 __export int32_t			PopCameraDevice_GetVersion();
 
+//	shouldn't need this, but cleans up explicitly
+__export void				PopCameraDevice_Cleanup();
+

@@ -8,6 +8,7 @@
 #include "TestDevice.h"
 
 
+
 namespace PopCameraDevice
 {
 	const Soy::TVersion	Version(2, 0, 0);
@@ -40,21 +41,14 @@ __export int32_t PopCameraDevice_GetVersion()
 #endif
 
 
-#if defined(TARGET_WINDOWS)
-BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
-{
-	switch (ul_reason_for_call)
-	{
-		case DLL_PROCESS_ATTACH:
-		case DLL_THREAD_ATTACH:
-		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
-			break;
-	}
-	return TRUE;
-}
-#endif
 
+
+class TDeviceAndFormats
+{
+public:
+	std::string			mSerial;
+	Array<std::string>	mFormats;
+};
 
 namespace PopCameraDevice
 {
@@ -66,12 +60,44 @@ namespace PopCameraDevice
 	void			FreeInstance(uint32_t Instance);
 	bool			PopFrame(TDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2,std::string& Meta);
 
-	uint32_t		CreateCameraDevice(const std::string& Name);
+	uint32_t		CreateCameraDevice(const std::string& Name,const std::string& Format);
+
+	void			Shutdown();
 
 	std::mutex				InstancesLock;
 	Array<TDeviceInstance>	Instances;
 	uint32_t				InstancesCounter = 1;
+
+	std::string				EnumDevicesJson();
+	void					EnumDevices(ArrayBridge< TDeviceAndFormats>&& DeviceAndFormats);
 }
+
+
+#if defined(TARGET_WINDOWS)
+BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+
+	//	need to mark threads as exited which may have been shutdown from owner
+	//	mostly used to clean up TLS
+	//	on process detatch, threads are already gone...
+	//if (ul_reason_for_call == DLL_THREAD_DETACH || ul_reason_for_call == DLL_PROCESS_DETACH)
+	if ( ul_reason_for_call == DLL_PROCESS_DETACH)
+	{
+		PopCameraDevice_Cleanup();
+	}
+
+	return TRUE;
+}
+#endif
+
 
 
 class PopCameraDevice::TDeviceInstance
@@ -84,19 +110,39 @@ public:
 };
 
 
-//	gr: make this safe!
-__export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t StringBufferLength)
+void GetObjectJson(const TDeviceAndFormats& DeviceAndFormats, std::stringstream& Json)
 {
-	//	first char is delin
-	//	£ gives Illegal character encoding in string literal
-	const char PossibleDelin[] = ",;:#!@+=_-&^%*$?|/ ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopoqrstuvwzy0123456789";
-	auto PossibleDelinArray = GetRemoteArray( PossibleDelin );
+	Json << "{\n";
+	Json << "\t\"Serial\":\"" << DeviceAndFormats.mSerial << "\",\n";
+	Json << "\t\"Formats\":\"[\n";
+	for (auto f = 0; f < DeviceAndFormats.mFormats.GetSize(); f++)
+	{
+		auto& Format = DeviceAndFormats.mFormats[f];
+		Json << "\t\t\"" << Format << "\"";
+		if (f != DeviceAndFormats.mFormats.GetSize() - 1)
+			Json << ",";
+		Json << "\n";
+	}
+	Json << "\t]\n";
+	Json << "}\n";
+}
 
-	Array<std::string> DeviceNames;
+
+void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndFormats)
+{
 	auto EnumDevice = [&](const std::string& Name)
 	{
-		DeviceNames.PushBack(Name);
+		auto& Device = DeviceAndFormats.PushBack();
+		Device.mSerial = Name;
 	};
+	
+	auto EnumDeviceAndFormats = [&](const std::string& Name,ArrayBridge<std::string>&& Formats)
+	{
+		auto& Device = DeviceAndFormats.PushBack();
+		Device.mSerial = Name;
+		Device.mFormats.Copy(Formats);
+	};
+
 	TestDevice::EnumDeviceNames(EnumDevice);
 #if defined(TARGET_WINDOWS)
 	MediaFoundation::EnumCaptureDevices(EnumDevice);
@@ -105,7 +151,7 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #endif
 	//Freenect2::EnumDeviceNames(EnumDevice);
 	//Kinect::EnumDeviceNames(EnumDevice);
-	
+
 #if defined(ENABLE_FREENECT)
 	Freenect::EnumDeviceNames(EnumDevice);
 #endif
@@ -115,48 +161,46 @@ __export void PopCameraDevice_EnumCameraDevices(char* StringBuffer,int32_t Strin
 #endif
 
 #if defined(ENABLE_KINECTAZURE)
-	KinectAzure::EnumDeviceNames(EnumDevice);
+	KinectAzure::EnumDeviceNameAndFormats(EnumDeviceAndFormats);
 #endif
+}
 
-	auto IsCharUsed = [&](char Char)
+
+std::string PopCameraDevice::EnumDevicesJson()
+{
+	Array<TDeviceAndFormats> DeviceAndFormats;
+	EnumDevices(GetArrayBridge(DeviceAndFormats));
+
+	//	make json
+	std::stringstream Json;
+	Json << "{\n";
+	
+	for (auto d = 0; d < DeviceAndFormats.GetSize(); d++)
 	{
-		for ( int d=0;	d<DeviceNames.GetSize();	d++ )
+		auto& DeviceAndFormat = DeviceAndFormats[d];
+		GetObjectJson(DeviceAndFormat, Json);
+
+		if (d != DeviceAndFormats.GetSize())
 		{
-			auto& DeviceName = DeviceNames[d];
-			auto Index = DeviceName.find_first_of(Char);
-			if ( Index != DeviceName.npos )
-				return true;
+			Json << ",\n";
 		}
-		return false;
-	};
-
-	char Delin = 0;
-	for ( auto pd=0;	pd<PossibleDelinArray.GetSize();	pd++ )
-	{
-		Delin = PossibleDelin[pd];
-		bool Used = IsCharUsed(Delin);
-		if ( !Used )
-			break;		
-	}
-	//	todo! handle no unused chars!
-
-	//	build output
-	//	first char is delin, then each device seperated by that delin
-	std::stringstream OutputString;
-	OutputString << Delin;
-	for ( int d=0;	d<DeviceNames.GetSize();	d++ )
-	{
-		auto& DeviceName = DeviceNames[d];
-		OutputString << DeviceName << Delin;
 	}
 
-	auto OutputStringStr = OutputString.str();
-	Soy::StringToBuffer( OutputStringStr, StringBuffer, StringBufferLength );
+	Json << "}\n";
+	return Json.str();
+}
+
+//	gr: make this safe!
+__export void PopCameraDevice_EnumCameraDevicesJson(char* StringBuffer,int32_t StringBufferLength)
+{
+	auto Json = PopCameraDevice::EnumDevicesJson();
+
+	Soy::StringToBuffer(Json, StringBuffer, StringBufferLength);
 }
 
 
 
-uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name)
+uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::string& Format)
 {
 	//	alloc device
 	try
@@ -251,11 +295,12 @@ RETURN SafeCall(FUNC Function,const char* FunctionName,RETURN ErrorReturn)
 	}
 }
 
-__export int32_t PopCameraDevice_CreateCameraDevice(const char* Name)
+__export int32_t PopCameraDevice_CreateCameraDeviceWithFormat(const char* Name,const char* Format, char* ErrorBuffer, int32_t ErrorBufferLength)
 {
 	auto Function = [&]()
 	{
-		auto InstanceId = PopCameraDevice::CreateCameraDevice( Name );
+		Format = Format ? Format : "";
+		auto InstanceId = PopCameraDevice::CreateCameraDevice( Name, Format );
 		return InstanceId;
 	};
 	return SafeCall( Function, __func__, -1 );
@@ -408,4 +453,16 @@ __export int32_t PopCameraDevice_PopFrameAndMeta(int32_t Instance, uint8_t* Plan
 __export int32_t PopCameraDevice_PopFrame(int32_t Instance, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size)
 {
 	return PopCameraDevice_PopFrameAndMeta(Instance, Plane0, Plane0Size, Plane1, Plane1Size, Plane2, Plane2Size, nullptr, 0);
+}
+
+void PopCameraDevice::Shutdown()
+{
+#if defined(ENABLE_FREENECT)
+	Freenect::Shutdown();
+#endif
+}
+
+__export void PopCameraDevice_Cleanup()
+{
+	PopCameraDevice::Shutdown();
 }

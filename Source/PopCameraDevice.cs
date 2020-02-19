@@ -20,7 +20,7 @@ public static class PopCameraDevice
 	
 	//	returns instance id
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int PopCameraDevice_CreateCameraDeviceWithFormat(byte[] Name, byte[] Format);
+	private static extern int PopCameraDevice_CreateCameraDeviceWithFormat(byte[] Name, byte[] Format,[In, Out] byte[] ErrorBuffer, int ErrorBufferLength);
 
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern void PopCameraDevice_FreeCameraDevice(int Instance);
@@ -36,6 +36,11 @@ public static class PopCameraDevice
 	//	returns	version integer as A.BBB.CCCCCC
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern int PopCameraDevice_GetVersion();
+
+	//	DLL cleanup
+	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+	private static extern void PopCameraDevice_Cleanup();
+		
 
 	//	PixelFormat_WidthxHeight@FrameRate
 	//	eg RGBA_640x480@30

@@ -8,7 +8,7 @@ namespace KinectAzure
 	class TCameraDevice;
 	class TDepthReader;
 
-	void			EnumDeviceNames(std::function<void(const std::string&)> Enum);
+	void	EnumDeviceNameAndFormats(std::function<void(const std::string&, ArrayBridge<std::string>&&) > Enum);
 }
 
 

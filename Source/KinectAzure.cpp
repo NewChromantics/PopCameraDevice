@@ -28,6 +28,8 @@ namespace KinectAzure
 
 	SoyPixelsRemote			GetPixels(k4a_image_t Image);
 	SoyPixelsFormat::Type	GetFormat(k4a_image_format_t Format);
+
+	constexpr auto	SerialPrefix = "KinectAzure_";
 }
 
 
@@ -138,34 +140,38 @@ void KinectAzure::InitDebugHandler()
 	//Platform::SetEnvVar("K4ABT_LOG_LEVEL", "i");	//	or W
 }
 
-void KinectAzure::EnumDeviceNames(std::function<void(const std::string&)> Enum)
+void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&,ArrayBridge<std::string>&&)> Enum)
 {
 	auto DeviceCount = k4a_device_get_installed_count();
 	std::Debug << "KinectDevice count: " << DeviceCount << std::endl;
 
-	for (auto i = 0; i < DeviceCount; i++)
-	{
-		try
-		{
-			//	both off will fail
-			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_NFOV_UNBINNED, K4A_COLOR_RESOLUTION_OFF);
-			auto Serial = Device.GetSerial();
-			Enum(Serial);
-		}
-		catch (std::exception& e)
-		{
-			std::Debug << "Error getting kinect device serial: " << e.what() << std::endl;
-		}
-	}
+	//	formats are known
+	//	todo: support depth & colour as seperate planes inheritely as multiple images
+	Array<std::string> Formats;
+	Formats.PushBack("Depth16_640x576@30");
+	Formats.PushBack("Depth16_320x288@30");
+	Formats.PushBack("Depth16_512x512@30");
+	Formats.PushBack("Depth16_1024x1024@30");
+	//Formats.PushBack("Depth16_1024x1024@30");	IR at higher framerate
+	
+	//	todo: get all the pixel formats for camera
+/*
+	Formats.PushBack("RGB_1280x720@30");
+	Formats.PushBack("RGB_1920x1080@30");
+	Formats.PushBack("RGB_2560x1440@30");
+	Formats.PushBack("RGB_2048x1536@30");
+	Formats.PushBack("RGB_3840x2160@30");
+	Formats.PushBack("RGB_4096x3072@30");
+	*/
 
 	for (auto i = 0; i < DeviceCount; i++)
 	{
 		try
 		{
-			//	both off will fail
-			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_NFOV_UNBINNED, K4A_COLOR_RESOLUTION_OFF);
+			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_OFF, K4A_COLOR_RESOLUTION_OFF);
 			auto Serial = Device.GetSerial();
-			Enum(Serial);
+
+			Enum(Serial, GetArrayBridge(Formats));
 		}
 		catch (std::exception& e)
 		{
@@ -179,7 +185,7 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 {
 	ssize_t SerialIndex = -1;
 	size_t RunningIndex = 0;
-	auto EnumName = [&](const std::string& DeviceSerial)
+	auto EnumName = [&](const std::string& DeviceSerial,ArrayBridge<std::string>& Formats)
 	{
 		if (SerialIndex >= 0)
 			return;
@@ -188,7 +194,7 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 
 		RunningIndex++;
 	};
-	EnumDeviceNames(EnumName);
+	EnumDeviceNameAndFormats(EnumName);
 
 	if (SerialIndex < 0)
 	{
@@ -204,6 +210,11 @@ KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4
 	//	so make sure we shutdown if we fail
 	auto Error = k4a_device_open(DeviceIndex, &mDevice);
 	IsOkay(Error, "k4a_device_open");
+
+	//	don't start cameras if nothing selected (throws error)
+	//	use this config for simple enum
+	if (DepthMode == K4A_DEPTH_MODE_OFF && ColourMode == K4A_COLOR_RESOLUTION_OFF)
+		return;
 
 	try
 	{
@@ -287,7 +298,7 @@ std::string KinectAzure::TDevice::GetSerial()
 	IsOkay(Error, "k4a_device_get_serialnum(get buffer)");
 
 	std::string Serial(SerialBuffer.GetArray());
-	return Serial;
+	return SerialPrefix + Serial;
 }
 
 KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial)
