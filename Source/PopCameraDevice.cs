@@ -16,21 +16,61 @@ public static class PopCameraDevice
 
 	//	use byte as System.Char is a unicode char (2 bytes), then convert to Unicode Char
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void PopCameraDevice_EnumCameraDevices([In, Out] byte[] StringBuffer,int StringBufferLength);
+	private static extern void PopCameraDevice_EnumCameraDevicesJson([In, Out] byte[] StringBuffer,int StringBufferLength);
 	
 	//	returns instance id
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int PopCameraDevice_CreateCameraDevice(byte[] Name);
+	private static extern int PopCameraDevice_CreateCameraDeviceWithFormat(byte[] Name, byte[] Format);
 
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern void PopCameraDevice_FreeCameraDevice(int Instance);
 
+	//	get meta for next frame so buffers can be allocated accordingly
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void PopCameraDevice_GetMeta(int Instance,int[] MetaValues,int MetaValuesCount);
+	private static extern void PopCameraDevice_GetFrameMetaJson(int Instance,int[] MetaValues,int MetaValuesCount);
 
-	//	returns 0 if no new frame
+	//	returns 0 if no new frame. We split planes because this is sometimes easiest approach, but unity cannot split one big buffer without allocation penalties
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int PopCameraDevice_PopFrame(int Instance,byte[] Plane0,int Plane0Size,byte[] Plane1,int Plane1Size,byte[] Plane2,int Plane2Size);
+	private static extern int PopCameraDevice_PopFrame(int Instance, byte[] Plane0, int Plane0Size, byte[] Plane1, int Plane1Size, byte[] Plane2, int Plane2Size);
+
+	//	returns	version integer as A.BBB.CCCCCC
+	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+	private static extern int PopCameraDevice_GetVersion();
+
+	//	PixelFormat_WidthxHeight@FrameRate
+	//	eg RGBA_640x480@30
+	//		Unknown@60
+	//		NV12_1024x1024
+	public static string CreateFormatString(string PixelFormat,int Width=0,int Height=0,int FrameRate=0)
+	{
+		if (String.IsNullOrEmpty(PixelFormat))
+			PixelFormat = "Unknown";
+
+		if (Width != 0 || Height != 0)
+			PixelFormat += "_" + Width + "x" + Height;
+		if (FrameRate != 0)
+			PixelFormat += "@" + FrameRate;
+		return PixelFormat;
+	}
+
+	[System.Serializable]
+	public struct FrameMeta
+	{
+		public string	PixelFormat;
+		public int		TimeMs;
+		public int		Width;
+		public int		Height;
+		public int[]	PlaneSizes;			//	size of each plane in bytes
+		public int		FrameRate;
+		public int		DeviceFrameRate;	//	the speed the camera is supposed to deliver at
+	};
+
+	[System.Serializable]
+	public struct DeviceMeta
+	{
+		public string	Serial;		//	unique identifier, sometimes prefixed
+		public string[]	Formats;	//	All availible formats, eg. RGBA_640x480@30
+	};
 
 	//	copied directly from https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
 	public enum SoyPixelsFormat

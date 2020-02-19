@@ -7,6 +7,18 @@
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
 
+
+namespace PopCameraDevice
+{
+	const Soy::TVersion	Version(2, 0, 0);
+}
+
+__export int32_t PopCameraDevice_GetVersion()
+{
+	return PopCameraDevice::Version.GetMillion();
+}
+
+
 #if defined(ENABLE_KINECT2)
 #include "Kinect2.h"
 #endif
