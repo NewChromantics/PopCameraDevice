@@ -10,60 +10,14 @@
 #include "AvfPixelBuffer.h"
 #include "SoyAvf.h"
 #include "SoyOpenglContext.h"
-
-
-
-//	this can be generic
-class TCaptureFormatMeta
-{
-public:
-	size_t	mMaxFps = 0;
-	size_t	mMinFps = 0;
-	
-	SoyPixelsMeta	mPixelMeta;
-	std::string	mCodec;
-};
+#include "SoyOpenglContext.h"
+#include "Avf.h"
 
 
 namespace Avf
 {
-	TCaptureFormatMeta GetMeta(AVCaptureDeviceFormat* Format);
-}
-
-
-
-
-
-vec2f GetMinMaxFrameRate(AVCaptureDeviceFormat* Format)
-{
-	if ( !Format )
-		throw Soy::AssertException("GetMinMaxFrameRate(): Format null");
-	
-	//	these are in pairs, but seems okay to just get min & max of both
-	Array<float> MinFrameRates;
-	Array<float> MaxFrameRates;
-	auto* FrameRateRanges = Format.videoSupportedFrameRateRanges;
-	auto EnumRange = [&](AVFrameRateRange* Range)
-	{
-		MinFrameRates.PushBack(Range.maxFrameRate);
-		MaxFrameRates.PushBack(Range.minFrameRate);
-	};
-	Platform::NSArray_ForEach<AVFrameRateRange*>(FrameRateRanges,EnumRange);
-	
-	if ( MinFrameRates.IsEmpty() )
-		throw Soy::AssertException("Got no frame rates from camera format");
-	
-	//std::Debug << "Camera fps min: " << Soy::StringJoin(GetArrayBridge(MinFrameRates),",") << " max: " << Soy::StringJoin(GetArrayBridge(MaxFrameRates),",") << std::endl;
-	
-	float Min = MinFrameRates[0];
-	float Max = MaxFrameRates[0];
-	for ( auto i=0;	i<MinFrameRates.GetSize();	i++ )
-	{
-		Min = std::min( Min, MinFrameRates[i] );
-		Max = std::max( Max, MaxFrameRates[i] );
-	}
-	
-	return vec2f( Min, Max );
+	TCaptureFormatMeta	GetMeta(AVCaptureDeviceFormat* Format);
+	vec2f				GetMinMaxFrameRate(AVCaptureDeviceFormat* Format);
 }
 
 
@@ -221,36 +175,6 @@ NSString* GetAVCaptureSessionQuality(TVideoQuality::Type Quality)
 }
 
 
-
-std::ostream& operator<<(std::ostream& out,const TCaptureFormatMeta& in)
-{
-	out << "MaxSize=" << in.mPixelMeta << ", ";
-	out << "Fps=" << in.mMinFps << "..." << in.mMaxFps << ", ";
-	
-	return out;
-}
-
-
-TCaptureFormatMeta Avf::GetMeta(AVCaptureDeviceFormat* Format)
-{
-	if ( !Format )
-		throw Soy::AssertException("GetMeta AVCaptureDeviceFormat null format");
-	
-	auto FrameRateRange = GetMinMaxFrameRate( Format );
-
-	//	lots of work already in here
-	auto StreamMeta = Avf::GetStreamMeta( Format.formatDescription );
-
-	
-	TCaptureFormatMeta Meta;
-	Meta.mMinFps = FrameRateRange.x;
-	Meta.mMaxFps = FrameRateRange.y;
-	Meta.mPixelMeta = StreamMeta.mPixelMeta;
-	
-	return Meta;
-}
-
-
 void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQuality,bool KeepOldFrames)
 {
 	NSError* error = nil;
@@ -271,7 +195,7 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	
 	//	enum all frame rates
 	{
-		Array<TCaptureFormatMeta> Metas;
+		Array<Avf::TCaptureFormatMeta> Metas;
 		auto EnumFormat = [&](AVCaptureDeviceFormat* Format)
 		{
 			auto Meta = Avf::GetMeta(Format);
@@ -623,7 +547,7 @@ void AvfVideoCapture::SetFrameRate(size_t FramesPerSec)
 	auto ActiveFormat = [Device activeFormat];
 	if ( ActiveFormat )
 	{
-		auto MinMax = GetMinMaxFrameRate(ActiveFormat);
+		auto MinMax = Avf::GetMinMaxFrameRate(ActiveFormat);
 		std::Debug << "Camera fps range " << MinMax.x << "..." << MinMax.y << std::endl;
 	}
 

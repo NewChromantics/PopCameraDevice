@@ -367,6 +367,7 @@
 		BF15205023855D8200A70EBF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		BF15205223855F1F00A70EBF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TestAppInfo.plist; path = Source/TestAppInfo.plist; sourceTree = "<group>"; };
+		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		BF4A6A141EA16D7D00613A64 /* PopCameraDevice.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopCameraDevice.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF8534B922B3FE360049C01B /* fwfetcher.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = fwfetcher.py; path = LibFreenect/src/fwfetcher.py; sourceTree = "<group>"; };
 		BF8534BA22B3FE360049C01B /* registration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = registration.h; path = LibFreenect/src/registration.h; sourceTree = "<group>"; };
@@ -475,6 +476,7 @@
 			isa = PBXGroup;
 			children = (
 				BF012B1A226A1FD3003AEB55 /* AvfPixelBuffer.h */,
+				BF39C0C9240089E9000C7E56 /* Array.hpp */,
 				BF012B1B226A1FD3003AEB55 /* AvfPixelBuffer.mm */,
 				BF108ACF229718ED003DDC5F /* HeapArray.hpp */,
 				BF012AE92269FCBF003AEB55 /* memheap.cpp */,

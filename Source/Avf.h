@@ -2,17 +2,37 @@
 
 #include <functional>
 #include <string>
+#include "SoyLib/src/Array.hpp"
+#include "SoyLib/src/HeapArray.hpp"
+#include "SoyPixels.h"
+
+
+
 
 
 
 namespace Avf
 {
 	class TDeviceMeta;
+	class TCaptureFormatMeta;
 	
-	void	EnumCaptureDevices(std::function<void(const std::string&)> Enum);
+	void	EnumCaptureDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> Enum);
 	void	EnumCaptureDevices(std::function<void(const TDeviceMeta&)> Enum);
+
+	std::ostream& operator<<(std::ostream& out,const TCaptureFormatMeta& in);
 }
 
+
+//	this can be generic
+class Avf::TCaptureFormatMeta
+{
+public:
+	size_t	mMaxFps = 0;
+	size_t	mMinFps = 0;
+	
+	SoyPixelsMeta	mPixelMeta;
+	std::string		mCodec;
+};
 
 //	this can probably be generic device meta...
 class Avf::TDeviceMeta
@@ -29,4 +49,5 @@ public:
 	bool				mIsSuspended = false;
 	bool				mHasAudio = false;
 	bool				mHasVideo = false;
+	Array<TCaptureFormatMeta>	mFormats;
 };
