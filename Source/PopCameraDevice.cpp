@@ -147,7 +147,7 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 #if defined(TARGET_WINDOWS)
 	MediaFoundation::EnumCaptureDevices(EnumDevice);
 #elif defined(TARGET_OSX)
-	Avf::EnumCaptureDevices(EnumDevice);
+	Avf::EnumCaptureDevices(EnumDeviceAndFormats);
 #endif
 	//Freenect2::EnumDeviceNames(EnumDevice);
 	//Kinect::EnumDeviceNames(EnumDevice);
@@ -180,7 +180,7 @@ std::string PopCameraDevice::EnumDevicesJson()
 		auto& DeviceAndFormat = DeviceAndFormats[d];
 		GetObjectJson(DeviceAndFormat, Json);
 
-		if (d != DeviceAndFormats.GetSize())
+		if (d != DeviceAndFormats.GetSize()-1)
 		{
 			Json << ",\n";
 		}
@@ -297,13 +297,22 @@ RETURN SafeCall(FUNC Function,const char* FunctionName,RETURN ErrorReturn)
 
 __export int32_t PopCameraDevice_CreateCameraDeviceWithFormat(const char* Name,const char* Format, char* ErrorBuffer, int32_t ErrorBufferLength)
 {
-	auto Function = [&]()
+	try
 	{
 		Format = Format ? Format : "";
 		auto InstanceId = PopCameraDevice::CreateCameraDevice( Name, Format );
 		return InstanceId;
-	};
-	return SafeCall( Function, __func__, -1 );
+	}
+	catch(std::exception& e)
+	{
+		Soy::StringToBuffer(e.what(), ErrorBuffer, ErrorBufferLength);
+		return 0;
+	}
+	catch(...)
+	{
+		Soy::StringToBuffer("Unknown exception", ErrorBuffer, ErrorBufferLength);
+		return 0;
+	}
 }
 
 
@@ -363,33 +372,121 @@ void PopCameraDevice::FreeInstance(uint32_t Instance)
 }
 
 
-__export void PopCameraDevice_GetMeta(int32_t Instance, int32_t* pMetaValues, int32_t MetaValuesCount)
+void PushJsonKey(std::stringstream& Json,const char* Key,int PreTab=1)
 {
-	auto Function = [&]()
+	for ( auto t=0;	t<PreTab;	t++ )
+		Json << '\t';
+	Json << '"' << Key << '"' << ':';
+}
+
+template<typename TYPE>
+void PushJson(std::stringstream& Json,const char* Key,const TYPE& Value,int PreTab=1,bool TrailingComma=false)
+{
+	PushJsonKey(Json,Key,PreTab);
+
+	//	todo: escape string
+	Json << '"' << Value << '"';
+
+	if ( TrailingComma )
+		Json << ',';
+	Json << '\n';
+}
+
+
+void PushJson(std::stringstream& Json,const char* Key,const char* String,int PreTab=1,bool TrailingComma=false)
+{
+	PushJsonKey(Json,Key,PreTab);
+
+	//	todo: escape string!
+	Json << '"' << String << '"';
+
+	if ( TrailingComma )
+		Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json,const char* Key,bool Boolean,int PreTab=1,bool TrailingComma=false)
+{
+	PushJsonKey(Json,Key,PreTab);
+
+	Json << Boolean ? "true" : "false";
+
+	if ( TrailingComma )
+		Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json,const char* Key,int Number,int PreTab=1,bool TrailingComma=false)
+{
+	PushJsonKey(Json,Key,PreTab);
+
+	Json << Number;
+
+	if ( TrailingComma )
+		Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json,const char* Key,float Number,int PreTab=1,bool TrailingComma=false)
+{
+	PushJsonKey(Json,Key,PreTab);
+
+	//	todo: handle special cases
+	Json << Number;
+
+	if ( TrailingComma )
+		Json << ',';
+	Json << '\n';
+}
+
+
+__export void PopCameraDevice_GetNextFrameMeta(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize)
+{
+	try
 	{
 		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
 		auto Meta = Device.GetMeta();
 
-		size_t MetaValuesCounter = 0;
-		auto MetaValues = GetRemoteArray(pMetaValues, MetaValuesCount, MetaValuesCounter);
-
 		BufferArray<SoyPixelsMeta, 3> PlaneMetas;
 		Meta.GetPlanes(GetArrayBridge(PlaneMetas));
-		MetaValues.PushBack(PlaneMetas.GetSize());
 
-		for ( auto p=0;	p<PlaneMetas.GetSize();	p++ )
+		bool HasNewFrame = Device.HasNewFrame();
+		
+		std::stringstream Json;
+		Json << "{\n";
 		{
-			auto& PlaneMeta = PlaneMetas[p];
-			MetaValues.PushBack(PlaneMeta.GetWidth());
-			MetaValues.PushBack(PlaneMeta.GetHeight());
-			MetaValues.PushBack(PlaneMeta.GetChannels());
-			MetaValues.PushBack(PlaneMeta.GetFormat());
-			MetaValues.PushBack(PlaneMeta.GetDataSize());
-		}
+			PushJsonKey(Json,"Planes",1);
+			Json << "[\n";
 
-		return 0;
-	};
-	 SafeCall(Function, __func__, 0 );
+			for ( auto p=0;	p<PlaneMetas.GetSize();	p++ )
+			{
+				auto Tabs = 2;
+				auto& PlaneMeta = PlaneMetas[p];
+				PushJson(Json,"Width",PlaneMeta.GetWidth(),Tabs,true);
+				PushJson(Json,"Height",PlaneMeta.GetHeight(),Tabs,true);
+				PushJson(Json,"Format",PlaneMeta.GetFormat(),Tabs,true);
+				//	gr: don't show size if no next frame
+				if ( HasNewFrame )
+					PushJson(Json,"DataSize",PlaneMeta.GetDataSize(),Tabs,true);
+				PushJson(Json,"Channels",PlaneMeta.GetChannels(),Tabs,false);
+			}
+			Json << "]\n";
+		}
+		Json << "}\n";
+		
+		Soy::StringToBuffer( Json.str(), JsonBuffer, JsonBufferSize );
+	}
+	catch(std::exception& e)
+	{
+		std::stringstream Json;
+		Json << "{\"Exception\":\"" << e.what() << "\"}";
+		Soy::StringToBuffer( Json.str(), JsonBuffer, JsonBufferSize );
+	}
+	catch(...)
+	{
+		std::string Json = "{\"Exception\":\"Unknown\"}";
+		Soy::StringToBuffer( Json, JsonBuffer, JsonBufferSize );
+	}
 }
 
 __export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
@@ -400,16 +497,6 @@ __export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
 		return 0;
 	};
 	SafeCall(Function, __func__, 0 );
-}
-
-__export POPCAMERADEVICE_EXPORTCLASS* PopCameraDevice_GetDevicePtr(int32_t Instance)
-{
-	auto Function = [&]()
-	{
-		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
-		return &Device;
-	};
-	return SafeCall<POPCAMERADEVICE_EXPORTCLASS*>( Function, __func__, nullptr );
 }
 
 

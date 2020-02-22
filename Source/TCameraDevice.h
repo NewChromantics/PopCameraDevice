@@ -40,7 +40,7 @@ public:
 	std::shared_ptr<TPixelBuffer>	PopLastFrame(std::string& Meta);
 	bool							PopLastFrame(ArrayBridge<uint8_t>& Plane0, ArrayBridge<uint8_t>& Plane1, ArrayBridge<uint8_t>& Plane2,std::string& Meta);
 	SoyPixelsMeta					GetMeta() const { return mLastPixelsMeta; }
-
+	bool							HasNewFrame() const{	return mLastPixelBuffer.get();	}
 	virtual void					EnableFeature(TFeature::Type Feature,bool Enable)=0;	//	throws if unsupported
 	
 protected:

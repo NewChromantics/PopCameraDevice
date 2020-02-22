@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;					// required for Coroutines
 using System.Runtime.InteropServices;		// required for DllImport
 using System;								// requred for IntPtr
@@ -27,7 +27,7 @@ public static class PopCameraDevice
 
 	//	get meta for next frame so buffers can be allocated accordingly
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void PopCameraDevice_GetFrameMetaJson(int Instance,int[] MetaValues,int MetaValuesCount);
+	private static extern void PopCameraDevice_GetFrameMetaJson(int Instance,[In, Out] byte[] JsonBuffer,int JsonBufferLength);
 
 	//	returns 0 if no new frame. We split planes because this is sometimes easiest approach, but unity cannot split one big buffer without allocation penalties
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
@@ -59,15 +59,22 @@ public static class PopCameraDevice
 	}
 
 	[System.Serializable]
-	public struct FrameMeta
+	public struct PlaneMeta
 	{
-		public string	PixelFormat;
-		public int		TimeMs;
+		public string	Format;
 		public int		Width;
 		public int		Height;
-		public int[]	PlaneSizes;			//	size of each plane in bytes
-		public int		FrameRate;
-		public int		DeviceFrameRate;	//	the speed the camera is supposed to deliver at
+		public int		DataSize;
+		public int		Channels;
+	};
+
+	[System.Serializable]
+	public struct FrameMeta
+	{
+		public int			TimeMs;
+		public PlaneMeta[]	Planes;
+		//public int		FrameRate;
+		//public int		DeviceFrameRate;	//	the speed the camera is supposed to deliver at
 	};
 
 	[System.Serializable]
