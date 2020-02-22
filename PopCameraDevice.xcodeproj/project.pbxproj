@@ -180,6 +180,9 @@
 		BF15204F23855BDD00A70EBF /* SoyArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF15204C23855BD500A70EBF /* SoyArray.cpp */; };
 		BF15205123855D8300A70EBF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205023855D8200A70EBF /* CoreGraphics.framework */; };
 		BF15205323855F1F00A70EBF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205223855F1F00A70EBF /* UIKit.framework */; };
+		BF39C0CB2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
+		BF39C0CC2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
+		BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
 		BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF76106A226B6E5C00762F15 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
@@ -368,6 +371,7 @@
 		BF15205223855F1F00A70EBF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TestAppInfo.plist; path = Source/TestAppInfo.plist; sourceTree = "<group>"; };
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
+		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Source/PopCameraDevice.cs; sourceTree = "<group>"; };
 		BF4A6A141EA16D7D00613A64 /* PopCameraDevice.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopCameraDevice.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF8534B922B3FE360049C01B /* fwfetcher.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = fwfetcher.py; path = LibFreenect/src/fwfetcher.py; sourceTree = "<group>"; };
 		BF8534BA22B3FE360049C01B /* registration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = registration.h; path = LibFreenect/src/registration.h; sourceTree = "<group>"; };
@@ -681,6 +685,7 @@
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
 				BF012AAA2268DBF7003AEB55 /* MfCapture.h */,
 				BF012AAD2268DBF7003AEB55 /* MfDecoder.cpp */,
+				BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */,
 				BF012AAB2268DBF7003AEB55 /* MfDecoder.h */,
 				BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */,
 				BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */,
@@ -888,6 +893,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF39C0CC2401EE81000C7E56 /* PopCameraDevice.cs in Resources */,
 				BF108AE5229726CF003DDC5F /* Readme.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -896,6 +902,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -903,6 +910,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF39C0CB2401EE81000C7E56 /* PopCameraDevice.cs in Resources */,
 				BF108AE4229726CF003DDC5F /* Readme.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
