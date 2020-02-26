@@ -40,19 +40,19 @@ public static class PopCameraDevice
 	//	DLL cleanup
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern void PopCameraDevice_Cleanup();
-		
 
-	//	PixelFormat_WidthxHeight@FrameRate
-	//	eg RGBA_640x480@30
+
+	//	PixelFormat^WidthxHeight@FrameRate
+	//	eg RGBA^640x480@30
 	//		Unknown@60
-	//		NV12_1024x1024
+	//		NV12^1024x1024
 	public static string CreateFormatString(string PixelFormat,int Width=0,int Height=0,int FrameRate=0)
 	{
 		if (String.IsNullOrEmpty(PixelFormat))
 			PixelFormat = "Unknown";
 
 		if (Width != 0 || Height != 0)
-			PixelFormat += "_" + Width + "x" + Height;
+			PixelFormat += "^" + Width + "x" + Height;
 		if (FrameRate != 0)
 			PixelFormat += "@" + FrameRate;
 		return PixelFormat;
@@ -81,7 +81,7 @@ public static class PopCameraDevice
 	public struct DeviceMeta
 	{
 		public string	Serial;		//	unique identifier, sometimes prefixed
-		public string[]	Formats;	//	All availible formats, eg. RGBA_640x480@30
+		public string[]	Formats;    //	All availible formats, eg. RGBA^640x480@30
 	};
 
 	//	copied directly from https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16

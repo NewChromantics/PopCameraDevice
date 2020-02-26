@@ -1,6 +1,7 @@
 #include "Avf.h"
 #include "SoyLib/src/SoyString.h"
 #include "SoyAvf.h"
+#include "TCameraDevice.h"
 
 
 namespace Avf
@@ -161,11 +162,7 @@ void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 
 std::string GetFormatString(const Avf::TCaptureFormatMeta& Meta)
 {
-	std::stringstream Format;
-	Format << Meta.mPixelMeta.GetFormat() << "_";
-	Format << Meta.mPixelMeta.GetWidth() << "x" << Meta.mPixelMeta.GetHeight();
-	Format << "@" << Meta.mMaxFps;
-	return Format.str();
+	return PopCameraDevice::GetFormatString(Meta.mPixelMeta, Meta.mMaxFps);
 }
 
 void Avf::EnumCaptureDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> EnumName)

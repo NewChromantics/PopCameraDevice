@@ -269,6 +269,9 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyFilesystem.h">
       <Filter>SoyLib</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Avf.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\AvfCapture.mm">

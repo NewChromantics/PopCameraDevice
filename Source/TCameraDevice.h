@@ -11,6 +11,8 @@ namespace PopCameraDevice
 	class TDevice;
 	class TStreamMeta;
 	
+	std::string	GetFormatString(SoyPixelsMeta Meta, size_t FrameRate = 0);
+
 	//	these features are currently all on/off.
 	//	but some cameras have options like ISO levels, which we should allow specific numbers of
 	namespace TFeature

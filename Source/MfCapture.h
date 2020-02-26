@@ -7,7 +7,7 @@
 
 namespace MediaFoundation
 {
-	void		EnumCaptureDevices(std::function<void(const std::string&)> AppendName);
+	void		EnumDeviceNameAndFormats(std::function<void(const std::string&, ArrayBridge<std::string>&&) > Enum);
 
 	class TCaptureExtractor;
 	class TCamera;

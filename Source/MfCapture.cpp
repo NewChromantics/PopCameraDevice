@@ -5,6 +5,9 @@
 namespace MediaFoundation
 {
 	Soy::AutoReleasePtr<IMFMediaSource>	FindCaptureDevice(const std::string& Match);
+	Soy::AutoReleasePtr<IMFMediaSource>	FindCaptureDevice(IMFActivate& Device);
+	void								EnumFormats(IMFActivate& Device, std::function<void(const std::string&)> EnumFormat);
+	std::string							GetFormat(IMFStreamDescriptor& Stream);
 
 	void		Init();
 }
@@ -119,18 +122,96 @@ void EnumCaptureDevices(std::function<void(IMFActivate&)> OnFoundDevice,GUID Dev
 
 
 
-void MediaFoundation::EnumCaptureDevices(std::function<void(const std::string&)> AppendName)
+std::string MediaFoundation::GetFormat(IMFStreamDescriptor& Stream)
+{
+	Soy::AutoReleasePtr<IMFMediaTypeHandler> MediaHandler;
+	auto Result = Stream.GetMediaTypeHandler(&MediaHandler.mObject);
+	MediaFoundation::IsOkay(Result, "MediaSource.stream.GetMediaTypeHandler");
+
+	Soy::AutoReleasePtr<IMFMediaType> MediaType;
+	Result = MediaHandler->GetCurrentMediaType(&MediaType.mObject);
+	MediaFoundation::IsOkay(Result, "MediaSource.stream.GetMediaTypeHandler.GetCurrentMediaType");
+
+	auto Meta = MediaFoundation::GetStreamMeta(*MediaType, true);
+	return PopCameraDevice::GetFormatString(Meta.mPixelMeta, Meta.mFramesPerSecond);
+}
+
+void MediaFoundation::EnumFormats(IMFActivate& Device,std::function<void(const std::string&)> EnumFormat)
+{
+	//	alloc an extractor
+	//MediaFoundation::TCaptureExtractor Extractor(Device);
+	auto pMediaSource = FindCaptureDevice(Device);
+	auto& MediaSource = *pMediaSource;
+
+	//	each stream is a format
+	//	https://msdn.microsoft.com/en-us/library/windows/desktop/ms702261(v=vs.85).aspx
+	IMFPresentationDescriptor* pDescriptor = nullptr;
+	auto Result = MediaSource.CreatePresentationDescriptor(&pDescriptor);
+
+	//	result already has a ref added
+	Soy::AutoReleasePtr<IMFPresentationDescriptor> Descriptor(pDescriptor, false);
+
+	//	failed to get a format
+	MediaFoundation::IsOkay(Result, "MediaSource.CreatePresentationDescriptor");
+	if (!Descriptor)
+		throw Soy::AssertException("Failed to get presentation descriptor (error is ok)");
+
+	//	extract each stream descriptor to get the format
+	DWORD StreamCount = 0;
+	Result = Descriptor->GetStreamDescriptorCount(&StreamCount);
+	MediaFoundation::IsOkay(Result, "MediaSource.GetStreamDescriptorCount");
+
+	for (int i = 0; i < StreamCount; i++)
+	{
+		//	get stream descriptor
+		try
+		{
+			BOOL Enabled = false;
+			IMFStreamDescriptor* pStream = nullptr;
+			Result = Descriptor->GetStreamDescriptorByIndex(i, &Enabled, &pStream);
+			Soy::AutoReleasePtr<IMFStreamDescriptor> Stream(pStream, false);
+			std::stringstream Error;
+			Error << "GetStreamDescriptorByIndex(" << i << ")";
+			MediaFoundation::IsOkay(Result, Error.str());
+
+			auto Format = GetFormat(*pStream);
+			EnumFormat(Format);
+		}
+		catch (std::exception& e)
+		{
+			std::Debug << "Failed to get descriptor stream " << i << ": " << e.what() << std::endl;
+			continue;
+		}
+	}
+}
+
+
+
+void MediaFoundation::EnumDeviceNameAndFormats(std::function<void(const std::string&, ArrayBridge<std::string>&&) > Enum)
 {
 	auto OnFoundDevice = [&](IMFActivate& Device)
 	{
 		auto Name = GetDeviceName( Device );
-		AppendName( Name );
+		Array<std::string> Formats;
+		try
+		{
+			auto AppendFormat = [&](const std::string& Format)
+			{
+				Formats.PushBack(Format);
+			};
+			EnumFormats(Device, AppendFormat);
+		}
+		catch (std::exception& e)
+		{
+			std::Debug << "Exception during device " << Name << " EnumFormats()" << std::endl;
+		}
+		Enum(Name, GetArrayBridge(Formats));
 	};
 
 	try
 	{
 		EnumCaptureDevices( OnFoundDevice, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID );
-		EnumCaptureDevices( OnFoundDevice, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_GUID );
+		//EnumCaptureDevices( OnFoundDevice, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_AUDCAP_GUID );
 	}
 	catch(std::exception& e)
 	{
@@ -168,25 +249,30 @@ Soy::AutoReleasePtr<IMFMediaSource> MediaFoundation::FindCaptureDevice(const std
 		return Soy::AutoReleasePtr<IMFMediaSource>();
 
 	//	throw if multiple matches?
-
-	//	explcit acquire
-	auto pDevice = Matches[0];
-	IMFMediaSource* pSource = nullptr;
-	IMFMediaSource** ppSource = &pSource;
-	auto Result = pDevice->ActivateObject( IID_PPV_ARGS(ppSource) );
-	::MediaFoundation::IsOkay( Result, "Device::ActivateObject");
-
-	if ( !pSource )
-	{
-		std::stringstream Error;
-		Error << "Error getting media source for device " << GetDeviceName( *pDevice ) << " but no error reported";
-		throw Soy::AssertException( Error.str() );
-	}
-
-	Soy::AutoReleasePtr<IMFMediaSource> Source( pSource, true );
-	return Source;
+	auto& Match0 = Matches[0];
+	return FindCaptureDevice(*Match0);
 }
 
+
+Soy::AutoReleasePtr<IMFMediaSource> MediaFoundation::FindCaptureDevice(IMFActivate& Device)
+{
+	//	explcit acquire
+	auto pDevice = &Device;
+	IMFMediaSource* pSource = nullptr;
+	IMFMediaSource** ppSource = &pSource;
+	auto Result = pDevice->ActivateObject(IID_PPV_ARGS(ppSource));
+	::MediaFoundation::IsOkay(Result, "Device::ActivateObject");
+
+	if (!pSource)
+	{
+		std::stringstream Error;
+		Error << "Error getting media source for device " << GetDeviceName(*pDevice) << " but no error reported";
+		throw Soy::AssertException(Error.str());
+	}
+
+	Soy::AutoReleasePtr<IMFMediaSource> Source(pSource, true);
+	return Source;
+}
 
 
 SoyPixelsFormat::Type GetMeta(IMFStreamDescriptor* Stream,bool VerboseDebug)

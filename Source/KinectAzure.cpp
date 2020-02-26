@@ -148,11 +148,11 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	//	formats are known
 	//	todo: support depth & colour as seperate planes inheritely as multiple images
 	Array<std::string> Formats;
-	Formats.PushBack("Depth16_640x576@30");
-	Formats.PushBack("Depth16_320x288@30");
-	Formats.PushBack("Depth16_512x512@30");
-	Formats.PushBack("Depth16_1024x1024@30");
-	//Formats.PushBack("Depth16_1024x1024@30");	IR at higher framerate
+	Formats.PushBack("Depth16^640x576@30");
+	Formats.PushBack("Depth16^320x288@30");
+	Formats.PushBack("Depth16^512x512@30");
+	Formats.PushBack("Depth16^1024x1024@30");
+	//Formats.PushBack("Depth16^1024x1024@30");	IR at higher framerate
 	
 	//	todo: get all the pixel formats for camera
 /*

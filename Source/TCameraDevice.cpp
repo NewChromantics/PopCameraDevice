@@ -2,6 +2,20 @@
 #include "SoyLib/src/SoyMedia.h"
 
 
+std::string PopCameraDevice::GetFormatString(SoyPixelsMeta Meta, size_t FrameRate)
+{
+	std::stringstream Format;
+	Format << Meta.GetFormat();
+	Format << "^" << Meta.GetWidth();
+	Format << "x" << Meta.GetHeight();
+
+	if (FrameRate != 0)
+		Format << "@" << FrameRate;
+
+	return Format.str();
+}
+
+
 void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,const SoyPixelsMeta& PixelMeta,const std::string& FrameMeta)
 {
 	{

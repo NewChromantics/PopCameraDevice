@@ -145,7 +145,7 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 
 	TestDevice::EnumDeviceNames(EnumDevice);
 #if defined(TARGET_WINDOWS)
-	MediaFoundation::EnumCaptureDevices(EnumDevice);
+	MediaFoundation::EnumDeviceNameAndFormats(EnumDeviceAndFormats);
 #elif defined(TARGET_OSX)
 	Avf::EnumCaptureDevices(EnumDeviceAndFormats);
 #endif

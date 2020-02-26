@@ -91,6 +91,7 @@
     <ClCompile Include="..\Source\TestDevice.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Avf.h" />
     <ClInclude Include="..\Source\AvfCapture.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
