@@ -112,19 +112,19 @@ public:
 
 void GetObjectJson(const TDeviceAndFormats& DeviceAndFormats, std::stringstream& Json)
 {
-	Json << "{\n";
-	Json << "\t\"Serial\":\"" << DeviceAndFormats.mSerial << "\",\n";
-	Json << "\t\"Formats\":\"[\n";
+	Json << "\t{\n";
+	Json << "\t\t\"Serial\":\"" << DeviceAndFormats.mSerial << "\",\n";
+	Json << "\t\t\"Formats\": [\n";
 	for (auto f = 0; f < DeviceAndFormats.mFormats.GetSize(); f++)
 	{
 		auto& Format = DeviceAndFormats.mFormats[f];
-		Json << "\t\t\"" << Format << "\"";
+		Json << "\t\t\t\"" << Format << "\"";
 		if (f != DeviceAndFormats.mFormats.GetSize() - 1)
 			Json << ",";
 		Json << "\n";
 	}
-	Json << "\t]\n";
-	Json << "}\n";
+	Json << "\t\t]\n";
+	Json << "\t}\n";
 }
 
 

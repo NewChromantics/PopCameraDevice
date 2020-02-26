@@ -132,7 +132,7 @@ std::string MediaFoundation::GetFormat(IMFStreamDescriptor& Stream)
 	Result = MediaHandler->GetCurrentMediaType(&MediaType.mObject);
 	MediaFoundation::IsOkay(Result, "MediaSource.stream.GetMediaTypeHandler.GetCurrentMediaType");
 
-	auto Meta = MediaFoundation::GetStreamMeta(*MediaType, true);
+	auto Meta = MediaFoundation::GetStreamMeta(*MediaType, false);
 	return PopCameraDevice::GetFormatString(Meta.mPixelMeta, Meta.mFramesPerSecond);
 }
 

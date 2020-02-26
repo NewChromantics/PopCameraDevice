@@ -138,16 +138,11 @@ bool ReadAttrib32(IMFAttributes& Attribs,uint32& Value,GUID Guid,const std::stri
 	else 
 		Error << Guid;
 
-	try
-	{
-		MediaFoundation::IsOkay(Result, Error.str());
+	if (Result == NO_ERROR)
 		return true;
-	}
-	catch(std::exception& e)
-	{
-		std::Debug << e.what() << std::endl;
-		return false;
-	}
+
+	//MediaFoundation::IsOkay(Result, Error.str());
+	return false;
 }
 
 template<typename TYPE>
