@@ -12,6 +12,8 @@
 namespace PopCameraDevice
 {
 	const Soy::TVersion	Version(2, 0, 0);
+	const int32_t		NoFrame = -1;
+	const int32_t		Error = -2;
 }
 
 __export int32_t PopCameraDevice_GetVersion()
@@ -59,6 +61,7 @@ namespace PopCameraDevice
 	uint32_t		CreateInstance(std::shared_ptr<TDevice> Device);
 	void			FreeInstance(uint32_t Instance);
 	bool			PopFrame(TDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2,std::string& Meta);
+	int32_t			GetNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize, ArrayBridge<ArrayBridge<uint8_t>*>&& Planes, bool DeleteFrame);
 
 	uint32_t		CreateCameraDevice(const std::string& Name,const std::string& Format);
 
@@ -149,9 +152,7 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 #elif defined(TARGET_OSX)
 	Avf::EnumCaptureDevices(EnumDeviceAndFormats);
 #endif
-	//Freenect2::EnumDeviceNames(EnumDevice);
-	//Kinect::EnumDeviceNames(EnumDevice);
-
+	
 #if defined(ENABLE_FREENECT)
 	Freenect::EnumDeviceNames(EnumDevice);
 #endif
@@ -440,54 +441,149 @@ void PushJson(std::stringstream& Json,const char* Key,float Number,int PreTab=1,
 }
 
 
-__export void PopCameraDevice_GetNextFrameMeta(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize)
+void GetJson(std::stringstream& Json,SoyPixelsMeta PixelMeta,std::string FrameMeta,const ArrayBridge<SoyTime>&& BufferedFrames)
+{
+	BufferArray<SoyPixelsMeta, 3> PlaneMetas;
+	PixelMeta.GetPlanes(GetArrayBridge(PlaneMetas));
+	const auto PreTab = 1;
+	Json << "{\n";
+	{
+		if (BufferedFrames.GetSize() > 0)
+		{
+			//	todo:
+			//PushJson(Json, "BufferedFrames", BufferedFrames, PreTab, true);
+		}
+
+		if (FrameMeta.length() >= 2 && FrameMeta[0] == '{')
+		{
+			//	meta is a json object
+			PushJsonKey(Json, "Meta", PreTab);
+			Json << FrameMeta << ",\n";
+		}
+		else if (FrameMeta.length() > 0)
+		{
+			PushJson(Json, "Meta", FrameMeta, PreTab, true);
+		}
+
+		PushJsonKey(Json, "Planes", PreTab);
+		Json << "[\n";
+
+		for (auto p = 0; p < PlaneMetas.GetSize(); p++)
+		{
+			auto Tabs = PreTab+1;
+			auto& PlaneMeta = PlaneMetas[p];
+			PushJson(Json, "Width", PlaneMeta.GetWidth(), Tabs, true);
+			PushJson(Json, "Height", PlaneMeta.GetHeight(), Tabs, true);
+			PushJson(Json, "Format", PlaneMeta.GetFormat(), Tabs, true);
+			PushJson(Json, "DataSize", PlaneMeta.GetDataSize(), Tabs, true);
+			PushJson(Json, "Channels", PlaneMeta.GetChannels(), Tabs, false);
+		}
+		Json << "]\n";
+	}
+	Json << "}\n";
+}
+
+
+void CopyPlanes(TPixelBuffer& PixelBuffer,ArrayBridge<ArrayBridge<uint8_t>*>& PlaneBuffers)
+{
+	//	gr: we're losing this transform. go back through PixelBuffer implementations
+	//		to see if we explicitly sometimes reveal this transform ONLY on locking the 
+	//		pixel buffer, or if it always comes from preexisting meta
+	float3x3 Transform;
+	BufferArray<SoyPixelsImpl*, 10> Textures;
+	PixelBuffer.Lock(GetArrayBridge(Textures), Transform);
+	try
+	{
+		//	split planes of planes
+		BufferArray<std::shared_ptr<SoyPixelsImpl>, 10> Planes;
+		for (auto t = 0; t < Textures.GetSize(); t++)
+		{
+			auto& Texture = *Textures[t];
+			Texture.SplitPlanes(GetArrayBridge(Planes));
+		}
+
+		for (auto p = 0; p < Planes.GetSize(); p++)
+		{
+			//	is there a buffer for this plane?
+			if (p >= PlaneBuffers.GetSize())
+				continue;
+			auto* pPlaneDstArray = PlaneBuffers[p];
+			if (!pPlaneDstArray)
+				continue;
+
+			auto& PlaneSrc = *Planes[p];
+			auto& PlaneSrcArray = PlaneSrc.GetPixelsArray();
+			auto& PlaneDstArray = *pPlaneDstArray;
+
+			auto MaxSize = std::min(PlaneDstArray.GetDataSize(), PlaneSrcArray.GetDataSize());
+			//	copy as much as possible
+			auto PlaneSrcPixelsMin = GetRemoteArray(PlaneSrcArray.GetArray(), MaxSize);
+			PlaneDstArray.Copy(PlaneSrcPixelsMin);
+		}
+		PixelBuffer.Unlock();
+	}
+	catch (...)
+	{
+		PixelBuffer.Unlock();
+		throw;
+	}
+}
+
+
+
+
+int32_t PopCameraDevice::GetNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize, ArrayBridge<ArrayBridge<uint8_t>*>&& Planes,bool DeleteFrame)
 {
 	try
 	{
 		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
-		auto Meta = Device.GetMeta();
+		SoyPixelsMeta PixelMeta;
+		SoyTime FrameTime;
+		std::string FrameMeta;
+		auto NextFrameBuffer = Device.GetNextFrame(PixelMeta, FrameTime, FrameMeta,DeleteFrame);
 
-		BufferArray<SoyPixelsMeta, 3> PlaneMetas;
-		Meta.GetPlanes(GetArrayBridge(PlaneMetas));
+		if (!NextFrameBuffer)
+			return PopCameraDevice::NoFrame;
 
-		bool HasNewFrame = Device.HasNewFrame();
-		
-		std::stringstream Json;
-		Json << "{\n";
+		//	get full meta
+		if (JsonBuffer)
 		{
-			PushJsonKey(Json,"Planes",1);
-			Json << "[\n";
-
-			for ( auto p=0;	p<PlaneMetas.GetSize();	p++ )
-			{
-				auto Tabs = 2;
-				auto& PlaneMeta = PlaneMetas[p];
-				PushJson(Json,"Width",PlaneMeta.GetWidth(),Tabs,true);
-				PushJson(Json,"Height",PlaneMeta.GetHeight(),Tabs,true);
-				PushJson(Json,"Format",PlaneMeta.GetFormat(),Tabs,true);
-				//	gr: don't show size if no next frame
-				if ( HasNewFrame )
-					PushJson(Json,"DataSize",PlaneMeta.GetDataSize(),Tabs,true);
-				PushJson(Json,"Channels",PlaneMeta.GetChannels(),Tabs,false);
-			}
-			Json << "]\n";
+			BufferArray<SoyTime, 1> BufferedFrames;
+			std::stringstream Json;
+			GetJson(Json, PixelMeta, FrameMeta, GetArrayBridge(BufferedFrames));
+			Soy::StringToBuffer(Json.str(), JsonBuffer, JsonBufferSize);
 		}
-		Json << "}\n";
-		
-		Soy::StringToBuffer( Json.str(), JsonBuffer, JsonBufferSize );
+
+		CopyPlanes(*NextFrameBuffer, Planes);
+
+		return FrameTime.GetTime();
 	}
-	catch(std::exception& e)
+	catch (std::exception& e)
 	{
 		std::stringstream Json;
 		Json << "{\"Exception\":\"" << e.what() << "\"}";
-		Soy::StringToBuffer( Json.str(), JsonBuffer, JsonBufferSize );
+		Soy::StringToBuffer(Json.str(), JsonBuffer, JsonBufferSize);
+		throw;
 	}
-	catch(...)
+	catch (...)
 	{
 		std::string Json = "{\"Exception\":\"Unknown\"}";
-		Soy::StringToBuffer( Json, JsonBuffer, JsonBufferSize );
+		Soy::StringToBuffer(Json, JsonBuffer, JsonBufferSize);
+		throw;
 	}
 }
+
+
+
+
+__export int32_t PopCameraDevice_PeekNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize)
+{
+	BufferArray<ArrayBridge<uint8_t>*,1> NoBuffers;
+	auto DeleteFrame = false;
+	return PopCameraDevice::GetNextFrame(Instance, JsonBuffer, JsonBufferSize, GetArrayBridge(NoBuffers), DeleteFrame);
+}
+
+
 
 __export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
 {
@@ -500,47 +596,29 @@ __export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
 }
 
 
-bool PopCameraDevice::PopFrame(TDevice& Device,ArrayBridge<uint8_t>&& Plane0,ArrayBridge<uint8_t>&& Plane1,ArrayBridge<uint8_t>&& Plane2, std::string& Meta)
-{
-	if ( !Device.PopLastFrame(Plane0, Plane1, Plane2, Meta) )
-		return false;
 
-	return true;
-}
-
-
-__export int32_t PopCameraDevice_PopFrameAndMeta(int32_t Instance, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size,char* MetaBuffer,int32_t MetaBufferLength)
+__export int32_t PopCameraDevice_PopNextFrame(int32_t Instance, char* MetaJsonBuffer, int32_t MetaJsonBufferSize, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size)
 {
 	auto Function = [&]()
 	{
-		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
 		auto Plane0Array = GetRemoteArray(Plane0, Plane0Size);
 		auto Plane1Array = GetRemoteArray(Plane1, Plane1Size);
 		auto Plane2Array = GetRemoteArray(Plane2, Plane2Size);
+		auto Plane0ArrayBridge = GetArrayBridge(Plane0Array);
+		auto Plane1ArrayBridge = GetArrayBridge(Plane1Array);
+		auto Plane2ArrayBridge = GetArrayBridge(Plane2Array);
+		BufferArray<ArrayBridge<uint8_t>*, 3> PlaneArrays;
+		PlaneArrays.PushBack(&Plane0ArrayBridge);
+		PlaneArrays.PushBack(&Plane1ArrayBridge);
+		PlaneArrays.PushBack(&Plane2ArrayBridge);
 
-		std::string MetaString;
-		auto Result = PopCameraDevice::PopFrame(Device, GetArrayBridge(Plane0Array), GetArrayBridge(Plane1Array), GetArrayBridge(Plane2Array), MetaString );
-
-		//	copy out meta
-		if (MetaBuffer)
-		{
-			for (auto i = 0; i < MetaBufferLength; i++)
-			{
-				auto Char = (i < MetaString.length()) ? MetaString[i] : '\0';
-				MetaBuffer[i] = Char;
-			}
-		}
-
-		return Result ? 1 : 0;
+		auto DeleteFrame = true;
+		auto Result = PopCameraDevice::GetNextFrame(Instance, MetaJsonBuffer, MetaJsonBufferSize, GetArrayBridge(PlaneArrays), DeleteFrame);
+		return Result;
 	};
-	return SafeCall(Function, __func__, 0);
+	return SafeCall(Function, __func__, PopCameraDevice::Error);
 }
 
-
-__export int32_t PopCameraDevice_PopFrame(int32_t Instance, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size)
-{
-	return PopCameraDevice_PopFrameAndMeta(Instance, Plane0, Plane0Size, Plane1, Plane1Size, Plane2, Plane2Size, nullptr, 0);
-}
 
 void PopCameraDevice::Shutdown()
 {

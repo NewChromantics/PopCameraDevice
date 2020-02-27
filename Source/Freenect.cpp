@@ -1647,7 +1647,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	
 	auto MetaString = Meta.GetString();
 	
-	this->PushFrame( PixelBuffer, Frame.GetMeta(), MetaString );
+	this->PushFrame( PixelBuffer, Frame.GetMeta(), Timestamp, MetaString );
 }
 
 

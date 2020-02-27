@@ -326,7 +326,7 @@ void KinectAzure::TCameraDevice::OnFrame(const SoyPixelsImpl& Pixels,SoyTime Tim
 	float3x3 Transform;
 	std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels, Transform));
 
-	PushFrame(PixelBuffer, PixelMeta, Meta);
+	PushFrame(PixelBuffer, PixelMeta, Time, Meta);
 }
 
 

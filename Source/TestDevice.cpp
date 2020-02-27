@@ -27,6 +27,8 @@ void TestDevice::GenerateFrame()
 	auto& PixelBuffer = dynamic_cast<TDumbPixelBuffer&>(*pPixelBuffer);
 	auto& Pixels = PixelBuffer.mPixels;
 
+	SoyTime FrameTime(true);
+
 	//	set the type, alloc pixels, then fill the test planes
 	Pixels.mMeta = SoyPixelsMeta(200, 100, SoyPixelsFormat::Yuv_8_88_Full);
 	Pixels.mArray.SetSize(Pixels.mMeta.GetDataSize());
@@ -45,7 +47,7 @@ void TestDevice::GenerateFrame()
 		Plane.SetPixels(GetArrayBridge(Components));
 	}
 
-	this->PushFrame(pPixelBuffer, Pixels.mMeta, "" );
+	this->PushFrame(pPixelBuffer, Pixels.mMeta, FrameTime, std::string() );
 }
 
 void TestDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)

@@ -1,6 +1,6 @@
 #pragma once
 
-//	if you're using this header to link to the DLL, you'll probbaly need the lib :)
+//	if you're using this header to link to the DLL, you'll probbaly need the lib
 //#pragma comment(lib, "PopCameraDevice.lib")
 
 #include <stdint.h>
@@ -8,7 +8,7 @@
 
 #if !defined(__export)
 
-#if defined(_MSC_VER) && !defined(TARGET_PS4)
+#if defined(_MSC_VER) && !defined(TARGET_PS4)	//	_MSC_VER = visual studio
 #define __export			extern "C" __declspec(dllexport)
 #else
 #define __export			extern "C"
@@ -30,11 +30,15 @@ __export void				PopCameraDevice_FreeCameraDevice(int32_t Instance);
 //	register a callback function when a new frame is ready. This is expected to exist until released
 __export void				PopCameraDevice_AddOnNewFrameCallback(int32_t Instance, PopCameraDevice_OnNewFrame* Callback, void* Meta);
 
-//	Next frame's info (size, format, time) as json. Sizes and time will be zero if no new frame
-__export void				PopCameraDevice_GetNextFrameMeta(int32_t Instance,char* JsonBuffer,int32_t JsonBufferSize);
+//	returns -1 if no new frame
+//	Fills in meta with JSON about frame
+//	Next frame is not deleted. 
+//	Meta will list other frames buffered up, so to skip to latest frame, Pop without buffers
+__export int32_t			PopCameraDevice_PeekNextFrame(int32_t Instance,char* MetaJsonBuffer,int32_t MetaJsonBufferSize);
 
-//	returns 0 if no new frame (and nothing updated). Otherwise fills buffers and returns timestamp (Where 1=0)
-__export int32_t			PopCameraDevice_GetNextFrame(int32_t Instance, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size);
+//	returns -1 if no new frame
+//	Deletes frame.
+__export int32_t			PopCameraDevice_PopNextFrame(int32_t Instance, char* MetaJsonBuffer, int32_t MetaJsonBufferSize, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size);
 
 //	returns	version integer as A.BBB.CCCCCC (major, minor, patch. Divide by 10's to split)
 __export int32_t			PopCameraDevice_GetVersion();
