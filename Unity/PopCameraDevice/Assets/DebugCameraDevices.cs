@@ -7,6 +7,6 @@ public class DebugCameraDevices : MonoBehaviour {
 	void OnEnable ()
 	{
 		var DeviceNames = PopCameraDevice.EnumCameraDevices();
-		DeviceNames.ForEach( Debug.Log );
+		DeviceNames.ForEach( d => Debug.Log(d.Serial) );
 	}
 }

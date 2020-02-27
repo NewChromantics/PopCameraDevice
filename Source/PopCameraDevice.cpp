@@ -9,6 +9,90 @@
 
 
 
+
+
+void PushJsonKey(std::stringstream& Json, const char* Key, int PreTab = 1)
+{
+	for (auto t = 0; t < PreTab; t++)
+		Json << '\t';
+	Json << '"' << Key << '"' << ':';
+}
+
+template<typename TYPE>
+void PushJson(std::stringstream& Json, const char* Key, const TYPE& Value, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+
+	//	todo: escape string
+	Json << '"' << Value << '"';
+
+	if (TrailingComma)
+		Json << ',';
+	Json << '\n';
+}
+
+
+void PushJson(std::stringstream& Json, const char* Key, const char* String, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+
+	//	todo: escape string!
+	Json << '"' << String << '"';
+
+	if (TrailingComma)
+		Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json, const char* Key, bool Boolean, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+
+	Json << Boolean ? "true" : "false";
+
+	if (TrailingComma)
+		Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json, const char* Key, int Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+
+	Json << Number;
+
+	if (TrailingComma)
+		Json << ',';
+	Json << '\n';
+}
+
+//	help the compiler
+void PushJson(std::stringstream& Json, const char* Key, size_t Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
+}
+
+void PushJson(std::stringstream& Json, const char* Key, uint8_t Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
+}
+
+
+void PushJson(std::stringstream& Json, const char* Key, float Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+
+	//	todo: handle special cases
+	Json << Number;
+
+	if (TrailingComma)
+		Json << ',';
+	Json << '\n';
+}
+
+
+
+
 namespace PopCameraDevice
 {
 	const Soy::TVersion	Version(2, 0, 0);
@@ -112,24 +196,53 @@ public:
 	bool						operator==(const uint32_t& InstanceId) const	{	return mInstanceId == InstanceId;	}
 };
 
-
-void GetObjectJson(const TDeviceAndFormats& DeviceAndFormats, std::stringstream& Json)
+const char* GetTabString(int TabCount)
 {
-	Json << "\t{\n";
-	Json << "\t\t\"Serial\":\"" << DeviceAndFormats.mSerial << "\",\n";
-	Json << "\t\t\"Formats\": [\n";
+	switch (TabCount)
+	{
+	case 0:	return "";
+	case 1:	return "\t";
+	case 2:	return "\t\t";
+	case 3:	return "\t\t\t";
+	case 4:	return "\t\t\t\t";
+	case 5:	return "\t\t\t\t\t";
+	default:
+	case 6:	return "\t\t\t\t\t\t";
+	}
+}
+
+void GetObjectJson(const TDeviceAndFormats& DeviceAndFormats, std::stringstream& Json,int Tabs)
+{
+	Json << GetTabString(Tabs) << "{\n";
+	PushJson(Json, "Serial", DeviceAndFormats.mSerial, Tabs+1, true);
+
+	PushJsonKey(Json, "Formats", Tabs + 1);
+	Json << "[\n";
 	for (auto f = 0; f < DeviceAndFormats.mFormats.GetSize(); f++)
 	{
 		auto& Format = DeviceAndFormats.mFormats[f];
-		Json << "\t\t\t\"" << Format << "\"";
+		Json << GetTabString(Tabs+2) << "\"" << Format << "\"";
 		if (f != DeviceAndFormats.mFormats.GetSize() - 1)
 			Json << ",";
 		Json << "\n";
 	}
-	Json << "\t\t]\n";
-	Json << "\t}\n";
+	Json << GetTabString(Tabs+2) << "]\n";
+	Json << GetTabString(Tabs) << "}";
 }
 
+
+void GetObjectJson(const SoyPixelsMeta& PlaneMeta, std::stringstream& Json, int Tabs)
+{
+	Json << GetTabString(Tabs) << "{\n";
+
+	PushJson(Json, "Width", PlaneMeta.GetWidth(), Tabs, true);
+	PushJson(Json, "Height", PlaneMeta.GetHeight(), Tabs, true);
+	PushJson(Json, "Format", PlaneMeta.GetFormat(), Tabs, true);
+	PushJson(Json, "DataSize", PlaneMeta.GetDataSize(), Tabs, true);
+	PushJson(Json, "Channels", PlaneMeta.GetChannels(), Tabs, false);
+
+	Json << GetTabString(Tabs) << "}";
+}
 
 void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndFormats)
 {
@@ -176,15 +289,22 @@ std::string PopCameraDevice::EnumDevicesJson()
 	std::stringstream Json;
 	Json << "{\n";
 	
-	for (auto d = 0; d < DeviceAndFormats.GetSize(); d++)
+	PushJsonKey(Json, "Devices");
 	{
-		auto& DeviceAndFormat = DeviceAndFormats[d];
-		GetObjectJson(DeviceAndFormat, Json);
-
-		if (d != DeviceAndFormats.GetSize()-1)
+		Json << "[\n";
+		for (auto d = 0; d < DeviceAndFormats.GetSize(); d++)
 		{
-			Json << ",\n";
+			auto Tabs = 2;
+			auto& DeviceAndFormat = DeviceAndFormats[d];
+			GetObjectJson(DeviceAndFormat, Json, Tabs);
+
+			if (d != DeviceAndFormats.GetSize() - 1)
+			{
+				Json << ",";
+			}
+			Json << "\n";
 		}
+		Json << "\t]\n";
 	}
 
 	Json << "}\n";
@@ -376,85 +496,6 @@ void PopCameraDevice::FreeInstance(uint32_t Instance)
 }
 
 
-void PushJsonKey(std::stringstream& Json,const char* Key,int PreTab=1)
-{
-	for ( auto t=0;	t<PreTab;	t++ )
-		Json << '\t';
-	Json << '"' << Key << '"' << ':';
-}
-
-template<typename TYPE>
-void PushJson(std::stringstream& Json,const char* Key,const TYPE& Value,int PreTab=1,bool TrailingComma=false)
-{
-	PushJsonKey(Json,Key,PreTab);
-
-	//	todo: escape string
-	Json << '"' << Value << '"';
-
-	if ( TrailingComma )
-		Json << ',';
-	Json << '\n';
-}
-
-
-void PushJson(std::stringstream& Json,const char* Key,const char* String,int PreTab=1,bool TrailingComma=false)
-{
-	PushJsonKey(Json,Key,PreTab);
-
-	//	todo: escape string!
-	Json << '"' << String << '"';
-
-	if ( TrailingComma )
-		Json << ',';
-	Json << '\n';
-}
-
-void PushJson(std::stringstream& Json,const char* Key,bool Boolean,int PreTab=1,bool TrailingComma=false)
-{
-	PushJsonKey(Json,Key,PreTab);
-
-	Json << Boolean ? "true" : "false";
-
-	if ( TrailingComma )
-		Json << ',';
-	Json << '\n';
-}
-
-void PushJson(std::stringstream& Json,const char* Key,int Number,int PreTab=1,bool TrailingComma=false)
-{
-	PushJsonKey(Json,Key,PreTab);
-
-	Json << Number;
-
-	if ( TrailingComma )
-		Json << ',';
-	Json << '\n';
-}
-
-//	help the compiler
-void PushJson(std::stringstream& Json, const char* Key, size_t Number, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
-}
-
-void PushJson(std::stringstream& Json, const char* Key, uint8_t Number, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
-}
-
-
-void PushJson(std::stringstream& Json,const char* Key,float Number,int PreTab=1,bool TrailingComma=false)
-{
-	PushJsonKey(Json,Key,PreTab);
-
-	//	todo: handle special cases
-	Json << Number;
-
-	if ( TrailingComma )
-		Json << ',';
-	Json << '\n';
-}
-
 
 void GetJson(std::stringstream& Json,SoyPixelsMeta PixelMeta,std::string FrameMeta,const ArrayBridge<SoyTime>&& BufferedFrames)
 {
@@ -487,11 +528,13 @@ void GetJson(std::stringstream& Json,SoyPixelsMeta PixelMeta,std::string FrameMe
 		{
 			auto Tabs = PreTab+1;
 			auto& PlaneMeta = PlaneMetas[p];
-			PushJson(Json, "Width", PlaneMeta.GetWidth(), Tabs, true);
-			PushJson(Json, "Height", PlaneMeta.GetHeight(), Tabs, true);
-			PushJson(Json, "Format", PlaneMeta.GetFormat(), Tabs, true);
-			PushJson(Json, "DataSize", PlaneMeta.GetDataSize(), Tabs, true);
-			PushJson(Json, "Channels", PlaneMeta.GetChannels(), Tabs, false);
+			GetObjectJson(PlaneMeta, Json, Tabs);
+
+			if (p != PlaneMetas.GetSize() - 1)
+			{
+				Json << ",";
+			}
+			Json << "\n";			
 		}
 		Json << "\t]\n";
 	}
@@ -652,3 +695,12 @@ __export void PopCameraDevice_UnitTests()
 	PopCameraDevice::DecodeFormatString_UnitTests();
 }
 
+
+__export void UnityPluginLoad(/*IUnityInterfaces*/void*)
+{
+}
+
+__export void UnityPluginUnload()
+{
+	PopCameraDevice_Cleanup();
+}

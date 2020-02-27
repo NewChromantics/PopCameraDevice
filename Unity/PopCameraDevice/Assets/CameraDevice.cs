@@ -17,16 +17,18 @@ public class CameraDevice : MonoBehaviour {
 	List<Texture2D> PlaneTextures;
 	List<PopCameraDevice.SoyPixelsFormat> PlaneFormats;
 	PopCameraDevice.Device Device;
+	[Header("Request specific texture format like RGBA^640x480@60")]
+	public string Format;
 
 	void OnEnable()
 	{
 		if ( DeviceIndex >= 0 )
 		{
 			var DeviceNames = PopCameraDevice.EnumCameraDevices();
-			DeviceName = DeviceNames[DeviceIndex];
+			DeviceName = DeviceNames[DeviceIndex].Serial;
 		}
 
-		Device = new PopCameraDevice.Device(DeviceName);
+		Device = new PopCameraDevice.Device(DeviceName, Format);
 	}
 
 	void OnDisable()
@@ -41,8 +43,12 @@ public class CameraDevice : MonoBehaviour {
 	{
 		if ( Device != null )
 		{
-			if ( Device.GetNextFrame( ref PlaneTextures,  ref PlaneFormats ) )
+			var NextFrameTime = Device.GetNextFrame(ref PlaneTextures, ref PlaneFormats);
+			if (NextFrameTime.HasValue)
+			{
+				Debug.Log("Got new frame");
 				OnNewFrame();
+			}
 		}
 	}
 

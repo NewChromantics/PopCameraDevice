@@ -3,11 +3,11 @@
 	Properties
 	{
 		LumaTexture ("LumaTexture", 2D) = "white" {}
-		[Enum(None,0,Greyscale,1,YYuv_8888_Full,18,YYuv_8888_Ntsc,19)]LumaFormat("LumaFormat",int) = 0
+		[Enum(Invalid,0,Greyscale,1,RGBA,3,YYuv_8888_Full,6,YYuv_8888_Ntsc,7)]LumaFormat("LumaFormat",int) = 0
 		ChromaUTexture ("ChromaUTexture", 2D) = "black" {}
-		[Enum(Debug,999,None,0,ChromaUV_88,25,ChromaVU_88,998,Chroma_U,26,Chroma_V,27)]ChromaUFormat("ChromaUFormat",int) = 0
+		[Enum(Debug,999,Invalid,0,ChromaUV_88,11,ChromaVU_88,12,Chroma_U,9,Chroma_V,10)]ChromaUFormat("ChromaUFormat",int) = 0
 		ChromaVTexture ("ChromaVTexture", 2D) = "black" {}
-		[Enum(Debug,999,None,0,Chroma_U,26,Chroma_V,27)]ChromaVFormat("ChromaVFormat",int) = 0
+		[Enum(Debug,999,Invalid,0,Chroma_U,9,Chroma_V,10)]ChromaVFormat("ChromaVFormat",int) = 0
 		
 		[Header(NTSC etc colour settings)]LumaMin("LumaMin", Range(0,255) ) = 16
 		LumaMax("LumaMax", Range(0,255) ) = 253
@@ -22,6 +22,7 @@
 	{
 		Tags { "RenderType"="Opaque" }
 		LOD 100
+
 
 		Pass
 		{
@@ -60,15 +61,22 @@
 
 			//	SoyPixelsFormat's 
 			//	see https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
-		#define Debug		999
-		#define None		0
-		#define Greyscale	1
-		#define YYuv_8888_Full	18
-		#define YYuv_8888_Ntsc	19
-		#define ChromaUV_88	25
-		#define Chroma_U	26
-		#define Chroma_V	27
-		#define ChromaVU_88	998
+			//	for their internal usage
+			//	match c# PopCameraDevice.SoyPixelsFormat for index
+#define Debug			999
+#define Invalid			0
+#define Greyscale		1
+#define RGB				2
+#define RGBA			3
+#define BGRA			4
+#define BGR				5
+#define YYuv_8888_Full	6
+#define YYuv_8888_Ntsc	7
+#define KinectDepth		8
+#define Chroma_U		9
+#define Chroma_V		10
+#define ChromaUV_88		11
+#define ChromaVU_88		12
 
 			float Flip;
 			float EnableChroma;
@@ -141,8 +149,22 @@
 
 			fixed4 frag (v2f i) : SV_Target
 			{
+				float4 Luma4 = tex2D(LumaTexture, i.uv);
+
+				//	look out for when we have luma+chroma+chroma?
+				if (LumaFormat == Greyscale)
+					return float4(Luma4.xxx,1);
+				if (LumaFormat == RGB)
+					return Luma4;
+				if (LumaFormat == RGBA)
+					return Luma4;
+				if (LumaFormat == BGRA)
+					return Luma4.zyxw;
+				if (LumaFormat == BGR)
+					return Luma4.zyxw;
+				
 				// sample the texture
-				float Luma = tex2D(LumaTexture, i.uv);
+				float Luma = Luma4.x;
 				float2 ChromaUV = float2(0, 0);
 				if ( LumaFormat == YYuv_8888_Full || LumaFormat == YYuv_8888_Ntsc )
 				{

@@ -20,22 +20,26 @@ public static class PopCameraDevice
 	
 	//	returns instance id
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int PopCameraDevice_CreateCameraDeviceWithFormat(byte[] Name, byte[] Format,[In, Out] byte[] ErrorBuffer, int ErrorBufferLength);
+	private static extern Int32 PopCameraDevice_CreateCameraDeviceWithFormat(byte[] Name, byte[] Format,[In, Out] byte[] ErrorBuffer, Int32 ErrorBufferLength);
 
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void PopCameraDevice_FreeCameraDevice(int Instance);
+	private static extern void PopCameraDevice_FreeCameraDevice(Int32 Instance);
 
-	//	get meta for next frame so buffers can be allocated accordingly
+	//	returns -1 if no new frame
+	//	Fills in meta with JSON about frame
+	//	Next frame is not deleted. 
+	//	Meta will list other frames buffered up, so to skip to latest frame, Pop without buffers
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern void PopCameraDevice_GetFrameMetaJson(int Instance,[In, Out] byte[] JsonBuffer,int JsonBufferLength);
+	private static extern Int32 PopCameraDevice_PeekNextFrame(Int32 Instance,[In, Out] byte[] JsonBuffer,int JsonBufferLength);
 
-	//	returns 0 if no new frame. We split planes because this is sometimes easiest approach, but unity cannot split one big buffer without allocation penalties
+	//	returns -1 if no new frame
+	//	Deletes frame.
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int PopCameraDevice_PopFrame(int Instance, byte[] Plane0, int Plane0Size, byte[] Plane1, int Plane1Size, byte[] Plane2, int Plane2Size);
+	private static extern Int32 PopCameraDevice_PopNextFrame(Int32 Instance, [In, Out] byte[] JsonBuffer, int JsonBufferLength, byte[] Plane0, Int32 Plane0Size, byte[] Plane1, Int32 Plane1Size, byte[] Plane2, Int32 Plane2Size);
 
 	//	returns	version integer as A.BBB.CCCCCC
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern int PopCameraDevice_GetVersion();
+	private static extern Int32 PopCameraDevice_GetVersion();
 
 	//	DLL cleanup
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
@@ -71,191 +75,52 @@ public static class PopCameraDevice
 	[System.Serializable]
 	public struct FrameMeta
 	{
-		public int			TimeMs;
-		public PlaneMeta[]	Planes;
-		//public int		FrameRate;
-		//public int		DeviceFrameRate;	//	the speed the camera is supposed to deliver at
+		public List<PlaneMeta>	Planes;
 	};
 
 	[System.Serializable]
 	public struct DeviceMeta
 	{
 		public string	Serial;		//	unique identifier, sometimes prefixed
-		public string[]	Formats;    //	All availible formats, eg. RGBA^640x480@30
+		public string[]	Formats;    //	All availible formats, eg. RGBA^640x480@30. Some devices report nothing (so can't pick explicit formats, or are not known until frame arrives)
 	};
 
-	//	copied directly from https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
+	[System.Serializable]
+	private struct DeviceMetas
+	{
+		public List<DeviceMeta> Devices;
+	};
+
+	//	format is now a string, but should map to these names
+	//	value is now purely unity side
+	//	if the plugin returns a string not listed here, it means we need to 
+	//	add it to this list, and add an entry to any YUV/colour conversion shader
+	//	see https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
 	public enum SoyPixelsFormat
 	{
-		Invalid			= 0,
-		Greyscale,
-		GreyscaleAlpha,		//	png has this for 2 channel, so why not us!
+		Invalid=0,
+		Greyscale,		//	this is also Luma_Full, other luma's may be ranged
 		RGB,
 		RGBA,
-		ARGB,
 		BGRA,
 		BGR,
-
-		//	non integer-based channel counts
-		KinectDepth,		//	16 bit, so "two channels". 13 bits of depth, 3 bits of user-index
-		FreenectDepth10bit,	//	16 bit
-		FreenectDepth11bit,	//	16 bit
-		FreenectDepthmm,	//	16 bit
-	
-
-		//	http://stackoverflow.com/a/6315159/355753
-		//	bi planar is luma followed by chroma.
-		//	Full range is 0..255
-		//	video LUMA range 16-235 (chroma is still 0-255)	http://stackoverflow.com/a/10129300/355753
-		//	Y=luma	uv=ChromaUv
-		
-		//	gr: I want to remove video/full/ntsc etc and have that explicit in a media format
-		//	http://www.chromapure.com/colorscience-decoding.asp
-		//	the range counts towards luma & chroma
-		//	video = NTSC
-		//	full = Rec. 709
-		//	SMPTE-C = SMPTE 170M 
-
-		//	gr: naming convention; planes seperated by underscore
-		Yuv_8_88_Full,		//	8 bit Luma, interleaved Chroma uv plane (uv is half size... reflect this somehow in the name!)
-		Yuv_8_88_Ntsc,		//	8 bit Luma, interleaved Chroma uv plane (uv is half size... reflect this somehow in the name!)
-		Yuv_8_88_Smptec,		//	8 bit Luma, interleaved Chroma uv plane (uv is half size... reflect this somehow in the name!)
-		Yuv_8_8_8_Full,		//	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
-		Yuv_8_8_8_Ntsc,	//	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
-		Yuv_8_8_8_Smptec,   //	luma, u, v seperate planes (uv is half size... reflect this somehow in the name!)
-
-		//	gr: YUY2: LumaX,ChromaU,LumaX+1,ChromaV (4:2:2 ratio, 8 bit)
-		//		we still treat it like a 2 component format so dimensions match original
-		//		(maybe should be renamed YYuv_88 for this reason)
-		Uvy_844_Full,
-		Yuv_844_Full,
-		Yuv_844_Ntsc,
-		Yuv_844_Smptec,
-
-		//	https://stackoverflow.com/a/22793325/355753
-		//	4:2:2, apple call this yuvs
-		Yuv_844_Full,
-		Yuv_844_Ntsc,
-		Yuv_844_Smptec,
-
-		ChromaUV_8_8,		//	8 bit plane, 8 bit plane
-		ChromaUV_88,		//	16 bit interleaved plane
-		ChromaU_8,			//	single plane
-		ChromaV_8,			//	single plane
-		ChromaUV_44,		//	8 bit interleaved plane
-		
-
-		//	https://github.com/ofTheo/ofxKinect/blob/ebb9075bcb5ab2543220b4dec598fd73cec40904/libs/libfreenect/src/cameras.c
-		//	kinect (16bit?) yuv. See if its the same as a standard one 
-		uyvy,
-		/*
-		 int u  = raw_buf[2*i];
-			int y1 = raw_buf[2*i+1];
-			int v  = raw_buf[2*i+2];
-			int y2 = raw_buf[2*i+3];
-			int r1 = (y1-16)*1164/1000 + (v-128)*1596/1000;
-			int g1 = (y1-16)*1164/1000 - (v-128)*813/1000 - (u-128)*391/1000;
-			int b1 = (y1-16)*1164/1000 + (u-128)*2018/1000;
-			int r2 = (y2-16)*1164/1000 + (v-128)*1596/1000;
-			int g2 = (y2-16)*1164/1000 - (v-128)*813/1000 - (u-128)*391/1000;
-			int b2 = (y2-16)*1164/1000 + (u-128)*2018/1000;
-			CLAMP(r1)
-			CLAMP(g1)
-			CLAMP(b1)
-			CLAMP(r2)
-			CLAMP(g2)
-			CLAMP(b2)
-			proc_buf[3*i]  =r1;
-			proc_buf[3*i+1]=g1;
-			proc_buf[3*i+2]=b1;
-			proc_buf[3*i+3]=r2;
-			proc_buf[3*i+4]=g2;
-			proc_buf[3*i+5]=b2;		 */
-
-		Luma_Ntsc,			//	ntsc-range luma plane
-		Luma_Smptec,		//	Smptec-range luma plane
-
-		//	2 planes, RGB (palette+length8) Greyscale (indexes)
-		//	warning, palette's first byte is the size of the palette! need to work out how to auto skip over this when extracting the plane...
-		Palettised_RGB_8,
-		Palettised_RGBA_8,
-		
-		//	to distinguish from RGBA etc
-		Float1,
-		Float2,
-		Float3,
-		Float4,
-		
-		
-		//	shorthand names
-		//	http://www.fourcc.org/yuv.php
-		Luma_Full		= Greyscale,	//	Luma plane of a YUV
-		Nv12			= Yuv_8_88_Full,
-		I420			= Yuv_8_8_8_Full,
-				
-		Count=99,
+		YYuv_8888_Full,
+		YYuv_8888_Ntsc,
+		KinectDepth,
+		Chroma_U,
+		Chroma_V,
+		ChromaUV_88,
+		ChromaVU_88,
 	}
 
-	private enum MetaIndex
+
+	public static List<DeviceMeta> EnumCameraDevices()
 	{
-		PlaneCount = 0,
-
-		Plane0_Width,
-		Plane0_Height,
-		Plane0_ComponentCount,
-		Plane0_SoyPixelsFormat,
-		Plane0_PixelDataSize,
-
-		Plane1_Width,
-		Plane1_Height,
-		Plane1_ComponentCount,
-		Plane1_SoyPixelsFormat,
-		Plane1_PixelDataSize,
-
-		Plane2_Width,
-		Plane2_Height,
-		Plane2_ComponentCount,
-		Plane2_SoyPixelsFormat,
-		Plane2_PixelDataSize,
-	};
-
-	public static List<string> EnumCameraDevices()
-	{
-		var StringBuffer = new byte[1000];
-		PopCameraDevice_EnumCameraDevices( StringBuffer, StringBuffer.Length );
-
-		//	split strings
-		var Delin = StringBuffer[0];
-		string CurrentName = "";
-		var Names = new List<string>();
-		System.Action FinishCurrentName = ()=>
-		{
-			if ( String.IsNullOrEmpty(CurrentName) )
-				return;
-			Names.Add(CurrentName);
-			CurrentName = "";
-		};
-
-		//	split at delin or when we hit a terminator
-		for ( var i=1;	i<StringBuffer.Length;	i++ )
-		{
-			var Char8 = StringBuffer[i];
-			if ( Char8 == '\0' )
-			{
-				FinishCurrentName();
-				break;
-			}
-			if ( Char8 == Delin )
-			{
-				FinishCurrentName();
-				continue;
-			}
-			var UnicodeChar = System.Convert.ToChar(Char8);
-			CurrentName += UnicodeChar;
-		}
-		FinishCurrentName();
-
-		return Names;
+		var JsonStringBuffer = new byte[1000];
+		PopCameraDevice_EnumCameraDevicesJson(JsonStringBuffer, JsonStringBuffer.Length );
+		var JsonString = System.Text.ASCIIEncoding.ASCII.GetString(JsonStringBuffer);
+		var Metas = JsonUtility.FromJson<DeviceMetas>(JsonString);
+		return Metas.Devices;
 	}
 	
 
@@ -267,12 +132,17 @@ public static class PopCameraDevice
 		List<byte[]> PlaneCaches;
 		byte[] UnusedBuffer = new byte[1];
 
-		public Device(string DeviceName)
+		public Device(string DeviceName,string Format="")
 		{
-			var DeviceNameAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(DeviceName);
-			Instance = PopCameraDevice_CreateCameraDevice(DeviceNameAscii);
+			var DeviceNameAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(DeviceName+"\0");
+			var FormatAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(Format + "\0");
+			var ErrorBuffer = new byte[100];
+			Instance = PopCameraDevice_CreateCameraDeviceWithFormat(DeviceNameAscii, FormatAscii, ErrorBuffer, ErrorBuffer.Length);
+			var Error = System.Text.ASCIIEncoding.ASCII.GetString(ErrorBuffer);
 			if ( Instance.Value <= 0 )
-				throw new System.Exception("Failed to create Camera device with name " + DeviceName);
+				throw new System.Exception("Failed to create Camera device with name " + DeviceName + "; " + Error);
+			if (Error.Length > 0)
+				Debug.LogWarning("Created PopCameraDevice(" + Instance.Value + ") but error was not empty; " + Error);
 		}
 		~Device()
 		{
@@ -329,35 +199,37 @@ public static class PopCameraDevice
 				Array.Add( default(T) );
 		}
 
-		//	returns if changed
-		public bool GetNextFrame(ref List<Texture2D> Planes,ref List<SoyPixelsFormat> PixelFormats)
+		//	returns value if we changed the texture[s]
+		public int? GetNextFrame(ref List<Texture2D> Planes,ref List<SoyPixelsFormat> PixelFormats)
 		{
-			var MetaValues = new int[100];
-			PopCameraDevice_GetMeta( Instance.Value, MetaValues, MetaValues.Length );
-			var PlaneCount = MetaValues[(int)MetaIndex.PlaneCount];
-			if ( PlaneCount <= 0 )
-			{
-				//Debug.Log("No planes (" + PlaneCount +")");
-				PixelFormats = null;
-				return false;
-			}
+			var JsonBuffer = new Byte[1000];
+			var NextFrameTime = PopCameraDevice_PeekNextFrame( Instance.Value, JsonBuffer, JsonBuffer.Length );
+			
+			//	no frame pending
+			if (NextFrameTime < 0)
+				return null;
+
+			var Json = System.Text.ASCIIEncoding.ASCII.GetString(JsonBuffer);
+			//Debug.Log("PopCameraDevice_PeekNextFrame:" + Json);
+			var Meta = JsonUtility.FromJson<FrameMeta>(Json);
+
+			var PlaneCount = Meta.Planes.Count;
+			//	throw here? should there ALWAYS be a plane?
+			if (PlaneCount <= 0)
+				throw new System.Exception("Not expecting zero planes");
 
 			AllocListToSize( ref Planes, PlaneCount );
 			AllocListToSize( ref PixelFormats, PlaneCount );
 			AllocListToSize( ref PlaneCaches, PlaneCount );
 
-			
-			if ( PlaneCount >= 1 )	PixelFormats[0] = (SoyPixelsFormat)MetaValues[(int)MetaIndex.Plane0_SoyPixelsFormat];
-			if ( PlaneCount >= 2 )	PixelFormats[1] = (SoyPixelsFormat)MetaValues[(int)MetaIndex.Plane1_SoyPixelsFormat];
-			if ( PlaneCount >= 3 )	PixelFormats[2] = (SoyPixelsFormat)MetaValues[(int)MetaIndex.Plane2_SoyPixelsFormat];
-
-			//	alloc textures so we have data to write to
-			if ( PlaneCount >= 1 )	Planes[0] = AllocTexture( Planes[0], MetaValues[(int)MetaIndex.Plane0_Width], MetaValues[(int)MetaIndex.Plane0_Height], MetaValues[(int)MetaIndex.Plane0_ComponentCount] );
-			if ( PlaneCount >= 2 )	Planes[1] = AllocTexture( Planes[1], MetaValues[(int)MetaIndex.Plane1_Width], MetaValues[(int)MetaIndex.Plane1_Height], MetaValues[(int)MetaIndex.Plane1_ComponentCount] );
-			if ( PlaneCount >= 3 )	Planes[2] = AllocTexture( Planes[2], MetaValues[(int)MetaIndex.Plane2_Width], MetaValues[(int)MetaIndex.Plane2_Height], MetaValues[(int)MetaIndex.Plane2_ComponentCount] );
-
-			for ( var p=0;	p<PlaneCount;	p++ )
+			for (var p = 0; p < PlaneCount; p++)
 			{
+				var PlaneMeta = Meta.Planes[p];
+				PixelFormats[p] = (SoyPixelsFormat)Enum.Parse(typeof(SoyPixelsFormat), PlaneMeta.Format);
+				//	alloc textures so we have data to write to
+				Planes[p] = AllocTexture(Planes[p], PlaneMeta.Width, PlaneMeta.Height, PlaneMeta.Channels);
+
+				//	setup plane cache that matches texture buffer size (unity is very picky, it even rejects the correct size sometimes :)
 				if ( PlaneCaches[p] != null )
 					continue;
 				if ( !Planes[p] )
@@ -369,9 +241,9 @@ public static class PopCameraDevice
 			var Plane0Data = (PlaneCaches.Count >=1 && PlaneCaches[0]!=null) ? PlaneCaches[0] : UnusedBuffer;
 			var Plane1Data = (PlaneCaches.Count >=2 && PlaneCaches[1]!=null) ? PlaneCaches[1] : UnusedBuffer;
 			var Plane2Data = (PlaneCaches.Count >=3 && PlaneCaches[2]!=null) ? PlaneCaches[2] : UnusedBuffer;
-			var PopResult = PopCameraDevice_PopFrame( Instance.Value, Plane0Data, Plane0Data.Length, Plane1Data, Plane1Data.Length, Plane2Data, Plane2Data.Length );
-			if ( PopResult == 0 )
-				return false;
+			var PopFrameTime = PopCameraDevice_PopNextFrame( Instance.Value, null, 0, Plane0Data, Plane0Data.Length, Plane1Data, Plane1Data.Length, Plane2Data, Plane2Data.Length );
+			if (PopFrameTime != NextFrameTime)
+				throw new System.Exception("Popped frame time(" + PopFrameTime + ") didn't match expected (peeked) time (" + NextFrameTime + ")");
 			
 			//	update texture
 			for ( var p=0;	p<PlaneCount;	p++ )
@@ -383,7 +255,7 @@ public static class PopCameraDevice
 				Planes[p].Apply();
 			}
 
-			return true;
+			return NextFrameTime;
 		}
 
 	}
