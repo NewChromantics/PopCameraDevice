@@ -29,3 +29,7 @@ PopCameraDevice\.visualstudio/Master/
 *.pdb
 
 *.user
+
+Build/
+
+Unity/PopCameraDevice/Assets/PopCameraDevice/
