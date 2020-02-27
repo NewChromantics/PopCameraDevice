@@ -117,6 +117,7 @@
     <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\registration.h" />
     <ClInclude Include="..\Source\Libs\LibFreenect\LibFreenect\src\usb_libusb10.h" />
     <ClInclude Include="..\Source\Libs\LibFreenect\libusb.h" />
+    <ClInclude Include="..\Source\MagicEnum\include\magic_enum.hpp" />
     <ClInclude Include="..\Source\MfCapture.h" />
     <ClInclude Include="..\Source\MfDecoder.h" />
     <CustomBuild Include="..\Source\PopCameraDevice.h" />

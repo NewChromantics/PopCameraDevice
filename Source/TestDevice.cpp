@@ -2,22 +2,19 @@
 #include "SoyLib/src/SoyMedia.h"
 
 
-auto const TestDeviceName = "Test";
 
 void TestDevice::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 {
-	Enum(TestDeviceName);
+	Enum(TestDevice::DeviceName);
 }
 
-std::shared_ptr<PopCameraDevice::TDevice> TestDevice::CreateDevice(const std::string& Name)
+TestDevice::TestDevice(const std::string& Format)
 {
-	if ( Name == TestDeviceName )
-	{
-		std::shared_ptr<PopCameraDevice::TDevice> Device(new TestDevice);
-		return Device;
-	}
+	PopCameraDevice::DecodeFormatString(Format, mMeta, mFrameRate);
 
-	return nullptr;
+	GenerateFrame();
+
+	//	todo: start a thread!
 }
 
 
@@ -30,7 +27,7 @@ void TestDevice::GenerateFrame()
 	SoyTime FrameTime(true);
 
 	//	set the type, alloc pixels, then fill the test planes
-	Pixels.mMeta = SoyPixelsMeta(200, 100, SoyPixelsFormat::Yuv_8_88_Full);
+	Pixels.mMeta = mMeta;
 	Pixels.mArray.SetSize(Pixels.mMeta.GetDataSize());
 
 	BufferArray<std::shared_ptr<SoyPixelsImpl>,3> Planes;

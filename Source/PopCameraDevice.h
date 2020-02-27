@@ -46,3 +46,6 @@ __export int32_t			PopCameraDevice_GetVersion();
 //	shouldn't need this, but cleans up explicitly
 __export void				PopCameraDevice_Cleanup();
 
+//	for internal building really
+__export void				PopCameraDevice_UnitTests();
+

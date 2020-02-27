@@ -204,15 +204,18 @@ __export void PopCameraDevice_EnumCameraDevicesJson(char* StringBuffer,int32_t S
 uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::string& Format)
 {
 	//	alloc device
-	try
+	if (Name == TestDevice::DeviceName)
 	{
-		auto Device = TestDevice::CreateDevice(Name);
-		if ( Device )
-			return PopCameraDevice::CreateInstance(Device);
-	}
-	catch(std::exception& e)
-	{
-		std::Debug << e.what() << std::endl;
+		try
+		{
+			std::shared_ptr<TDevice> Device(new TestDevice(Format));
+			if (Device)
+				return PopCameraDevice::CreateInstance(Device);
+		}
+		catch (std::exception& e)
+		{
+			std::Debug << e.what() << std::endl;
+		}
 	}
 
 
@@ -428,6 +431,18 @@ void PushJson(std::stringstream& Json,const char* Key,int Number,int PreTab=1,bo
 	Json << '\n';
 }
 
+//	help the compiler
+void PushJson(std::stringstream& Json, const char* Key, size_t Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
+}
+
+void PushJson(std::stringstream& Json, const char* Key, uint8_t Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
+}
+
+
 void PushJson(std::stringstream& Json,const char* Key,float Number,int PreTab=1,bool TrailingComma=false)
 {
 	PushJsonKey(Json,Key,PreTab);
@@ -478,7 +493,7 @@ void GetJson(std::stringstream& Json,SoyPixelsMeta PixelMeta,std::string FrameMe
 			PushJson(Json, "DataSize", PlaneMeta.GetDataSize(), Tabs, true);
 			PushJson(Json, "Channels", PlaneMeta.GetChannels(), Tabs, false);
 		}
-		Json << "]\n";
+		Json << "\t]\n";
 	}
 	Json << "}\n";
 }
@@ -631,3 +646,9 @@ __export void PopCameraDevice_Cleanup()
 {
 	PopCameraDevice::Shutdown();
 }
+
+__export void PopCameraDevice_UnitTests()
+{
+	PopCameraDevice::DecodeFormatString_UnitTests();
+}
+

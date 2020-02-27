@@ -5,15 +5,15 @@
 
 class TestDevice : public PopCameraDevice::TDevice
 {
+	static inline const char* DeviceName = "Test";
 public:
-	TestDevice()
-	{
-		GenerateFrame();
-	}
+	TestDevice(const std::string& Format);
 
 	static void											EnumDeviceNames(std::function<void(const std::string&)> Enum);
-	static std::shared_ptr<PopCameraDevice::TDevice>	CreateDevice(const std::string& Name);
 
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
 	void			GenerateFrame();
+
+	SoyPixelsMeta	mMeta = SoyPixelsMeta(16, 16, SoyPixelsFormat::Greyscale);
+	size_t			mFrameRate = 30;
 };
