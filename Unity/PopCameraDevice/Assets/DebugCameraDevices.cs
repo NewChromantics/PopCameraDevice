@@ -7,6 +7,10 @@ public class DebugCameraDevices : MonoBehaviour {
 	void OnEnable ()
 	{
 		var DeviceNames = PopCameraDevice.EnumCameraDevices();
-		DeviceNames.ForEach( d => Debug.Log(d.Serial) );
+		foreach(var Device in DeviceNames)
+		{
+			var FormatString = string.Join(",",Device.Formats);
+			Debug.Log(Device.Serial + " formats: " + FormatString);
+		}
 	}
 }

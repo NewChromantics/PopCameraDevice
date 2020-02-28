@@ -148,20 +148,25 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	//	formats are known
 	//	todo: support depth & colour as seperate planes inheritely as multiple images
 	Array<std::string> Formats;
-	Formats.PushBack("Depth16^640x576@30");
-	Formats.PushBack("Depth16^320x288@30");
-	Formats.PushBack("Depth16^512x512@30");
-	Formats.PushBack("Depth16^1024x1024@30");
+	//	this IS in prefered order
+	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(640, 576, SoyPixelsFormat::FreenectDepthmm), 30));
+	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(320, 288, SoyPixelsFormat::FreenectDepthmm), 30));
+	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(512, 512, SoyPixelsFormat::FreenectDepthmm), 30));
+	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(1024, 1024, SoyPixelsFormat::FreenectDepthmm), 30));
 	//Formats.PushBack("Depth16^1024x1024@30");	IR at higher framerate
 	
 	//	todo: get all the pixel formats for camera
-/*
-	Formats.PushBack("RGB_1280x720@30");
-	Formats.PushBack("RGB_1920x1080@30");
-	Formats.PushBack("RGB_2560x1440@30");
-	Formats.PushBack("RGB_2048x1536@30");
-	Formats.PushBack("RGB_3840x2160@30");
-	Formats.PushBack("RGB_4096x3072@30");
+	/*
+	SoyPixelsFormat::Type ColourPixelFormats[] = { SoyPixelsFormat::RGB };
+	for (auto Format : ColourPixelFormats)
+	{
+		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(1280, 720, Format), 30));
+		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(1920, 1080, Format), 30));
+		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(2560, 1440, Format), 30));
+		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(2048, 1536, Format), 30));
+		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(3840, 2160, Format), 30));
+		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(4096, 3072, Format), 30));
+	}
 	*/
 
 	for (auto i = 0; i < DeviceCount; i++)

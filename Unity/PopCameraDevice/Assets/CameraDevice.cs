@@ -46,7 +46,7 @@ public class CameraDevice : MonoBehaviour {
 			var NextFrameTime = Device.GetNextFrame(ref PlaneTextures, ref PlaneFormats);
 			if (NextFrameTime.HasValue)
 			{
-				Debug.Log("Got new frame");
+				//Debug.Log("Got new frame " + NextFrameTime.Value);
 				OnNewFrame();
 			}
 		}
