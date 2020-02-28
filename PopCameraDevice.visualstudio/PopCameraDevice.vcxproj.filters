@@ -319,5 +319,8 @@
     <CopyFileToFolders Include="..\Source\PopCameraDevice.cs">
       <Filter>Source</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Source\Libs\KinectAzure\depthengine_2_0.dll">
+      <Filter>Libs\KinectAzure</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
