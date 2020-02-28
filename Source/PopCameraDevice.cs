@@ -106,7 +106,7 @@ public static class PopCameraDevice
 		BGR,
 		YYuv_8888_Full,
 		YYuv_8888_Ntsc,
-		KinectDepth,
+		FreenectDepthmm,
 		Chroma_U,
 		Chroma_V,
 		ChromaUV_88,
@@ -167,9 +167,13 @@ public static class PopCameraDevice
 			Instance = null;
 		}
 
-		TextureFormat GetTextureFormat(int ComponentCount)
+		static TextureFormat GetTextureFormat(int ComponentCount,SoyPixelsFormat PixelFormat)
 		{
-			switch(ComponentCount)
+			//	special/currently unhandled case, c++ code gives out 16bit, 1 component data
+			if (PixelFormat == SoyPixelsFormat.FreenectDepthmm)
+				return TextureFormat.R16;
+
+			switch (ComponentCount)
 			{
 				case 1:	return TextureFormat.R8;
 				case 2:	return TextureFormat.RG16;
@@ -180,9 +184,9 @@ public static class PopCameraDevice
 			}
 		}
 
-		Texture2D AllocTexture(Texture2D Plane,int Width, int Height,int ComponentCount)
+		Texture2D AllocTexture(Texture2D Plane,int Width, int Height,int ComponentCount,SoyPixelsFormat PixelFormat)
 		{
-			var Format = GetTextureFormat( ComponentCount );
+			var Format = GetTextureFormat( ComponentCount, PixelFormat);
 			if ( Plane != null )
 			{
 				if ( Plane.width != Width )
@@ -197,6 +201,7 @@ public static class PopCameraDevice
 			{
 				var MipMap = false;
 				Plane = new Texture2D( Width, Height, Format, MipMap );
+				Plane.filterMode = FilterMode.Point;
 			}
 
 			return Plane;
@@ -238,7 +243,7 @@ public static class PopCameraDevice
 				var PlaneMeta = Meta.Planes[p];
 				PixelFormats[p] = (SoyPixelsFormat)Enum.Parse(typeof(SoyPixelsFormat), PlaneMeta.Format);
 				//	alloc textures so we have data to write to
-				Planes[p] = AllocTexture(Planes[p], PlaneMeta.Width, PlaneMeta.Height, PlaneMeta.Channels);
+				Planes[p] = AllocTexture(Planes[p], PlaneMeta.Width, PlaneMeta.Height, PlaneMeta.Channels, PixelFormats[p] );
 
 				//	setup plane cache that matches texture buffer size (unity is very picky, it even rejects the correct size sometimes :)
 				if ( PlaneCaches[p] != null )

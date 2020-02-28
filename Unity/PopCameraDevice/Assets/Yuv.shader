@@ -8,15 +8,16 @@
 		[Enum(Debug,999,Invalid,0,ChromaUV_88,11,ChromaVU_88,12,Chroma_U,9,Chroma_V,10)]ChromaUFormat("ChromaUFormat",int) = 0
 		ChromaVTexture ("ChromaVTexture", 2D) = "black" {}
 		[Enum(Debug,999,Invalid,0,Chroma_U,9,Chroma_V,10)]ChromaVFormat("ChromaVFormat",int) = 0
-		
-		[Header(NTSC etc colour settings)]LumaMin("LumaMin", Range(0,255) ) = 16
-		LumaMax("LumaMax", Range(0,255) ) = 253
-		ChromaVRed("ChromaVRed", Range(-2,2) ) = 1.5958
-		ChromaUGreen("ChromaUGreen", Range(-2,2) ) = -0.39173
-		ChromaVGreen("ChromaVGreen", Range(-2,2) ) = -0.81290
-		ChromaUBlue("ChromaUBlue", Range(-2,2) ) = 2.017
+
+		[Header(NTSC etc colour settings)]LumaMin("LumaMin", Range(0,255)) = 16
+		LumaMax("LumaMax", Range(0,255)) = 253
+		ChromaVRed("ChromaVRed", Range(-2,2)) = 1.5958
+		ChromaUGreen("ChromaUGreen", Range(-2,2)) = -0.39173
+		ChromaVGreen("ChromaVGreen", Range(-2,2)) = -0.81290
+		ChromaUBlue("ChromaUBlue", Range(-2,2)) = 2.017
 		[Toggle]Flip("Flip", Range(0,1)) = 1
 		[Toggle]EnableChroma("EnableChroma", Range(0,1)) = 1
+		DepthMaxmm("DepthMaxmm", Range(0,40000)) = 10000
 	}
 	SubShader
 	{
@@ -58,6 +59,8 @@
 			float ChromaUGreen;
 			float ChromaVGreen;
 			float ChromaUBlue;
+			float DepthMaxmm;
+
 
 			//	SoyPixelsFormat's 
 			//	see https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
@@ -72,7 +75,7 @@
 #define BGR				5
 #define YYuv_8888_Full	6
 #define YYuv_8888_Ntsc	7
-#define KinectDepth		8
+#define FreenectDepthmm		8
 #define Chroma_U		9
 #define Chroma_V		10
 #define ChromaUV_88		11
@@ -93,6 +96,40 @@
 					o.uv.y = 1 - o.uv.y;
 
 				return o;
+			}
+
+			float Range(float Min, float Max, float Value)
+			{
+				return (Value - Min) / (Max - Min);
+			}
+
+			float4 NormalToRedGreenBlue(float Normal, float Alpha = 1)
+			{
+				if (Normal < 0)
+					return float4(0, 0, 0, Alpha);
+				if (Normal > 1)
+					return float4(1, 1, 1, Alpha);
+
+				if (Normal < 0.25)
+				{
+					Normal = Range(0, 0.25, Normal);
+					return float4(1, Normal, 0, Alpha);
+				}
+				else if (Normal < 0.50)
+				{
+					Normal = Range(0.25, 0.50, Normal);
+					return float4(1 - Normal, 1, 0, Alpha);
+				}
+				else if (Normal < 0.75)
+				{
+					Normal = Range(0.50, 0.75, Normal);
+					return float4(0, 1, Normal, Alpha);
+				}
+				else
+				{
+					Normal = Range(0.75, 1.0, Normal);
+					return float4(0, 1- Normal, 1, Alpha);
+				}
 			}
 
 			float2 GetChromaUv_88(float2 uv)
@@ -162,7 +199,19 @@
 					return Luma4.zyxw;
 				if (LumaFormat == BGR)
 					return Luma4.zyxw;
-				
+
+				//	gr: this is expected to be 16bit texture format, so 1 component
+				if (LumaFormat == FreenectDepthmm)
+				{
+					float Depth = Luma4.x * 65535.0;
+					//	detect zero and render black
+					if ( Depth == 0 )
+						return NormalToRedGreenBlue(-1);
+					
+					float DepthNormal = Depth / DepthMaxmm;
+					return NormalToRedGreenBlue(DepthNormal);
+				}
+
 				// sample the texture
 				float Luma = Luma4.x;
 				float2 ChromaUV = float2(0, 0);
