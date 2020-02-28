@@ -17,7 +17,7 @@ namespace Freenect
 	class TFrameListener;
 	
 	void			EnumDeviceNames(std::function<void(const std::string&)> Enum);
-	void			Shutdown();
+	void			Shutdown(bool ProcessExit);
 }
 
 

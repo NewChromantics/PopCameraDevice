@@ -183,6 +183,8 @@ public:
 	
 	std::shared_ptr<TFrameListener>	CreateListener(const std::string& Serial,SoyPixelsMeta Format);
 	
+	void							FailRunningThreads();	//	for process exit, threads have gone, but we are unaware
+
 private:
 	void							OnFrame(TDevice& Device,TStream::TYPE Stream,const SoyPixelsImpl& Pixels,SoyTime Timestamp);
 
@@ -264,8 +266,12 @@ const char* Freenect::LogLevelToString(freenect_loglevel level)
 	}
 }
 
-void Freenect::Shutdown()
+void Freenect::Shutdown(bool ProcessExit)
 {
+	if (gContext)
+	{
+		gContext->FailRunningThreads();
+	}
 	//	if this thread is the freenect context thread, we need to tell the thread it's already shutdown
 	gContext.reset();
 }
@@ -362,6 +368,13 @@ bool Freenect::IsOkay(int Result,const std::string& Context,bool Throw)
 	}
 }
 
+void Freenect::TContext::FailRunningThreads()
+{
+	if (!mFreenect)
+		return;
+
+	mFreenect->OnDetatchedExternally();
+}
 
 Freenect::TFreenect& Freenect::TContext::GetFreenect()
 {
@@ -597,8 +610,15 @@ Freenect::TFreenect::TFreenect() :
 
 Freenect::TFreenect::~TFreenect()
 {
-	Stop( true );
-	
+	try
+	{
+		Stop(true);
+	}
+	catch (std::exception&e)
+	{
+		std::Debug << "Freenect thread cleanup error: " << e.what() << std::endl;
+	}
+
 	try
 	{
 		std::lock_guard<std::mutex> Lock(mDeviceLock);

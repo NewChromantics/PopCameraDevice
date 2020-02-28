@@ -59,7 +59,7 @@ int main()
 
 	//	todo: verify pixels
 
-	PopCameraDevice_Cleanup();
+	//PopCameraDevice_Cleanup();
 	return 0;
 }
 

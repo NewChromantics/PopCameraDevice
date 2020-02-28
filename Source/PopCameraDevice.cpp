@@ -149,7 +149,9 @@ namespace PopCameraDevice
 
 	uint32_t		CreateCameraDevice(const std::string& Name,const std::string& Format);
 
-	void			Shutdown();
+	//	to deal with windows exiting a process but silently destroying/detaching threads	
+	//	we do a hail mary shutdown
+	void			Shutdown(bool ProcessExit);
 
 	std::mutex				InstancesLock;
 	Array<TDeviceInstance>	Instances;
@@ -161,7 +163,7 @@ namespace PopCameraDevice
 
 
 #if defined(TARGET_WINDOWS)
-BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
 	{
@@ -175,10 +177,14 @@ BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /*
 	//	need to mark threads as exited which may have been shutdown from owner
 	//	mostly used to clean up TLS
 	//	on process detatch, threads are already gone...
-	//if (ul_reason_for_call == DLL_THREAD_DETACH || ul_reason_for_call == DLL_PROCESS_DETACH)
+	if (ul_reason_for_call == DLL_THREAD_DETACH)
+	{
+		//	gr: this seems to only be called for the main thread?
+	}
+
 	if ( ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
-		PopCameraDevice_Cleanup();
+		PopCameraDevice::Shutdown(true);
 	}
 
 	return TRUE;
@@ -678,16 +684,16 @@ __export int32_t PopCameraDevice_PopNextFrame(int32_t Instance, char* MetaJsonBu
 }
 
 
-void PopCameraDevice::Shutdown()
+void PopCameraDevice::Shutdown(bool ProcessExit)
 {
 #if defined(ENABLE_FREENECT)
-	Freenect::Shutdown();
+	Freenect::Shutdown(ProcessExit);
 #endif
 }
 
 __export void PopCameraDevice_Cleanup()
 {
-	PopCameraDevice::Shutdown();
+	PopCameraDevice::Shutdown(false);
 }
 
 __export void PopCameraDevice_UnitTests()
