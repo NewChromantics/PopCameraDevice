@@ -17,7 +17,7 @@
 namespace KinectAzure
 {
 	class TFrameReader;
-	class TDepthFrameReader;
+	class TPixelReader;
 
 	void		IsOkay(k4a_result_t Error, const char* Context);
 	void		IsOkay(k4a_wait_result_t Error, const char* Context);
@@ -84,22 +84,169 @@ private:
 };
 
 
-class KinectAzure::TDepthReader : public TFrameReader
+
+SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
+{
+	auto PixelFormat = SoyPixelsFormat::FreenectDepthmm;
+	FrameRate = 30;
+
+	switch (Mode)
+	{
+	case K4A_DEPTH_MODE_OFF:	return SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid);
+	case K4A_DEPTH_MODE_NFOV_2X2BINNED:	return SoyPixelsMeta(320, 288, PixelFormat);
+	case K4A_DEPTH_MODE_NFOV_UNBINNED:	return SoyPixelsMeta(640, 576, PixelFormat);
+	case K4A_DEPTH_MODE_WFOV_2X2BINNED:	return SoyPixelsMeta(512, 512, PixelFormat);
+	case K4A_DEPTH_MODE_WFOV_UNBINNED:	return SoyPixelsMeta(1024, 1024, PixelFormat);
+		//case K4A_DEPTH_MODE_PASSIVE_IR: break;
+	}
+
+	std::stringstream Error;
+	Error << "Unhandled K4A_COLOR_RESOLUTION_XXX " << Mode;
+	throw Soy::AssertException(Error);
+}
+
+SoyPixelsMeta GetPixelMeta(k4a_color_resolution_t Mode, size_t& FrameRate, SoyPixelsFormat::Type PixelFormat = SoyPixelsFormat::Nv12)
+{
+	//	gr: maybe should use K4A_IMAGE_FORMAT_XXX
+	FrameRate = 30;
+	switch (Mode)
+	{
+	case K4A_COLOR_RESOLUTION_OFF:	return SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid);
+	case K4A_COLOR_RESOLUTION_720P:	return SoyPixelsMeta(1280, 720, PixelFormat);
+	case K4A_COLOR_RESOLUTION_1080P:	return SoyPixelsMeta(1920, 1080, PixelFormat);
+	case K4A_COLOR_RESOLUTION_1440P:	return SoyPixelsMeta(2560, 1440, PixelFormat);
+	case K4A_COLOR_RESOLUTION_1536P:	return SoyPixelsMeta(2048, 1536, PixelFormat);
+	case K4A_COLOR_RESOLUTION_2160P:	return SoyPixelsMeta(3840, 2160, PixelFormat);
+	case K4A_COLOR_RESOLUTION_3072P:	return SoyPixelsMeta(4096, 3072, PixelFormat);
+	}
+
+	std::stringstream Error;
+	Error << "Unhandled K4A_COLOR_RESOLUTION_XXX " << Mode;
+	throw Soy::AssertException(Error);
+}
+
+
+k4a_depth_mode_t GetDepthMode(SoyPixelsMeta Format)
+{
+	auto SameDim = [](SoyPixelsMeta a, SoyPixelsMeta b)
+	{
+		if (a.GetWidth() != b.GetWidth())return false;
+		if (a.GetHeight() != b.GetHeight())return false;
+		return true;
+	};
+
+	auto DepthFormats = 
+	{ 
+		K4A_DEPTH_MODE_NFOV_2X2BINNED,
+		K4A_DEPTH_MODE_NFOV_UNBINNED,
+		K4A_DEPTH_MODE_WFOV_2X2BINNED,
+		K4A_DEPTH_MODE_WFOV_UNBINNED 
+	};
+	for (auto DepthFormat : DepthFormats)
+	{
+		//	require format to be right?
+		size_t DummyFrameRate = 0;
+		auto PixelFormat = GetPixelMeta(DepthFormat, DummyFrameRate);
+		if (SameDim(Format, PixelFormat))
+			return DepthFormat;
+	}
+
+	//	allow a way to get the no-depth mode
+	if (Format == SoyPixelsMeta())
+		return K4A_DEPTH_MODE_OFF;
+
+	//	todo: if pixel format is right, return best res
+	//	todo: get depth for mixed pixel format
+	std::stringstream Error;
+	Error << "Couldn't convert pixel meta to a depth format; " << Format;
+	throw Soy::AssertException(Error);
+}
+
+k4a_color_resolution_t GetColourMode(SoyPixelsMeta Format)
+{
+	auto SameDim = [](SoyPixelsMeta a, SoyPixelsMeta b)
+	{
+		if (a.GetWidth() != b.GetWidth())return false;
+		if (a.GetHeight() != b.GetHeight())return false;
+		return true;
+	};
+
+	auto ColourFormats =
+	{
+		//K4A_COLOR_RESOLUTION_OFF,
+		K4A_COLOR_RESOLUTION_720P,
+		K4A_COLOR_RESOLUTION_1080P,
+		K4A_COLOR_RESOLUTION_1440P,
+		K4A_COLOR_RESOLUTION_1536P,
+		K4A_COLOR_RESOLUTION_2160P,
+		K4A_COLOR_RESOLUTION_3072P
+	};
+	for (auto ColourFormat : ColourFormats)
+	{
+		//	require format to be right?
+		size_t DummyFrameRate = 0;
+		auto PixelFormat = GetPixelMeta(ColourFormat, DummyFrameRate);
+		if (SameDim(Format, PixelFormat))
+			return ColourFormat;
+	}
+
+	//	allow a way to get the no-depth mode
+	if (Format == SoyPixelsMeta())
+		return K4A_COLOR_RESOLUTION_OFF;
+
+	//	todo: if pixel format is right, return best res
+	//	todo: get depth for mixed pixel format
+	std::stringstream Error;
+	Error << "Couldn't convert pixel meta to a colour format; " << Format;
+	throw Soy::AssertException(Error);
+}
+
+SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
+{
+	switch (Format)
+	{
+	case K4A_IMAGE_FORMAT_CUSTOM16:
+	case K4A_IMAGE_FORMAT_DEPTH16:
+	case K4A_IMAGE_FORMAT_IR16:
+		return SoyPixelsFormat::FreenectDepthmm;
+
+	case K4A_IMAGE_FORMAT_COLOR_BGRA32:	return SoyPixelsFormat::BGRA;
+	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Nv12;
+	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::Yuv_844_Ntsc;
+	case K4A_IMAGE_FORMAT_CUSTOM8:		return SoyPixelsFormat::Greyscale;
+
+	default:
+	case K4A_IMAGE_FORMAT_COLOR_MJPG:
+	case K4A_IMAGE_FORMAT_CUSTOM:
+		break;
+	}
+
+	std::stringstream Error;
+	Error << "Unhandled pixel format " << magic_enum::enum_name(Format);
+	throw Soy::AssertException(Error);
+}
+
+
+class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TDepthReader(size_t DeviceIndex, bool KeepAlive,std::function<void(const SoyPixelsImpl&,SoyTime)> OnFrame) :
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(const SoyPixelsImpl&, SoyTime)> OnFrame, k4a_depth_mode_t DepthMode, k4a_color_resolution_t ColourMode) :
 		TFrameReader	(DeviceIndex, KeepAlive),
-		mOnNewFrame		( OnFrame )
+		mOnNewFrame		(OnFrame),
+		mDepthMode		( DepthMode ),
+		mColourMode		( ColourMode )
 	{
 	}
 
 private:
 	virtual void		OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
 	void				OnFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
-	virtual k4a_depth_mode_t		GetDepthMode() override { return K4A_DEPTH_MODE_NFOV_UNBINNED; }
-	virtual k4a_color_resolution_t	GetColourMode() override { return K4A_COLOR_RESOLUTION_OFF; }
+	virtual k4a_depth_mode_t		GetDepthMode() override { return mDepthMode; }
+	virtual k4a_color_resolution_t	GetColourMode() override { return mColourMode; }
 
 	std::function<void(const SoyPixelsImpl&, SoyTime)>	mOnNewFrame;
+	k4a_depth_mode_t		mDepthMode = K4A_DEPTH_MODE_OFF;
+	k4a_color_resolution_t	mColourMode = K4A_COLOR_RESOLUTION_OFF;
 };
 
 
@@ -148,26 +295,41 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	//	formats are known
 	//	todo: support depth & colour as seperate planes inheritely as multiple images
 	Array<std::string> Formats;
-	//	this IS in prefered order
-	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(640, 576, SoyPixelsFormat::FreenectDepthmm), 30));
-	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(320, 288, SoyPixelsFormat::FreenectDepthmm), 30));
-	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(512, 512, SoyPixelsFormat::FreenectDepthmm), 30));
-	Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(1024, 1024, SoyPixelsFormat::FreenectDepthmm), 30));
-	//Formats.PushBack("Depth16^1024x1024@30");	IR at higher framerate
-	
-	//	todo: get all the pixel formats for camera
-	/*
-	SoyPixelsFormat::Type ColourPixelFormats[] = { SoyPixelsFormat::RGB };
+
+	auto PushDepthFormat = [&](k4a_depth_mode_t Mode)
+	{
+		size_t FrameRate = 0;
+		auto Meta = GetPixelMeta(Mode, FrameRate);
+		auto FormatString = PopCameraDevice::GetFormatString(Meta, FrameRate);
+		Formats.PushBack(FormatString);
+	};
+
+	auto PushColourFormat = [&](k4a_color_resolution_t Mode,SoyPixelsFormat::Type Format)
+	{
+		size_t FrameRate = 0;
+		auto Meta = GetPixelMeta(Mode, FrameRate, Format);
+		auto FormatString = PopCameraDevice::GetFormatString(Meta, FrameRate);
+		Formats.PushBack(FormatString);
+	};
+
+	//	todo: colour & depth formats, including RGBA where a is depth
+
+	//	this is in prefered order
+	PushDepthFormat(K4A_DEPTH_MODE_NFOV_UNBINNED);
+	PushDepthFormat(K4A_DEPTH_MODE_NFOV_2X2BINNED);
+	PushDepthFormat(K4A_DEPTH_MODE_WFOV_UNBINNED);
+	PushDepthFormat(K4A_DEPTH_MODE_WFOV_2X2BINNED);
+
+	SoyPixelsFormat::Type ColourPixelFormats[] = { SoyPixelsFormat::Nv12, SoyPixelsFormat::RGB };
 	for (auto Format : ColourPixelFormats)
 	{
-		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(1280, 720, Format), 30));
-		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(1920, 1080, Format), 30));
-		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(2560, 1440, Format), 30));
-		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(2048, 1536, Format), 30));
-		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(3840, 2160, Format), 30));
-		Formats.PushBack(PopCameraDevice::GetFormatString(SoyPixelsMeta(4096, 3072, Format), 30));
+		PushColourFormat(K4A_COLOR_RESOLUTION_3072P, Format);
+		PushColourFormat(K4A_COLOR_RESOLUTION_2160P, Format);
+		PushColourFormat(K4A_COLOR_RESOLUTION_1536P, Format);
+		PushColourFormat(K4A_COLOR_RESOLUTION_1440P, Format);
+		PushColourFormat(K4A_COLOR_RESOLUTION_1080P, Format);
+		PushColourFormat(K4A_COLOR_RESOLUTION_720P, Format);
 	}
-	*/
 
 	for (auto i = 0; i < DeviceCount; i++)
 	{
@@ -306,18 +468,27 @@ std::string KinectAzure::TDevice::GetSerial()
 	return SerialPrefix + Serial;
 }
 
-KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial)
+KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::string& FormatString)
 {
 	LoadDll();
 	InitDebugHandler();
 
-		auto DeviceIndex = GetDeviceIndex(Serial);
+	auto DeviceIndex = GetDeviceIndex(Serial);
 	//	todo: remove keep alive when PopEngine/CAPI is fixed
 	auto KeepAlive = true;	//	keep reopening the device in the reader
 
 	std::function<void(const SoyPixelsImpl&,SoyTime)> OnNewFrame = std::bind(&TCameraDevice::OnFrame, this, std::placeholders::_1, std::placeholders::_2);
-		
-	mReader.reset( new TDepthReader(DeviceIndex, KeepAlive, OnNewFrame) );
+	
+	//	work out which reader we need to create
+	//	gr: what default should we use, default to both?
+	//	gr: this default should be first from EnumDeviceNameAndFormats()!
+	size_t FrameRate = 0;
+	SoyPixelsMeta Format = GetPixelMeta(K4A_DEPTH_MODE_NFOV_UNBINNED, FrameRate);
+	PopCameraDevice::DecodeFormatString(FormatString, Format, FrameRate);
+
+	auto DepthMode = GetDepthMode(Format);
+	auto ColourMode = GetColourMode(Format);
+	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode) );
 }
 
 KinectAzure::TCameraDevice::~TCameraDevice()
@@ -575,35 +746,11 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 }
 
 
-void KinectAzure::TDepthReader::OnFrame(const SoyPixelsImpl& Frame,SoyTime CaptureTime)
+void KinectAzure::TPixelReader::OnFrame(const SoyPixelsImpl& Frame,SoyTime CaptureTime)
 {
 	mOnNewFrame(Frame, CaptureTime);
 }
 
-SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
-{
-	switch (Format)
-	{
-	case K4A_IMAGE_FORMAT_CUSTOM16:
-	case K4A_IMAGE_FORMAT_DEPTH16:
-	case K4A_IMAGE_FORMAT_IR16:
-			return SoyPixelsFormat::FreenectDepthmm;
-
-	case K4A_IMAGE_FORMAT_COLOR_BGRA32:	return SoyPixelsFormat::BGRA;
-	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Nv12;
-	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::Yuv_844_Ntsc;
-	case K4A_IMAGE_FORMAT_CUSTOM8:		return SoyPixelsFormat::Greyscale;
-	
-	default:
-	case K4A_IMAGE_FORMAT_COLOR_MJPG:
-	case K4A_IMAGE_FORMAT_CUSTOM:
-		break;
-	}
-
-	std::stringstream Error;
-	Error << "Unhandled pixel format " << magic_enum::enum_name(Format);
-	throw Soy::AssertException(Error);
-}
 
 //	to minimise copies, we return remote pixels
 SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
@@ -619,7 +766,7 @@ SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
 	return ImagePixels;
 }
 
-void KinectAzure::TDepthReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
+void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
 {
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
 	auto DepthPixels = GetPixels(DepthImage);

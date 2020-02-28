@@ -391,7 +391,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 #if defined(ENABLE_KINECTAZURE)
 	try
 	{
-		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Name));
+		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Name,Format));
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}
