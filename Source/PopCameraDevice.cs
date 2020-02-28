@@ -114,11 +114,20 @@ public static class PopCameraDevice
 	}
 
 
+	static public string GetString(byte[] Ascii)
+	{
+		var String = System.Text.ASCIIEncoding.ASCII.GetString(Ascii);
+		var TerminatorPos = String.IndexOf('\0');
+		if (TerminatorPos >= 0)
+			String = String.Substring(0, TerminatorPos);
+		return String;
+	}
+
 	public static List<DeviceMeta> EnumCameraDevices()
 	{
 		var JsonStringBuffer = new byte[1000];
 		PopCameraDevice_EnumCameraDevicesJson(JsonStringBuffer, JsonStringBuffer.Length );
-		var JsonString = System.Text.ASCIIEncoding.ASCII.GetString(JsonStringBuffer);
+		var JsonString = GetString(JsonStringBuffer);
 		var Metas = JsonUtility.FromJson<DeviceMetas>(JsonString);
 		return Metas.Devices;
 	}
@@ -138,11 +147,13 @@ public static class PopCameraDevice
 			var FormatAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(Format + "\0");
 			var ErrorBuffer = new byte[100];
 			Instance = PopCameraDevice_CreateCameraDeviceWithFormat(DeviceNameAscii, FormatAscii, ErrorBuffer, ErrorBuffer.Length);
-			var Error = System.Text.ASCIIEncoding.ASCII.GetString(ErrorBuffer);
+			var Error = GetString(ErrorBuffer);
 			if ( Instance.Value <= 0 )
 				throw new System.Exception("Failed to create Camera device with name " + DeviceName + "; " + Error);
-			if (Error.Length > 0)
-				Debug.LogWarning("Created PopCameraDevice(" + Instance.Value + ") but error was not empty; " + Error);
+			if (!String.IsNullOrEmpty(Error))
+			{
+				Debug.LogWarning("Created PopCameraDevice(" + Instance.Value + ") but error was not empty (length = "+ Error.Length+") " + Error );
+			}
 		}
 		~Device()
 		{
@@ -209,7 +220,7 @@ public static class PopCameraDevice
 			if (NextFrameTime < 0)
 				return null;
 
-			var Json = System.Text.ASCIIEncoding.ASCII.GetString(JsonBuffer);
+			var Json = GetString(JsonBuffer);
 			//Debug.Log("PopCameraDevice_PeekNextFrame:" + Json);
 			var Meta = JsonUtility.FromJson<FrameMeta>(Json);
 
