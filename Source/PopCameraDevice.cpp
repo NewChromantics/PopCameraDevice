@@ -345,21 +345,6 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 	}
 
 
-	try
-	{
-#if defined(TARGET_WINDOWS)
-		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
-#elif defined(TARGET_OSX) || defined(TARGET_IOS)
-		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name));
-#endif
-		if ( Device )
-			return PopCameraDevice::CreateInstance(Device);
-	}
-	catch(TInvalidNameException& e)
-	{
-		//std::Debug << e.what() << std::endl;
-	}
-
 #if defined(ENABLE_KINECT2)
 	try
 	{
@@ -401,6 +386,23 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 	}
 #endif
 
+	//	do generic, non-prefixed names LAST
+	try
+	{
+#if defined(TARGET_WINDOWS)
+		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
+#elif defined(TARGET_OSX) || defined(TARGET_IOS)
+		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name));
+#endif
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+	catch (TInvalidNameException& e)
+	{
+		//std::Debug << e.what() << std::endl;
+	}
+
+	//	this shouldn't REALLY occur any more as the generic capture device should fail to find the name
 	throw Soy::AssertException("Failed to create device, name/serial didn't match any systems");
 }
 
