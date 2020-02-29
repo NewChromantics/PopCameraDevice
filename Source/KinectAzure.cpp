@@ -470,6 +470,9 @@ std::string KinectAzure::TDevice::GetSerial()
 
 KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::string& FormatString)
 {
+	if (!Soy::StringBeginsWith(Serial, KinectAzure::SerialPrefix, true))
+		throw PopCameraDevice::TInvalidNameException();
+
 	LoadDll();
 	InitDebugHandler();
 

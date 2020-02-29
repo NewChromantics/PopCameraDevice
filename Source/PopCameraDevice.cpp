@@ -338,9 +338,9 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 			if (Device)
 				return PopCameraDevice::CreateInstance(Device);
 		}
-		catch (std::exception& e)
+		catch (TInvalidNameException& e)
 		{
-			std::Debug << e.what() << std::endl;
+			//std::Debug << e.what() << std::endl;
 		}
 	}
 
@@ -355,9 +355,9 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 		if ( Device )
 			return PopCameraDevice::CreateInstance(Device);
 	}
-	catch(std::exception& e)
+	catch(TInvalidNameException& e)
 	{
-		std::Debug << e.what() << std::endl;
+		//std::Debug << e.what() << std::endl;
 	}
 
 #if defined(ENABLE_KINECT2)
@@ -367,9 +367,9 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 		if ( Device )
 			return PopCameraDevice::CreateInstance(Device);
 	}
-	catch(std::exception& e)
+	catch(TInvalidNameException& e)
 	{
-		std::Debug << e.what() << std::endl;
+		//std::Debug << e.what() << std::endl;
 	}
 #endif
 
@@ -381,9 +381,9 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 		if ( Device )
 			return PopCameraDevice::CreateInstance(Device);
 	}
-	catch(std::exception& e)
+	catch(TInvalidNameException& e)
 	{
-		std::Debug << e.what() << std::endl;
+		//std::Debug << e.what() << std::endl;
 	}
 #endif
 
@@ -395,13 +395,13 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}
-	catch (std::exception& e)
+	catch (TInvalidNameException& e)
 	{
-		std::Debug << e.what() << std::endl;
+		//std::Debug << e.what() << std::endl;
 	}
 #endif
 
-	throw Soy::AssertException("Failed to create device");
+	throw Soy::AssertException("Failed to create device, name/serial didn't match any systems");
 }
 
 

@@ -10,6 +10,9 @@ void TestDevice::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 
 TestDevice::TestDevice(const std::string& Format)
 {
+	//if (!Soy::StringBeginsWith(Serial, TestDevice::DeviceName, true))
+	//	throw PopCameraDevice::TInvalidNameException();
+
 	PopCameraDevice::DecodeFormatString(Format, mMeta, mFrameRate);
 
 	GenerateFrame();

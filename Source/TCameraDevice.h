@@ -10,6 +10,8 @@ namespace PopCameraDevice
 {
 	class TDevice;
 	class TStreamMeta;
+	class TInvalidNameException;
+
 	
 	std::string	GetFormatString(SoyPixelsMeta Meta, size_t FrameRate = 0);
 	void		DecodeFormatString(std::string FormatString, SoyPixelsMeta& Meta, size_t& FrameRate);
@@ -26,6 +28,13 @@ namespace PopCameraDevice
 		};
 	}
 }
+
+
+class PopCameraDevice::TInvalidNameException : public std::exception
+{
+public:
+	virtual const char* what() const __noexcept { return "Invalid device name"; }
+};
 
 //	used as desired params when creating camera devices
 //	todo: merge/cleanup soy TStreamMeta which has more info (eg. transform matrix)
