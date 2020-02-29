@@ -41,11 +41,7 @@ Kinect2::TDevice::TDevice(const std::string& DeviceName) :
 {
 	std::string Serial = DeviceName;
 	if ( !Soy::StringTrimLeft(Serial,DeviceName_Prefix,true) )
-	{
-		std::stringstream Error;
-		Error << "Device name (" << DeviceName << ") doesn't begin with " << DeviceName_Prefix;
-		throw Soy_AssertException(Error);
-	}
+		throw PopCameraDevice::TInvalidNameException();
 
 	bool Colour = true;
 

@@ -76,7 +76,9 @@ void Freenect2::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 
 Freenect2::TDevice::TDevice(const std::string& Serial)
 {
-	
+	if( !Soy::StringBeginsWith(Serial, DeviceNamePrefix, true ) )
+		throw PopCameraDevice::TInvalidNameException();
+
 }
 
 void Freenect2::TDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
