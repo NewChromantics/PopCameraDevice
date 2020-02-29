@@ -14,6 +14,13 @@
 #endif
 
 
+class k4a_colour_mode_t
+{
+public:
+	k4a_image_format_t		format = K4A_IMAGE_FORMAT_CUSTOM;
+	k4a_color_resolution_t	resolution = K4A_COLOR_RESOLUTION_OFF;
+};
+
 namespace KinectAzure
 {
 	class TFrameReader;
@@ -28,6 +35,10 @@ namespace KinectAzure
 
 	SoyPixelsRemote			GetPixels(k4a_image_t Image);
 	SoyPixelsFormat::Type	GetFormat(k4a_image_format_t Format);
+	k4a_image_format_t		GetFormat(SoyPixelsFormat::Type Format);
+	k4a_colour_mode_t		GetColourMode(SoyPixelsMeta Format,size_t& FrameRate);
+	k4a_depth_mode_t		GetDepthMode(SoyPixelsMeta Format, size_t& FrameRate);
+	k4a_fps_t				GetFrameRate(size_t FrameRate);
 
 	constexpr auto	SerialPrefix = "KinectAzure_";
 }
@@ -38,7 +49,7 @@ namespace KinectAzure
 class KinectAzure::TDevice
 {
 public:
-	TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_color_resolution_t ColourMode);
+	TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate);
 	~TDevice();
 
 	std::string			GetSerial();
@@ -66,8 +77,9 @@ protected:
 	virtual void		OnError(const char* Error) {}
 
 	//	as we keep-alive, we need to know these modes
-	virtual k4a_depth_mode_t		GetDepthMode() = 0;
-	virtual k4a_color_resolution_t	GetColourMode() = 0;
+	virtual k4a_depth_mode_t	GetDepthMode() = 0;
+	virtual k4a_colour_mode_t	GetColourMode() = 0;
+	virtual k4a_fps_t			GetFrameRate() = 0;
 
 private:
 	void				Iteration(int32_t TimeoutMs);
@@ -88,7 +100,8 @@ private:
 SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
 {
 	auto PixelFormat = SoyPixelsFormat::FreenectDepthmm;
-	FrameRate = 30;
+	if ( FrameRate==0 )
+		FrameRate = 30;
 
 	switch (Mode)
 	{
@@ -101,18 +114,43 @@ SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
 	}
 
 	std::stringstream Error;
-	Error << "Unhandled K4A_COLOR_RESOLUTION_XXX " << Mode;
+	Error << "Unhandled K4A_DEPTH_MODE_XXX " << Mode;
+	throw Soy::AssertException(Error);
+}
+
+
+size_t GetMaxFrameRate(k4a_color_resolution_t Mode)
+{
+	switch (Mode)
+	{
+	case K4A_COLOR_RESOLUTION_OFF:	
+		return 0;
+
+	case K4A_COLOR_RESOLUTION_720P:
+	case K4A_COLOR_RESOLUTION_1080P:
+	case K4A_COLOR_RESOLUTION_1440P:
+	case K4A_COLOR_RESOLUTION_1536P:
+	case K4A_COLOR_RESOLUTION_2160P:
+		return 30;
+
+	case K4A_COLOR_RESOLUTION_3072P:
+		return 15;
+	}
+
+	std::stringstream Error;
+	Error << __PRETTY_FUNCTION__ << " Unhandled K4A_COLOR_RESOLUTION_XXX " << Mode;
 	throw Soy::AssertException(Error);
 }
 
 SoyPixelsMeta GetPixelMeta(k4a_color_resolution_t Mode, size_t& FrameRate, SoyPixelsFormat::Type PixelFormat = SoyPixelsFormat::Nv12)
 {
-	//	gr: maybe should use K4A_IMAGE_FORMAT_XXX
-	FrameRate = 30;
+	if (FrameRate == 0)
+		FrameRate = GetMaxFrameRate(Mode);
+
 	switch (Mode)
 	{
-	case K4A_COLOR_RESOLUTION_OFF:	return SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid);
-	case K4A_COLOR_RESOLUTION_720P:	return SoyPixelsMeta(1280, 720, PixelFormat);
+	case K4A_COLOR_RESOLUTION_OFF:		return SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid);
+	case K4A_COLOR_RESOLUTION_720P:		return SoyPixelsMeta(1280, 720, PixelFormat);
 	case K4A_COLOR_RESOLUTION_1080P:	return SoyPixelsMeta(1920, 1080, PixelFormat);
 	case K4A_COLOR_RESOLUTION_1440P:	return SoyPixelsMeta(2560, 1440, PixelFormat);
 	case K4A_COLOR_RESOLUTION_1536P:	return SoyPixelsMeta(2048, 1536, PixelFormat);
@@ -126,7 +164,7 @@ SoyPixelsMeta GetPixelMeta(k4a_color_resolution_t Mode, size_t& FrameRate, SoyPi
 }
 
 
-k4a_depth_mode_t GetDepthMode(SoyPixelsMeta Format)
+k4a_depth_mode_t KinectAzure::GetDepthMode(SoyPixelsMeta Format, size_t& FrameRate)
 {
 	auto SameDim = [](SoyPixelsMeta a, SoyPixelsMeta b)
 	{
@@ -145,10 +183,13 @@ k4a_depth_mode_t GetDepthMode(SoyPixelsMeta Format)
 	for (auto DepthFormat : DepthFormats)
 	{
 		//	require format to be right?
-		size_t DummyFrameRate = 0;
+		size_t DummyFrameRate = FrameRate;
 		auto PixelFormat = GetPixelMeta(DepthFormat, DummyFrameRate);
 		if (SameDim(Format, PixelFormat))
+		{
+			FrameRate = DummyFrameRate;
 			return DepthFormat;
+		}
 	}
 
 	//	allow a way to get the no-depth mode
@@ -162,7 +203,22 @@ k4a_depth_mode_t GetDepthMode(SoyPixelsMeta Format)
 	throw Soy::AssertException(Error);
 }
 
-k4a_color_resolution_t GetColourMode(SoyPixelsMeta Format)
+k4a_fps_t KinectAzure::GetFrameRate(size_t FrameRate)
+{
+	switch (FrameRate)
+	{
+	case 5:		return K4A_FRAMES_PER_SECOND_5;
+	case 15:	return K4A_FRAMES_PER_SECOND_15;
+	case 30:	return K4A_FRAMES_PER_SECOND_30;
+	}
+
+	std::stringstream Error;
+	Error << "Frame rate " << FrameRate << " not supported";
+	throw Soy::AssertException(Error);
+}
+
+
+k4a_colour_mode_t KinectAzure::GetColourMode(SoyPixelsMeta Format, size_t& FrameRate)
 {
 	auto SameDim = [](SoyPixelsMeta a, SoyPixelsMeta b)
 	{
@@ -171,7 +227,17 @@ k4a_color_resolution_t GetColourMode(SoyPixelsMeta Format)
 		return true;
 	};
 
-	auto ColourFormats =
+	k4a_colour_mode_t ColorMode;
+
+	//	work out the format
+	//	default to BGRA
+	if (Format.GetFormat() == SoyPixelsFormat::Invalid)
+		ColorMode.format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
+	else
+		ColorMode.format = GetFormat(Format.GetFormat());
+
+
+	auto ColourResolutions =
 	{
 		//K4A_COLOR_RESOLUTION_OFF,
 		K4A_COLOR_RESOLUTION_720P,
@@ -181,18 +247,31 @@ k4a_color_resolution_t GetColourMode(SoyPixelsMeta Format)
 		K4A_COLOR_RESOLUTION_2160P,
 		K4A_COLOR_RESOLUTION_3072P
 	};
-	for (auto ColourFormat : ColourFormats)
+	for (auto ColourResolution : ColourResolutions)
 	{
 		//	require format to be right?
-		size_t DummyFrameRate = 0;
-		auto PixelFormat = GetPixelMeta(ColourFormat, DummyFrameRate);
-		if (SameDim(Format, PixelFormat))
-			return ColourFormat;
+		size_t DummyFrameRate = FrameRate;
+		auto PixelMeta = GetPixelMeta(ColourResolution, DummyFrameRate, Format.GetFormat());
+		if (SameDim(Format, PixelMeta))
+		{
+			ColorMode.resolution = ColourResolution;
+			FrameRate = DummyFrameRate;
+			return ColorMode;
+		}
 	}
 
 	//	allow a way to get the no-depth mode
 	if (Format == SoyPixelsMeta())
-		return K4A_COLOR_RESOLUTION_OFF;
+		return k4a_colour_mode_t();
+
+	//	if no dimensions, but we have a pixelformat, then default the resolution
+	if (SameDim(Format, SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid)))
+	{
+		ColorMode.resolution = K4A_COLOR_RESOLUTION_2160P;
+		if (FrameRate == 0)
+			FrameRate = GetMaxFrameRate(ColorMode.resolution);
+		return ColorMode;
+	}
 
 	//	todo: if pixel format is right, return best res
 	//	todo: get depth for mixed pixel format
@@ -200,6 +279,7 @@ k4a_color_resolution_t GetColourMode(SoyPixelsMeta Format)
 	Error << "Couldn't convert pixel meta to a colour format; " << Format;
 	throw Soy::AssertException(Error);
 }
+
 
 SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
 {
@@ -227,10 +307,38 @@ SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
 }
 
 
+k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
+{
+	switch (Format)
+	{
+	case SoyPixelsFormat::FreenectDepthmm:
+		return K4A_IMAGE_FORMAT_DEPTH16;
+
+	case SoyPixelsFormat::RGBA:
+	case SoyPixelsFormat::BGRA:
+		return K4A_IMAGE_FORMAT_COLOR_BGRA32;
+
+	case SoyPixelsFormat::Nv12:	
+		return K4A_IMAGE_FORMAT_COLOR_NV12;
+
+	case SoyPixelsFormat::Yuv_844_Ntsc:
+		return K4A_IMAGE_FORMAT_COLOR_YUY2;
+
+		//	return YUV for luma?
+	case SoyPixelsFormat::Greyscale:
+		return K4A_IMAGE_FORMAT_CUSTOM8;
+	}
+
+	std::stringstream Error;
+	Error << "Unhandled pixel format " << magic_enum::enum_name(Format);
+	throw Soy::AssertException(Error);
+}
+
+
 class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(const SoyPixelsImpl&, SoyTime)> OnFrame, k4a_depth_mode_t DepthMode, k4a_color_resolution_t ColourMode) :
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(const SoyPixelsImpl&, SoyTime)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
 		TFrameReader	(DeviceIndex, KeepAlive),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
@@ -239,14 +347,16 @@ public:
 	}
 
 private:
-	virtual void		OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
-	void				OnFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
-	virtual k4a_depth_mode_t		GetDepthMode() override { return mDepthMode; }
-	virtual k4a_color_resolution_t	GetColourMode() override { return mColourMode; }
+	virtual void				OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
+	void						OnFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
+	virtual k4a_depth_mode_t	GetDepthMode() override { return mDepthMode; }
+	virtual k4a_colour_mode_t	GetColourMode() override { return mColourMode; }
+	virtual k4a_fps_t			GetFrameRate() override { return mFrameRate; }
 
 	std::function<void(const SoyPixelsImpl&, SoyTime)>	mOnNewFrame;
 	k4a_depth_mode_t		mDepthMode = K4A_DEPTH_MODE_OFF;
-	k4a_color_resolution_t	mColourMode = K4A_COLOR_RESOLUTION_OFF;
+	k4a_colour_mode_t		mColourMode;
+	k4a_fps_t				mFrameRate;
 };
 
 
@@ -320,22 +430,23 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	PushDepthFormat(K4A_DEPTH_MODE_WFOV_UNBINNED);
 	PushDepthFormat(K4A_DEPTH_MODE_WFOV_2X2BINNED);
 
-	SoyPixelsFormat::Type ColourPixelFormats[] = { SoyPixelsFormat::Nv12, SoyPixelsFormat::RGB };
-	for (auto Format : ColourPixelFormats)
+	k4a_image_format_t ColourPixelFormats[] = { K4A_IMAGE_FORMAT_COLOR_YUY2, K4A_IMAGE_FORMAT_COLOR_NV12, K4A_IMAGE_FORMAT_COLOR_BGRA32 };
+	for (auto ImageFormat : ColourPixelFormats)
 	{
-		PushColourFormat(K4A_COLOR_RESOLUTION_3072P, Format);
-		PushColourFormat(K4A_COLOR_RESOLUTION_2160P, Format);
-		PushColourFormat(K4A_COLOR_RESOLUTION_1536P, Format);
-		PushColourFormat(K4A_COLOR_RESOLUTION_1440P, Format);
-		PushColourFormat(K4A_COLOR_RESOLUTION_1080P, Format);
-		PushColourFormat(K4A_COLOR_RESOLUTION_720P, Format);
+		auto PixelFormat = GetFormat(ImageFormat);
+		PushColourFormat(K4A_COLOR_RESOLUTION_2160P, PixelFormat);
+		PushColourFormat(K4A_COLOR_RESOLUTION_3072P, PixelFormat);
+		PushColourFormat(K4A_COLOR_RESOLUTION_1536P, PixelFormat);
+		PushColourFormat(K4A_COLOR_RESOLUTION_1440P, PixelFormat);
+		PushColourFormat(K4A_COLOR_RESOLUTION_1080P, PixelFormat);
+		PushColourFormat(K4A_COLOR_RESOLUTION_720P, PixelFormat);
 	}
 
 	for (auto i = 0; i < DeviceCount; i++)
 	{
 		try
 		{
-			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_OFF, K4A_COLOR_RESOLUTION_OFF);
+			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_OFF, k4a_colour_mode_t(), K4A_FRAMES_PER_SECOND_5);
 			auto Serial = Device.GetSerial();
 
 			Enum(Serial, GetArrayBridge(Formats));
@@ -371,7 +482,7 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 	return SerialIndex;
 }
 
-KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_color_resolution_t ColourMode)
+KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate)
 {
 	//	this fails the second time if we didn't close properly (app still has exclusive access)
 	//	so make sure we shutdown if we fail
@@ -380,14 +491,18 @@ KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4
 
 	//	don't start cameras if nothing selected (throws error)
 	//	use this config for simple enum
-	if (DepthMode == K4A_DEPTH_MODE_OFF && ColourMode == K4A_COLOR_RESOLUTION_OFF)
+	if (DepthMode == K4A_DEPTH_MODE_OFF && ColourMode.resolution == K4A_COLOR_RESOLUTION_OFF)
 		return;
 
 	try
 	{
 		k4a_device_configuration_t DeviceConfig = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 		DeviceConfig.depth_mode = DepthMode;
-		DeviceConfig.color_resolution = ColourMode;
+		DeviceConfig.color_resolution = ColourMode.resolution;
+		//	start_cameras fails if this is set to say, custom, so don't change from default(mjpg)
+		if (ColourMode.resolution != K4A_COLOR_RESOLUTION_OFF )
+			DeviceConfig.color_format = ColourMode.format;
+		DeviceConfig.camera_fps = FrameRate;
 		Error = k4a_device_start_cameras(mDevice, &DeviceConfig);
 		IsOkay(Error, "k4a_device_start_cameras");
 		
@@ -486,15 +601,17 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::
 	//	gr: what default should we use, default to both?
 	//	gr: this default should be first from EnumDeviceNameAndFormats()!
 	size_t FrameRate = 0;
-	SoyPixelsMeta Format = GetPixelMeta(K4A_DEPTH_MODE_NFOV_UNBINNED, FrameRate);
+	SoyPixelsMeta Format;
 	PopCameraDevice::DecodeFormatString(FormatString, Format, FrameRate);
+	if ( Format == SoyPixelsMeta() )
+		Format = GetPixelMeta(K4A_DEPTH_MODE_NFOV_UNBINNED, FrameRate);
 
 	auto DepthMode = K4A_DEPTH_MODE_OFF;
-	auto ColourMode = K4A_COLOR_RESOLUTION_OFF;
-	
+	k4a_colour_mode_t ColourMode;
+
 	try
 	{
-		DepthMode = GetDepthMode(Format);
+		DepthMode = GetDepthMode(Format, FrameRate);
 	}
 	catch (std::exception& e)
 	{
@@ -503,14 +620,16 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::
 
 	try
 	{
-		ColourMode = GetColourMode(Format);
+		ColourMode = GetColourMode(Format, FrameRate );
 	}
 	catch (std::exception& e)
 	{
 		std::Debug << e.what() << std::endl;
 	}
 
-	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode) );
+	auto Fps = GetFrameRate(FrameRate);
+
+	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode, Fps) );
 }
 
 KinectAzure::TCameraDevice::~TCameraDevice()
@@ -582,7 +701,15 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 
 KinectAzure::TFrameReader::~TFrameReader()
 {
-	std::Debug << "~TFrameReader" << std::endl;
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+	try
+	{
+		this->Stop(true);
+	}
+	catch (std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << e.what() << std::endl;
+	}
 }
 
 void KinectAzure::TFrameReader::Open()
@@ -591,12 +718,11 @@ void KinectAzure::TFrameReader::Open()
 	if (mDevice)
 		return;
 	std::Debug << __PRETTY_FUNCTION__ << std::endl;
-
-
-	_CrtCheckMemory();
+	
 	auto DepthMode = GetDepthMode();
 	auto ColourMode = GetColourMode();
-	mDevice.reset(new TDevice(mDeviceIndex, DepthMode, ColourMode));
+	auto FrameRate = GetFrameRate();
+	mDevice.reset(new TDevice(mDeviceIndex, DepthMode, ColourMode, FrameRate ));
 }
 
 bool KinectAzure::TFrameReader::ThreadIteration()
@@ -791,11 +917,47 @@ SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
 void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
 {
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
-	auto DepthPixels = GetPixels(DepthImage);
-	
-	OnFrame( DepthPixels, CaptureTime );
+	auto ColourImage = k4a_capture_get_color_image(Frame);
 
-	k4a_image_release(DepthImage);
+	auto Cleanup = [&]()
+	{
+		if (DepthImage )
+			k4a_image_release(DepthImage);
+		if (ColourImage)
+			k4a_image_release(ColourImage);
+	};
+	
+	try
+	{
+		if (!DepthImage && !ColourImage)
+		{
+			//	gr: throw?
+			std::Debug << __PRETTY_FUNCTION__ << " Frame had no depth or colour" << std::endl;
+		}
+		else if (DepthImage && !ColourImage)
+		{
+			auto DepthPixels = GetPixels(DepthImage);
+			OnFrame(DepthPixels, CaptureTime);
+		}
+		else if (ColourImage && !DepthImage)
+		{
+			auto ColourPixels = GetPixels(ColourImage);
+			OnFrame(ColourPixels, CaptureTime);
+		}
+		else
+		{
+			auto DepthPixels = GetPixels(DepthImage);
+			auto ColourPixels = GetPixels(ColourImage);
+			//	merge!
+			throw Soy::AssertException("Todo; merge colour + depth image");
+		}
+		Cleanup();
+	}
+	catch (...)
+	{
+		Cleanup();
+		throw;
+	}	
 }
 
 
