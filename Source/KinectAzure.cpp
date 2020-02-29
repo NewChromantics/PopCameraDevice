@@ -342,7 +342,8 @@ public:
 		TFrameReader	(DeviceIndex, KeepAlive),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
-		mColourMode		( ColourMode )
+		mColourMode		( ColourMode ),
+		mFrameRate		( FrameRate )
 	{
 	}
 
