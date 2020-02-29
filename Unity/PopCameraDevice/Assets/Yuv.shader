@@ -196,7 +196,7 @@
 				if (LumaFormat == RGBA)
 					return Luma4;
 				if (LumaFormat == BGRA)
-					return Luma4.zyxw;
+					return float4(Luma4.yxw, 1);	//	ARGB data, but is BGRA. z is alpha it seems
 				if (LumaFormat == BGR)
 					return Luma4.zyxw;
 
