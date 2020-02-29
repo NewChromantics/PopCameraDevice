@@ -391,7 +391,7 @@ bool IsDepthFormat(SoyPixelsFormat::Type Format)
 {
 	switch ( Format )
 	{
-		case SoyPixelsFormat::FreenectDepthmm:
+		case SoyPixelsFormat::Depth16mm:
 		case SoyPixelsFormat::KinectDepth:
 		case SoyPixelsFormat::FreenectDepth10bit:
 		case SoyPixelsFormat::FreenectDepth11bit:
@@ -1141,7 +1141,7 @@ void Freenect::TDevice::CreateStreams(bool Video, bool Depth)
 		std::this_thread::sleep_for( std::chrono::milliseconds(200) );
 		
 		if ( Depth )
-			mDepthStream.reset( new TDepthStream( *mDevice, SoyPixelsFormat::FreenectDepthmm, Freenect::DepthStreamIndex ) );
+			mDepthStream.reset( new TDepthStream( *mDevice, SoyPixelsFormat::Depth16mm, Freenect::DepthStreamIndex ) );
 	}
 	catch (std::exception& e)
 	{
@@ -1249,7 +1249,7 @@ void Freenect::TDeviceDecoder::OnNewFrame(const Freenect::TFrame& Frame)
 		case SoyPixelsFormat::KinectDepth:
 		case SoyPixelsFormat::FreenectDepth10bit:
 		case SoyPixelsFormat::FreenectDepth11bit:
-		case SoyPixelsFormat::FreenectDepthmm:
+		case SoyPixelsFormat::Depth16mm:
 			//	copy pixels
 			PixelBuffer.mPixels.reset( new TDepthPixelBuffer( Frame.mPixels, mOpenglBlitter, mOpenglContext ) );
 			break;
@@ -1319,8 +1319,8 @@ freenect_depth_format Freenect::GetDepthFormat(SoyPixelsFormat::Type Format)
 		//	gr: don't use re-aligned, it's expensive
 		//	use this in a shader!
 		//	http://www.mindtreatstudios.com/kinect-3d-view-projection-matrix-rgb-camera/
-		case SoyPixelsFormat::FreenectDepthmm:		return FREENECT_DEPTH_REGISTERED;
-		//case SoyPixelsFormat::FreenectDepthmm:		return FREENECT_DEPTH_MM;
+		case SoyPixelsFormat::Depth16mm:		return FREENECT_DEPTH_REGISTERED;
+		//case SoyPixelsFormat::Depth16mm:		return FREENECT_DEPTH_MM;
 		default:
 			break;
 	}
@@ -1350,8 +1350,8 @@ SoyPixelsFormat::Type Freenect::GetFormat(freenect_depth_format Format)
 	{
 		case FREENECT_DEPTH_11BIT:		return SoyPixelsFormat::FreenectDepth11bit;
 		case FREENECT_DEPTH_10BIT:		return SoyPixelsFormat::FreenectDepth10bit;
-		case FREENECT_DEPTH_REGISTERED:	return SoyPixelsFormat::FreenectDepthmm;
-		case FREENECT_DEPTH_MM:			return SoyPixelsFormat::FreenectDepthmm;
+		case FREENECT_DEPTH_REGISTERED:	return SoyPixelsFormat::Depth16mm;
+		case FREENECT_DEPTH_MM:			return SoyPixelsFormat::Depth16mm;
 		default:
 			break;
 	}
@@ -1598,7 +1598,7 @@ Freenect::TSource::TSource(const std::string& DeviceName)
 	}
 	else if ( Soy::StringTrimRight( Serial, DeviceName_Depth_Suffix, true ) )
 	{
-		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::FreenectDepthmm );
+		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::Depth16mm);
 		mListener = Context.CreateListener( Serial, Meta );
 	}
 	else
@@ -1641,7 +1641,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	float DepthVertFov = 46.6f;
 	float ColourHorzFov = 62;
 	float ColourVertFov = 48.6f;
-	if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepthmm )
+	if ( Frame.GetFormat() == SoyPixelsFormat::Depth16mm)
 	{
 		Meta.Push("DepthMax",FREENECT_DEPTH_MM_MAX_VALUE);
 		Meta.Push("DepthInvalid",FREENECT_DEPTH_MM_NO_VALUE);

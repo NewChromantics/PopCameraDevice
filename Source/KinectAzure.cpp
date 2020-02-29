@@ -99,7 +99,7 @@ private:
 
 SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
 {
-	auto PixelFormat = SoyPixelsFormat::FreenectDepthmm;
+	auto PixelFormat = SoyPixelsFormat::Depth16mm;
 	if ( FrameRate==0 )
 		FrameRate = 30;
 
@@ -142,7 +142,7 @@ size_t GetMaxFrameRate(k4a_color_resolution_t Mode)
 	throw Soy::AssertException(Error);
 }
 
-SoyPixelsMeta GetPixelMeta(k4a_color_resolution_t Mode, size_t& FrameRate, SoyPixelsFormat::Type PixelFormat = SoyPixelsFormat::Nv12)
+SoyPixelsMeta GetPixelMeta(k4a_color_resolution_t Mode, size_t& FrameRate, SoyPixelsFormat::Type PixelFormat)
 {
 	if (FrameRate == 0)
 		FrameRate = GetMaxFrameRate(Mode);
@@ -195,6 +195,15 @@ k4a_depth_mode_t KinectAzure::GetDepthMode(SoyPixelsMeta Format, size_t& FrameRa
 	//	allow a way to get the no-depth mode
 	if (Format == SoyPixelsMeta())
 		return K4A_DEPTH_MODE_OFF;
+
+	//	todo: how do we pick res?
+	//	note: res will/should match colour, not dept
+	switch (Format.GetFormat())
+	{
+	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:	return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:		return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	case SoyPixelsFormat::BGRA_Depth16:				return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	}
 
 	//	todo: if pixel format is right, return best res
 	//	todo: get depth for mixed pixel format
@@ -267,7 +276,7 @@ k4a_colour_mode_t KinectAzure::GetColourMode(SoyPixelsMeta Format, size_t& Frame
 	//	if no dimensions, but we have a pixelformat, then default the resolution
 	if (SameDim(Format, SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid)))
 	{
-		ColorMode.resolution = K4A_COLOR_RESOLUTION_2160P;
+		ColorMode.resolution = K4A_COLOR_RESOLUTION_1080P;
 		if (FrameRate == 0)
 			FrameRate = GetMaxFrameRate(ColorMode.resolution);
 		return ColorMode;
@@ -288,7 +297,7 @@ SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
 	case K4A_IMAGE_FORMAT_CUSTOM16:
 	case K4A_IMAGE_FORMAT_DEPTH16:
 	case K4A_IMAGE_FORMAT_IR16:
-		return SoyPixelsFormat::FreenectDepthmm;
+		return SoyPixelsFormat::Depth16mm;
 
 	case K4A_IMAGE_FORMAT_COLOR_BGRA32:	return SoyPixelsFormat::BGRA;
 	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Nv12;
@@ -311,17 +320,20 @@ k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
 {
 	switch (Format)
 	{
-	case SoyPixelsFormat::FreenectDepthmm:
+	case SoyPixelsFormat::Depth16mm:
 		return K4A_IMAGE_FORMAT_DEPTH16;
 
 	case SoyPixelsFormat::RGBA:
 	case SoyPixelsFormat::BGRA:
+	case SoyPixelsFormat::BGRA_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
-	case SoyPixelsFormat::Nv12:	
+	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:
+	case SoyPixelsFormat::Nv12:
 		return K4A_IMAGE_FORMAT_COLOR_NV12;
 
 	case SoyPixelsFormat::Yuv_844_Ntsc:
+	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_YUY2;
 
 		//	return YUV for luma?
@@ -424,6 +436,9 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	};
 
 	//	todo: colour & depth formats, including RGBA where a is depth
+	PushColourFormat(K4A_COLOR_RESOLUTION_2160P, SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_2160P, SoyPixelsFormat::Yuv_844_Ntsc_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_2160P, SoyPixelsFormat::BGRA_Depth16);
 
 	//	this is in prefered order
 	PushDepthFormat(K4A_DEPTH_MODE_NFOV_UNBINNED);
@@ -431,7 +446,8 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	PushDepthFormat(K4A_DEPTH_MODE_WFOV_UNBINNED);
 	PushDepthFormat(K4A_DEPTH_MODE_WFOV_2X2BINNED);
 
-	k4a_image_format_t ColourPixelFormats[] = { K4A_IMAGE_FORMAT_COLOR_YUY2, K4A_IMAGE_FORMAT_COLOR_NV12, K4A_IMAGE_FORMAT_COLOR_BGRA32 };
+	//k4a_image_format_t ColourPixelFormats[] = { K4A_IMAGE_FORMAT_COLOR_NV12, K4A_IMAGE_FORMAT_COLOR_YUY2, K4A_IMAGE_FORMAT_COLOR_BGRA32 };
+	k4a_image_format_t ColourPixelFormats[] = { K4A_IMAGE_FORMAT_COLOR_NV12, K4A_IMAGE_FORMAT_COLOR_BGRA32 };
 	for (auto ImageFormat : ColourPixelFormats)
 	{
 		auto PixelFormat = GetFormat(ImageFormat);
@@ -947,10 +963,15 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 		}
 		else
 		{
-			auto DepthPixels = GetPixels(DepthImage);
 			auto ColourPixels = GetPixels(ColourImage);
-			//	merge!
-			throw Soy::AssertException("Todo; merge colour + depth image");
+			auto DepthPixels = GetPixels(DepthImage);
+			auto MergedFormat = SoyPixelsFormat::GetMergedFormat(ColourPixels.GetFormat(), DepthPixels.GetFormat());
+			SoyPixels MergedPixels(SoyPixelsMeta(ColourPixels.GetWidth(), ColourPixels.GetHeight(), MergedFormat));
+			BufferArray<std::shared_ptr<SoyPixelsImpl>,4> MergedPlanes;
+			MergedPixels.SplitPlanes(GetArrayBridge(MergedPlanes));
+			MergedPlanes[0]->Copy(ColourPixels);
+			MergedPlanes[1]->Copy(DepthPixels);
+			OnFrame(MergedPixels, CaptureTime);
 		}
 		Cleanup();
 	}

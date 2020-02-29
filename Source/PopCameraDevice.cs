@@ -106,11 +106,11 @@ public static class PopCameraDevice
 		BGR,
 		YYuv_8888_Full,
 		YYuv_8888_Ntsc,
-		FreenectDepthmm,
+		Depth16mm,
 		Chroma_U,
 		Chroma_V,
 		ChromaUV_88,
-		ChromaVU_88,
+		ChromaVU_88
 	}
 
 
@@ -170,7 +170,7 @@ public static class PopCameraDevice
 		static TextureFormat GetTextureFormat(int ComponentCount,SoyPixelsFormat PixelFormat)
 		{
 			//	special/currently unhandled case, c++ code gives out 16bit, 1 component data
-			if (PixelFormat == SoyPixelsFormat.FreenectDepthmm)
+			if (PixelFormat == SoyPixelsFormat.Depth16mm)
 				return TextureFormat.R16;
 
 			switch (ComponentCount)
@@ -243,7 +243,12 @@ public static class PopCameraDevice
 				var PlaneMeta = Meta.Planes[p];
 				PixelFormats[p] = (SoyPixelsFormat)Enum.Parse(typeof(SoyPixelsFormat), PlaneMeta.Format);
 				//	alloc textures so we have data to write to
+				var OldTexture = Planes[p];
 				Planes[p] = AllocTexture(Planes[p], PlaneMeta.Width, PlaneMeta.Height, PlaneMeta.Channels, PixelFormats[p] );
+
+				//	clear cache
+				if (Planes[p] != OldTexture)
+					PlaneCaches[p] = null;
 
 				//	setup plane cache that matches texture buffer size (unity is very picky, it even rejects the correct size sometimes :)
 				if ( PlaneCaches[p] != null )
