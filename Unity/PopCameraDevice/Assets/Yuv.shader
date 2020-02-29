@@ -75,7 +75,7 @@
 #define BGR				5
 #define YYuv_8888_Full	6
 #define YYuv_8888_Ntsc	7
-#define FreenectDepthmm		8
+#define Depth16mm		8
 #define Chroma_U		9
 #define Chroma_V		10
 #define ChromaUV_88		11
@@ -184,33 +184,47 @@
 				ChromaUV = float2(ChromaU, ChromaV);
 			}
 
+			float3 GetDepthColour(float Depthf)
+			{
+				float Depth = Luma4.x * 65535.0;
+				//	detect zero and render black
+				if (Depth == 0)
+					return NormalToRedGreenBlue(-1);
+				float DepthNormal = Depth / DepthMaxmm;
+				return NormalToRedGreenBlue(DepthNormal);
+			}
+
+			float4 MergeColourAndDepth(float3 Rgb, float2 DepthAndValid)
+			{
+				float3 DepthRgb = GetDepthColour(Depthf);
+				Rgb = lerp(Rgb, DepthRgb, DepthAndValid.y * 0.5);
+				return float4(Rgb, 1);
+			}
+
 			fixed4 frag (v2f i) : SV_Target
 			{
 				float4 Luma4 = tex2D(LumaTexture, i.uv);
 
+				float2 DepthAndValid = float2(0, 0);
+				if (ChromaUFormat == Depth16mm)
+				{
+					float Depthf = tex2D(ChromaUTexture, i.uv);
+					DepthAndValid = float2(Depthf, 1);
+				}
+
 				//	look out for when we have luma+chroma+chroma?
 				if (LumaFormat == Greyscale)
-					return float4(Luma4.xxx,1);
+					return MergeColourAndDepth(Luma4.xxx, DepthAndValid);
 				if (LumaFormat == RGB)
-					return Luma4;
+					return MergeColourAndDepth(Luma4, DepthAndValid);
 				if (LumaFormat == RGBA)
-					return Luma4;
-				if (LumaFormat == BGRA)
-					return float4(Luma4.yxw, 1);	//	ARGB data, but is BGRA. z is alpha it seems
-				if (LumaFormat == BGR)
-					return Luma4.zyxw;
+					return MergeColourAndDepth(Luma4, DepthAndValid);
+				if (LumaFormat == BGRA  || LumaFormat == BGR)
+					return MergeColourAndDepth(Luma4.yxw, DepthAndValid);//	ARGB data, but is BGRA. z is alpha it seems
 
 				//	gr: this is expected to be 16bit texture format, so 1 component
-				if (LumaFormat == FreenectDepthmm)
-				{
-					float Depth = Luma4.x * 65535.0;
-					//	detect zero and render black
-					if ( Depth == 0 )
-						return NormalToRedGreenBlue(-1);
-					
-					float DepthNormal = Depth / DepthMaxmm;
-					return NormalToRedGreenBlue(DepthNormal);
-				}
+				if (LumaFormat == Depth16mm)
+					return GetDepthColour(Luma4.x);
 
 				// sample the texture
 				float Luma = Luma4.x;
