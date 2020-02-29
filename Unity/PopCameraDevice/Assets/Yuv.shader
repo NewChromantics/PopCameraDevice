@@ -186,7 +186,7 @@
 
 			float3 GetDepthColour(float Depthf)
 			{
-				float Depth = Luma4.x * 65535.0;
+				float Depth = Depthf * 65535.0;
 				//	detect zero and render black
 				if (Depth == 0)
 					return NormalToRedGreenBlue(-1);
@@ -196,7 +196,7 @@
 
 			float4 MergeColourAndDepth(float3 Rgb, float2 DepthAndValid)
 			{
-				float3 DepthRgb = GetDepthColour(Depthf);
+				float3 DepthRgb = GetDepthColour(DepthAndValid.x);
 				Rgb = lerp(Rgb, DepthRgb, DepthAndValid.y * 0.5);
 				return float4(Rgb, 1);
 			}
@@ -224,7 +224,7 @@
 
 				//	gr: this is expected to be 16bit texture format, so 1 component
 				if (LumaFormat == Depth16mm)
-					return GetDepthColour(Luma4.x);
+					return float4(GetDepthColour(Luma4.x), 1);
 
 				// sample the texture
 				float Luma = Luma4.x;
