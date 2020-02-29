@@ -489,8 +489,27 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::
 	SoyPixelsMeta Format = GetPixelMeta(K4A_DEPTH_MODE_NFOV_UNBINNED, FrameRate);
 	PopCameraDevice::DecodeFormatString(FormatString, Format, FrameRate);
 
-	auto DepthMode = GetDepthMode(Format);
-	auto ColourMode = GetColourMode(Format);
+	auto DepthMode = K4A_DEPTH_MODE_OFF;
+	auto ColourMode = K4A_COLOR_RESOLUTION_OFF;
+	
+	try
+	{
+		DepthMode = GetDepthMode(Format);
+	}
+	catch (std::exception& e)
+	{
+		std::Debug << e.what() << std::endl;
+	}
+
+	try
+	{
+		ColourMode = GetColourMode(Format);
+	}
+	catch (std::exception& e)
+	{
+		std::Debug << e.what() << std::endl;
+	}
+
 	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode) );
 }
 
