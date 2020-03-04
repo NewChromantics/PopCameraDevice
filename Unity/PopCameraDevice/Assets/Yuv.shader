@@ -184,20 +184,26 @@
 				ChromaUV = float2(ChromaU, ChromaV);
 			}
 
-			float3 GetDepthColour(float Depthf)
+			float4 GetDepthColour(float Depthf)
 			{
 				float Depth = Depthf * 65535.0;
-				//	detect zero and render black
-				if (Depth == 0)
-					return NormalToRedGreenBlue(-1);
+				//	detect zero and render black/alpha=0
+				//	>9999 is because the empty part of the texture seems to be solid white...
+				if (Depth == 0 || Depth >= 32000)
+				{
+					float3 Rgb = NormalToRedGreenBlue(-1);
+					return float4(Rgb, 0);
+				}
 				float DepthNormal = Depth / DepthMaxmm;
-				return NormalToRedGreenBlue(DepthNormal);
+				float3 Rgb = NormalToRedGreenBlue(DepthNormal);
+				return float4(Rgb, 1);
 			}
 
 			float4 MergeColourAndDepth(float3 Rgb, float2 DepthAndValid)
 			{
-				float3 DepthRgb = GetDepthColour(DepthAndValid.x);
-				Rgb = lerp(Rgb, DepthRgb, DepthAndValid.y * 0.5);
+				float4 DepthRgb = GetDepthColour(DepthAndValid.x);
+				float Mix = DepthAndValid.y*DepthRgb.w;
+				Rgb = lerp(Rgb, DepthRgb, Mix);
 				return float4(Rgb, 1);
 			}
 
@@ -224,7 +230,7 @@
 
 				//	gr: this is expected to be 16bit texture format, so 1 component
 				if (LumaFormat == Depth16mm)
-					return float4(GetDepthColour(Luma4.x), 1);
+					return float4(GetDepthColour(Luma4.x).xyz, 1);
 
 				// sample the texture
 				float Luma = Luma4.x;
