@@ -3,7 +3,7 @@
 	Properties
 	{
 		LumaTexture ("LumaTexture", 2D) = "white" {}
-		[Enum(Invalid,0,Greyscale,1,RGBA,3,YYuv_8888_Full,6,YYuv_8888_Ntsc,7)]LumaFormat("LumaFormat",int) = 0
+		[Enum(Invalid,0,Greyscale,1,RGBA,3,YYuv_8888_Full,6,YYuv_8888_Ntsc,7,Luma_Ntsc,13)]LumaFormat("LumaFormat",int) = 0
 		ChromaUTexture ("ChromaUTexture", 2D) = "black" {}
 		[Enum(Debug,999,Invalid,0,ChromaUV_88,11,ChromaVU_88,12,Chroma_U,9,Chroma_V,10)]ChromaUFormat("ChromaUFormat",int) = 0
 		ChromaVTexture ("ChromaVTexture", 2D) = "black" {}
@@ -80,6 +80,7 @@
 #define Chroma_V		10
 #define ChromaUV_88		11
 #define ChromaVU_88		12
+#define Luma_Ntsc		13
 
 			float Flip;
 			float EnableChroma;
@@ -216,10 +217,15 @@
 				{
 					float Depthf = tex2D(ChromaUTexture, i.uv);
 					DepthAndValid = float2(Depthf, 1);
+				}//gr: else, because sometimes c# leaves old values instead of setting to invalid!
+				else if (ChromaVFormat == Depth16mm)
+				{
+					float Depthf = tex2D(ChromaVTexture, i.uv);
+					DepthAndValid = float2(Depthf, 1);
 				}
 
 				//	look out for when we have luma+chroma+chroma?
-				if (LumaFormat == Greyscale)
+				if (LumaFormat == Greyscale || LumaFormat == Luma_Ntsc)
 					return MergeColourAndDepth(Luma4.xxx, DepthAndValid);
 				if (LumaFormat == RGB)
 					return MergeColourAndDepth(Luma4, DepthAndValid);
