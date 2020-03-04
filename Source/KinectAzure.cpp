@@ -358,6 +358,7 @@ public:
 		mFrameRate		( FrameRate )
 	{
 	}
+	~TPixelReader();
 
 private:
 	virtual void				OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
@@ -716,9 +717,26 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 	Start();
 }
 
+
+KinectAzure::TPixelReader::~TPixelReader()
+{
+	//	we need to stop the thread here (before FrameReader destructor)
+	//	because as this class is destroyed, so is the virtual OnFrame func
+	//	which when called by the thread abort()s because we've destructed this class
+	try
+	{
+		this->Stop(true);
+	}
+	catch (std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << e.what() << std::endl;
+	}
+}
+
+
 KinectAzure::TFrameReader::~TFrameReader()
 {
-	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+	//std::Debug << __PRETTY_FUNCTION__ << std::endl;
 	try
 	{
 		this->Stop(true);
