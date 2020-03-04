@@ -21,7 +21,7 @@ public:
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature, bool Enable) override;
 
 private:
-	void			OnFrame(const SoyPixelsImpl& Pixels,SoyTime Time);
+	void			OnFrame(std::shared_ptr<TPixelBuffer>& Pixels, SoyPixelsMeta PixelsMeta, SoyTime Time);
 
 private:
 	std::shared_ptr<TPixelReader>	mReader;

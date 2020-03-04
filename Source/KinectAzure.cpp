@@ -350,7 +350,7 @@ k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
 class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(const SoyPixelsImpl&, SoyTime)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta, SoyTime)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
 		TFrameReader	(DeviceIndex, KeepAlive),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
@@ -362,12 +362,11 @@ public:
 
 private:
 	virtual void				OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
-	void						OnFrame(const SoyPixelsImpl& Frame, SoyTime CaptureTime);
 	virtual k4a_depth_mode_t	GetDepthMode() override { return mDepthMode; }
 	virtual k4a_colour_mode_t	GetColourMode() override { return mColourMode; }
 	virtual k4a_fps_t			GetFrameRate() override { return mFrameRate; }
 
-	std::function<void(const SoyPixelsImpl&, SoyTime)>	mOnNewFrame;
+	std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta,SoyTime)>	mOnNewFrame;
 	k4a_depth_mode_t		mDepthMode = K4A_DEPTH_MODE_OFF;
 	k4a_colour_mode_t		mColourMode;
 	k4a_fps_t				mFrameRate;
@@ -613,8 +612,8 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::
 	//	todo: remove keep alive when PopEngine/CAPI is fixed
 	auto KeepAlive = true;	//	keep reopening the device in the reader
 
-	std::function<void(const SoyPixelsImpl&,SoyTime)> OnNewFrame = std::bind(&TCameraDevice::OnFrame, this, std::placeholders::_1, std::placeholders::_2);
-	
+	auto OnNewFrame = std::bind(&TCameraDevice::OnFrame, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+
 	//	work out which reader we need to create
 	//	gr: what default should we use, default to both?
 	//	gr: this default should be first from EnumDeviceNameAndFormats()!
@@ -654,13 +653,9 @@ KinectAzure::TCameraDevice::~TCameraDevice()
 {
 }
 
-void KinectAzure::TCameraDevice::OnFrame(const SoyPixelsImpl& Pixels,SoyTime Time)
+void KinectAzure::TCameraDevice::OnFrame(std::shared_ptr<TPixelBuffer>& PixelBuffer,SoyPixelsMeta PixelMeta,SoyTime Time)
 {
-	auto PixelMeta = Pixels.GetMeta();
 	std::string Meta;
-	float3x3 Transform;
-	std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels, Transform));
-
 	PushFrame(PixelBuffer, PixelMeta, Time, Meta);
 }
 
@@ -749,7 +744,6 @@ KinectAzure::TFrameReader::~TFrameReader()
 
 void KinectAzure::TFrameReader::Open()
 {
-	//	already ready
 	if (mDevice)
 		return;
 	std::Debug << __PRETTY_FUNCTION__ << std::endl;
@@ -788,9 +782,7 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 		if (mKeepAlive)
 		{
 			//	close device and let next iteration reopen
-			std::Debug << "resetting mdevice" << std::endl; 
 			mDevice.reset();
-			std::Debug << "resetting mdevice done" << std::endl;
 		}
 		else
 		{
@@ -823,6 +815,8 @@ bool KinectAzure::TFrameReader::HasImuMoved(k4a_imu_sample_t Imu)
 
 void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 {
+	//	keep copy for lifetime
+	//auto pDevice = mDevice;
 	if (!mDevice)
 		throw Soy::AssertException("TFrameReader::Iteration null device");
 
@@ -913,7 +907,6 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		OnFrame(Capture, ImuSample, FrameCaptureTime);
 
 		//	cleanup
-		//k4abt_frame_release(Frame);
 		FreeCapture();
 	}
 	catch (std::exception& e)
@@ -928,11 +921,6 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 	}
 }
 
-
-void KinectAzure::TPixelReader::OnFrame(const SoyPixelsImpl& Frame,SoyTime CaptureTime)
-{
-	mOnNewFrame(Frame, CaptureTime);
-}
 
 
 //	to minimise copies, we return remote pixels
@@ -961,6 +949,21 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 		if (ColourImage)
 			k4a_image_release(ColourImage);
 	};
+
+	auto OnOneImage = [&](k4a_image_t Image)
+	{
+		auto Pixels = GetPixels(Image);
+		float3x3 Transform;
+		auto Meta = Pixels.GetMeta();
+		std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels,Transform));
+		this->mOnNewFrame(PixelBuffer, Meta, CaptureTime);
+	};
+
+	//	todo: if colour & depth, realign!
+	if (ColourImage && !DepthImage)
+	{
+		std::Debug << "Todo: realign depth with colour!" << std::endl;
+	}
 	
 	try
 	{
@@ -971,25 +974,33 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 		}
 		else if (DepthImage && !ColourImage)
 		{
-			auto DepthPixels = GetPixels(DepthImage);
-			OnFrame(DepthPixels, CaptureTime);
+			OnOneImage(DepthImage);
 		}
 		else if (ColourImage && !DepthImage)
 		{
-			auto ColourPixels = GetPixels(ColourImage);
-			OnFrame(ColourPixels, CaptureTime);
+			OnOneImage(ColourImage);
 		}
 		else
 		{
 			auto ColourPixels = GetPixels(ColourImage);
 			auto DepthPixels = GetPixels(DepthImage);
+			
+			//	still need a format, but providing two buffers is simpler
 			auto MergedFormat = SoyPixelsFormat::GetMergedFormat(ColourPixels.GetFormat(), DepthPixels.GetFormat());
+			SoyPixelsMeta MergedMeta(ColourPixels.GetWidth(), DepthPixels.GetHeight(), MergedFormat);
+
+			std::shared_ptr<SoyPixelsImpl> ColourPixelsCopy(new SoyPixels(ColourPixels));
+			std::shared_ptr<SoyPixelsImpl> DepthPixelsCopy(new SoyPixels(DepthPixels));
+			std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbSharedPixelBuffer(ColourPixelsCopy, DepthPixelsCopy));
+			this->mOnNewFrame(PixelBuffer, MergedMeta, CaptureTime);
+			/*
 			SoyPixels MergedPixels(SoyPixelsMeta(ColourPixels.GetWidth(), ColourPixels.GetHeight(), MergedFormat));
 			BufferArray<std::shared_ptr<SoyPixelsImpl>,4> MergedPlanes;
 			MergedPixels.SplitPlanes(GetArrayBridge(MergedPlanes));
 			MergedPlanes[0]->Copy(ColourPixels);
 			MergedPlanes[1]->Copy(DepthPixels);
 			OnFrame(MergedPixels, CaptureTime);
+			*/
 		}
 		Cleanup();
 	}
