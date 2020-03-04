@@ -110,7 +110,8 @@ public static class PopCameraDevice
 		Chroma_U,
 		Chroma_V,
 		ChromaUV_88,
-		ChromaVU_88
+		ChromaVU_88,
+		Luma_Ntsc
 	}
 
 
