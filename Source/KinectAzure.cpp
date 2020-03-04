@@ -52,14 +52,17 @@ public:
 	TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate);
 	~TDevice();
 
-	std::string			GetSerial();
+	std::string				GetSerial();
+	k4a_transformation_t	GetDepthToImageTransform();
 
 private:
-	void				Shutdown();
+	void					Shutdown();
 
 public:
-	k4a_device_t		mDevice = nullptr;
-	k4a_calibration_t	mCalibration;
+	k4a_device_t			mDevice = nullptr;
+	k4a_calibration_t		mCalibration;
+	k4a_transformation_t	mTransformation = nullptr;
+
 };
 
 
@@ -80,7 +83,9 @@ protected:
 	virtual k4a_depth_mode_t	GetDepthMode() = 0;
 	virtual k4a_colour_mode_t	GetColourMode() = 0;
 	virtual k4a_fps_t			GetFrameRate() = 0;
-
+	k4a_calibration_t			GetCalibration() { return mDevice->mCalibration; }
+	k4a_transformation_t		GetDepthToImageTransform() { return mDevice->GetDepthToImageTransform(); }
+	
 private:
 	void				Iteration(int32_t TimeoutMs);
 	virtual bool		ThreadIteration() override;
@@ -600,6 +605,16 @@ std::string KinectAzure::TDevice::GetSerial()
 	return SerialPrefix + Serial;
 }
 
+
+k4a_transformation_t KinectAzure::TDevice::GetDepthToImageTransform()
+{
+	if (mTransformation)
+		return mTransformation;
+
+	mTransformation = k4a_transformation_create(&mCalibration);
+	return mTransformation;
+}
+
 KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::string& FormatString)
 {
 	if (!Soy::StringBeginsWith(Serial, KinectAzure::SerialPrefix, true))
@@ -713,21 +728,6 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 }
 
 
-KinectAzure::TPixelReader::~TPixelReader()
-{
-	//	we need to stop the thread here (before FrameReader destructor)
-	//	because as this class is destroyed, so is the virtual OnFrame func
-	//	which when called by the thread abort()s because we've destructed this class
-	try
-	{
-		this->Stop(true);
-	}
-	catch (std::exception& e)
-	{
-		std::Debug << __PRETTY_FUNCTION__ << e.what() << std::endl;
-	}
-}
-
 
 KinectAzure::TFrameReader::~TFrameReader()
 {
@@ -811,6 +811,7 @@ bool KinectAzure::TFrameReader::HasImuMoved(k4a_imu_sample_t Imu)
 	mLastAccell.z = Imu.acc_sample.xyz.z;
 	return true;
 }
+
 
 
 void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
@@ -937,18 +938,27 @@ SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
 	return ImagePixels;
 }
 
+
+KinectAzure::TPixelReader::~TPixelReader()
+{
+	//	we need to stop the thread here (before FrameReader destructor)
+	//	because as this class is destroyed, so is the virtual OnFrame func
+	//	which when called by the thread abort()s because we've destructed this class
+	try
+	{
+		this->Stop(true);
+	}
+	catch (std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << e.what() << std::endl;
+	}
+}
+
+
 void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
 {
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
 	auto ColourImage = k4a_capture_get_color_image(Frame);
-
-	auto Cleanup = [&]()
-	{
-		if (DepthImage )
-			k4a_image_release(DepthImage);
-		if (ColourImage)
-			k4a_image_release(ColourImage);
-	};
 
 	auto OnOneImage = [&](k4a_image_t Image)
 	{
@@ -959,11 +969,41 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 		this->mOnNewFrame(PixelBuffer, Meta, CaptureTime);
 	};
 
-	//	todo: if colour & depth, realign!
-	if (ColourImage && !DepthImage)
+	//	if colour & depth, realign so depth matches colour
+	if (ColourImage && DepthImage)
 	{
-		std::Debug << "Todo: realign depth with colour!" << std::endl;
+		auto ColourPixels = GetPixels(ColourImage);
+		auto Transform = this->GetDepthToImageTransform();
+		k4a_image_t TransformedDepthImage = nullptr;
+		auto Width = ColourPixels.GetWidth();
+		auto Height = ColourPixels.GetHeight();
+		//auto Stride = ColourPixels.GetMeta().GetRowDataSize();
+		auto Stride = SoyPixelsMeta(Width, Height, SoyPixelsFormat::Depth16mm).GetRowDataSize();
+		auto Result = k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, Width, Height, Stride, &TransformedDepthImage);
+		IsOkay(Result, "k4a_image_create(transformed depth");
+
+		Result = k4a_transformation_depth_image_to_color_camera(Transform, DepthImage, TransformedDepthImage);
+		IsOkay(Result, "k4a_transformation_depth_image_to_color_camera");
+
+		//	swap depth for new depth
+		k4a_image_release(DepthImage);
+		DepthImage = TransformedDepthImage;
 	}
+
+	auto Cleanup = [&]()
+	{
+		if (DepthImage)
+		{
+			k4a_image_release(DepthImage);
+			DepthImage = nullptr;
+		}
+
+		if (ColourImage)
+		{
+			k4a_image_release(ColourImage);
+			ColourImage = nullptr;
+		}
+	};
 	
 	try
 	{
