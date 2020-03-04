@@ -987,7 +987,7 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 			
 			//	still need a format, but providing two buffers is simpler
 			auto MergedFormat = SoyPixelsFormat::GetMergedFormat(ColourPixels.GetFormat(), DepthPixels.GetFormat());
-			SoyPixelsMeta MergedMeta(ColourPixels.GetWidth(), DepthPixels.GetHeight(), MergedFormat);
+			SoyPixelsMeta MergedMeta(ColourPixels.GetWidth(), ColourPixels.GetHeight(), MergedFormat);
 
 			std::shared_ptr<SoyPixelsImpl> ColourPixelsCopy(new SoyPixels(ColourPixels));
 			std::shared_ptr<SoyPixelsImpl> DepthPixelsCopy(new SoyPixels(DepthPixels));
