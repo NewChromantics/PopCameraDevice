@@ -440,11 +440,15 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 		Formats.PushBack(FormatString);
 	};
 
-	//	todo: work out all valid combinations 844 seems NOT to be availible
-	PushColourFormat(K4A_COLOR_RESOLUTION_1080P, SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16);
-	//PushColourFormat(K4A_COLOR_RESOLUTION_2160P, SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16);
-	//PushColourFormat(K4A_COLOR_RESOLUTION_2160P, SoyPixelsFormat::Yuv_844_Ntsc_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::BGRA_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_1080P, SoyPixelsFormat::BGRA_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_1440P, SoyPixelsFormat::BGRA_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_1536P, SoyPixelsFormat::BGRA_Depth16);
+	//	DO NOT WORK - all 844's dont work
+	//Yuv_8_88_Ntsc_Depth16 ^ 1920x1080
+	//Yuv_8_88_Ntsc_Depth16 ^ 2560x1440
+	//Yuv_8_88_Ntsc_Depth16 ^ 2048x1536
 
 	//	this is in prefered order
 	PushDepthFormat(K4A_DEPTH_MODE_NFOV_UNBINNED);
