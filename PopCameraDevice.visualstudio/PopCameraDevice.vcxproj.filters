@@ -19,6 +19,9 @@
     <Filter Include="Libs\KinectAzure">
       <UniqueIdentifier>{50bc8efe-546f-4b5c-8cc9-0e632d3e50db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Unity">
+      <UniqueIdentifier>{1ba6344e-446c-4c80-8640-edf3db7faa5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
@@ -292,6 +295,9 @@
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in">
       <Filter>Libs\LibFreenect</Filter>
     </None>
+    <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
+      <Filter>Unity</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
@@ -314,9 +320,6 @@
       <Filter>Libs\LibFreenect2</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\Source\PopCameraDevice.h">
-      <Filter>Source</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\Source\PopCameraDevice.cs">
       <Filter>Source</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\Source\Libs\KinectAzure\depthengine_2_0.dll">

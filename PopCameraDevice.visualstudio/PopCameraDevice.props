@@ -29,7 +29,8 @@
       <FullProgramDatabaseFile>true</FullProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y $(OutDir). $(ProjectDir)..\Unity\$(ProjectName)\Assets\$(ProjectName)
+      <Command>REM Copy the Build dir contents to unity
+xcopy /y $(OutDir). $(ProjectDir)..\Unity\$(ProjectName)\Assets\$(ProjectName)
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

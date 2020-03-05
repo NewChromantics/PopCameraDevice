@@ -18,18 +18,12 @@ Unity/**/holobuild/
 **/*.unitypackage
 PopEncodeJpeg.uwp/Release/
 
-PopCameraDevice\.visualstudio/Build/
-
-PopCameraDevice\.visualstudio/x64/
-
-Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice\.dll
-
-PopCameraDevice\.visualstudio/Master/
-
-*.pdb
-
-*.user
-
+# Build files
 Build/
-
 Unity/PopCameraDevice/Assets/PopCameraDevice/
+
+# Intermediates
+PopCameraDevice\.visualstudio/x64/
+PopCameraDevice\.visualstudio/Master/
+*.pdb
+*.user
