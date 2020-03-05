@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;		// required for DllImport
 using System;								// requred for IntPtr
 using System.Text;
 using System.Collections.Generic;
-
+using PopX;		//	for PopX.PixelFormat, replace this and provide your own pixelformat if you want to remove the dependency
 
 
 /// <summary>
@@ -65,16 +65,19 @@ public static class PopCameraDevice
 	[System.Serializable]
 	public struct PlaneMeta
 	{
-		public string	Format;
-		public int		Width;
-		public int		Height;
-		public int		DataSize;
-		public int		Channels;
+		//	gr: we don't NEED to have this external dependency of a type, https://github.com/NewChromantics/PopUnityYuvShader
+		public PixelFormat	PixelFormat { get { return (PixelFormat)Enum.Parse(typeof(PixelFormat), Format); } }
+		public string		Format;
+		public int			Width;
+		public int			Height;
+		public int			DataSize;
+		public int			Channels;
 	};
 
 	[System.Serializable]
 	public struct FrameMeta
 	{
+		public int				PlaneCount { get { return (Planes != null) ? Planes.Count : 0; } }
 		public List<PlaneMeta>	Planes;
 	};
 
@@ -90,30 +93,7 @@ public static class PopCameraDevice
 	{
 		public List<DeviceMeta> Devices;
 	};
-
-	//	format is now a string, but should map to these names
-	//	value is now purely unity side
-	//	if the plugin returns a string not listed here, it means we need to 
-	//	add it to this list, and add an entry to any YUV/colour conversion shader
-	//	see https://github.com/SoylentGraham/SoyLib/blob/master/src/SoyPixels.h#L16
-	public enum SoyPixelsFormat
-	{
-		Invalid=0,
-		Greyscale,		//	this is also Luma_Full, other luma's may be ranged
-		RGB,
-		RGBA,
-		BGRA,
-		BGR,
-		YYuv_8888_Full,
-		YYuv_8888_Ntsc,
-		Depth16mm,
-		Chroma_U,
-		Chroma_V,
-		ChromaUV_88,
-		ChromaVU_88,
-		Luma_Ntsc
-	}
-
+	
 
 	static public string GetString(byte[] Ascii)
 	{
@@ -168,10 +148,10 @@ public static class PopCameraDevice
 			Instance = null;
 		}
 
-		static TextureFormat GetTextureFormat(int ComponentCount,SoyPixelsFormat PixelFormat)
+		static TextureFormat GetTextureFormat(int ComponentCount,PopX.PixelFormat PixelFormat)
 		{
 			//	special/currently unhandled case, c++ code gives out 16bit, 1 component data
-			if (PixelFormat == SoyPixelsFormat.Depth16mm)
+			if (PixelFormat == PixelFormat.Depth16mm)
 				return TextureFormat.R16;
 
 			switch (ComponentCount)
@@ -185,7 +165,7 @@ public static class PopCameraDevice
 			}
 		}
 
-		Texture2D AllocTexture(Texture2D Plane,int Width, int Height,int ComponentCount,SoyPixelsFormat PixelFormat)
+		Texture2D AllocTexture(Texture2D Plane,int Width, int Height,int ComponentCount, PixelFormat PixelFormat)
 		{
 			var Format = GetTextureFormat( ComponentCount, PixelFormat);
 			if ( Plane != null )
@@ -217,7 +197,7 @@ public static class PopCameraDevice
 		}
 
 		//	returns value if we changed the texture[s]
-		public int? GetNextFrame(ref List<Texture2D> Planes,ref List<SoyPixelsFormat> PixelFormats)
+		public int? GetNextFrame(ref List<Texture2D> Planes,ref List<PixelFormat> PixelFormats)
 		{
 			var JsonBuffer = new Byte[1000];
 			var NextFrameTime = PopCameraDevice_PeekNextFrame( Instance.Value, JsonBuffer, JsonBuffer.Length );
@@ -242,7 +222,7 @@ public static class PopCameraDevice
 			for (var p = 0; p < PlaneCount; p++)
 			{
 				var PlaneMeta = Meta.Planes[p];
-				PixelFormats[p] = (SoyPixelsFormat)Enum.Parse(typeof(SoyPixelsFormat), PlaneMeta.Format);
+				PixelFormats[p] = PlaneMeta.PixelFormat;
 				//	alloc textures so we have data to write to
 				var OldTexture = Planes[p];
 				Planes[p] = AllocTexture(Planes[p], PlaneMeta.Width, PlaneMeta.Height, PlaneMeta.Channels, PixelFormats[p] );

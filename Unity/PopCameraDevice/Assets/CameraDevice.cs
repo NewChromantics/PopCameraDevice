@@ -15,7 +15,7 @@ public class CameraDevice : MonoBehaviour {
 	[Header("Turn off to debug by changing the material setting manually")]
 	public bool SetMaterialFormat = true;
 	List<Texture2D> PlaneTextures;
-	List<PopCameraDevice.SoyPixelsFormat> PlaneFormats;
+	List<PopX.PixelFormat> PlaneFormats;
 	PopCameraDevice.Device Device;
 	[Header("Request specific texture format like RGBA^640x480@60")]
 	public string Format;
