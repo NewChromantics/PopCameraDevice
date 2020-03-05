@@ -72,8 +72,18 @@ void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixe
 		mLastFrameTime = FrameTime;
 	}
 
-	if ( mOnNewFrame )
-		mOnNewFrame();
+	for (auto i = 0; i < mOnNewFrameCallbacks.GetSize(); i++)
+	{
+		try
+		{
+			auto& Callback = mOnNewFrameCallbacks[i];
+			Callback();
+		}
+		catch (std::exception& e)
+		{
+			std::Debug << "OnNewFrame callback exception; " << e.what() << std::endl;
+		}
+	}
 }
 
 

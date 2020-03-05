@@ -58,7 +58,7 @@ protected:
 	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,const std::string& FrameMeta);
 
 public:
-	std::function<void()>			mOnNewFrame;
+	Array<std::function<void()>>	mOnNewFrameCallbacks;
 
 private:
 	//	currently storing just last frame

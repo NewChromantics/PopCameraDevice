@@ -144,8 +144,8 @@ namespace PopCameraDevice
 	TDevice&		GetCameraDevice(uint32_t Instance);
 	uint32_t		CreateInstance(std::shared_ptr<TDevice> Device);
 	void			FreeInstance(uint32_t Instance);
-	bool			PopFrame(TDevice& Device, ArrayBridge<uint8_t>&& Plane0, ArrayBridge<uint8_t>&& Plane1, ArrayBridge<uint8_t>&& Plane2,std::string& Meta);
 	int32_t			GetNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize, ArrayBridge<ArrayBridge<uint8_t>*>&& Planes, bool DeleteFrame);
+	void			AddOnNewFrameCallback(int32_t Instance,std::function<void()> Callback);
 
 	uint32_t		CreateCameraDevice(const std::string& Name,const std::string& Format);
 
@@ -596,6 +596,11 @@ void CopyPlanes(TPixelBuffer& PixelBuffer,ArrayBridge<ArrayBridge<uint8_t>*>& Pl
 }
 
 
+void PopCameraDevice::AddOnNewFrameCallback(int32_t Instance, std::function<void()> Callback)
+{
+	auto& Device = PopCameraDevice::GetCameraDevice(Instance);
+	Device.mOnNewFrameCallbacks.PushBack(Callback);
+}
 
 
 int32_t PopCameraDevice::GetNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize, ArrayBridge<ArrayBridge<uint8_t>*>&& Planes,bool DeleteFrame)
@@ -649,6 +654,22 @@ __export int32_t PopCameraDevice_PeekNextFrame(int32_t Instance, char* JsonBuffe
 	return PopCameraDevice::GetNextFrame(Instance, JsonBuffer, JsonBufferSize, GetArrayBridge(NoBuffers), DeleteFrame);
 }
 
+__export void PopCameraDevice_AddOnNewFrameCallback(int32_t Instance, PopCameraDevice_OnNewFrame* Callback, void* Meta)
+{
+	auto Function = [&]()
+	{
+		if (!Callback)
+			throw Soy::AssertException("PopCameraDevice_AddOnNewFrameCallback callback is null");
+
+		auto Lambda = [Callback, Meta]()
+		{
+			Callback(Meta);
+		};
+		PopCameraDevice::AddOnNewFrameCallback(Instance, Lambda);
+		return 0;
+	};
+	SafeCall(Function, __func__, 0);
+}
 
 
 __export void PopCameraDevice_FreeCameraDevice(int32_t Instance)
