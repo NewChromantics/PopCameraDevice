@@ -39,6 +39,7 @@ namespace KinectAzure
 	k4a_colour_mode_t		GetColourMode(SoyPixelsMeta Format,size_t& FrameRate);
 	k4a_depth_mode_t		GetDepthMode(SoyPixelsMeta Format, size_t& FrameRate);
 	k4a_fps_t				GetFrameRate(size_t FrameRate);
+	k4a_color_resolution_t	GetLargestColourResolution(SoyPixelsFormat::Type Format);
 
 	constexpr auto	SerialPrefix = "KinectAzure_";
 }
@@ -231,6 +232,28 @@ k4a_fps_t KinectAzure::GetFrameRate(size_t FrameRate)
 	throw Soy::AssertException(Error);
 }
 
+k4a_color_resolution_t KinectAzure::GetLargestColourResolution(SoyPixelsFormat::Type Format)
+{
+	switch (Format)
+	{
+		//	this doesn't work at all
+	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:
+		return K4A_COLOR_RESOLUTION_OFF;
+
+	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:
+		return K4A_COLOR_RESOLUTION_720P;
+
+	case SoyPixelsFormat::BGRA_Depth16:
+		return K4A_COLOR_RESOLUTION_1536P;
+
+	case SoyPixelsFormat::Yuv_844_Ntsc:
+	case SoyPixelsFormat::Yuv_8_88_Ntsc:
+		return K4A_COLOR_RESOLUTION_3072P;
+	}
+	//	needs to throw?
+	return K4A_COLOR_RESOLUTION_OFF;
+}
+
 
 k4a_colour_mode_t KinectAzure::GetColourMode(SoyPixelsMeta Format, size_t& FrameRate)
 {
@@ -281,10 +304,15 @@ k4a_colour_mode_t KinectAzure::GetColourMode(SoyPixelsMeta Format, size_t& Frame
 	//	if no dimensions, but we have a pixelformat, then default the resolution
 	if (SameDim(Format, SoyPixelsMeta(0, 0, SoyPixelsFormat::Invalid)))
 	{
-		ColorMode.resolution = K4A_COLOR_RESOLUTION_1080P;
-		if (FrameRate == 0)
-			FrameRate = GetMaxFrameRate(ColorMode.resolution);
-		return ColorMode;
+		//	get biggest res for a format, need to make a better system for this
+		auto Resolution = GetLargestColourResolution(Format.GetFormat());
+		if (Resolution != K4A_COLOR_RESOLUTION_OFF)
+		{
+			ColorMode.resolution = Resolution;
+			if (FrameRate == 0)
+				FrameRate = GetMaxFrameRate(ColorMode.resolution);
+			return ColorMode;
+		}
 	}
 
 	//	todo: if pixel format is right, return best res
