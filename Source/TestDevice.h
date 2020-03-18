@@ -5,6 +5,7 @@
 
 class TestDevice : public PopCameraDevice::TDevice
 {
+public:
 	static inline const char* DeviceName = "Test";
 public:
 	TestDevice(const std::string& Format);
