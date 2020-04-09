@@ -49,3 +49,9 @@ __export void				PopCameraDevice_Cleanup();
 //	for internal building really
 __export void				PopCameraDevice_UnitTests();
 
+
+
+//	create an output device, a virtual camera device
+__export int32_t			PopOutputDevice_CreateDevice(const char* Name,const char* Format,char* ErrorBuffer, int32_t ErrorBufferLength);
+__export void				PopOutputDevice_FreeDevice(int32_t Instance);
+__export void				PopOutputDevice_PushFrame(int32_t Instance,uint8_t* PixelBuffer,int32_t PixelBufferSize,const char* MetaJson,char* ErrorBuffer, int32_t ErrorBufferLength);
