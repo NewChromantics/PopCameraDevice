@@ -46,7 +46,6 @@
 		BF012B04226A047F003AEB55 /* Avf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B02226A047F003AEB55 /* Avf.mm */; };
 		BF012B07226A09EC003AEB55 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B06226A09EC003AEB55 /* AVFoundation.framework */; };
 		BF012B0A226A0B05003AEB55 /* PopCameraDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AB22268DBF8003AEB55 /* PopCameraDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BF012B0F226A141E003AEB55 /* TCameraDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AAF2268DBF8003AEB55 /* TCameraDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF012B16226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */; };
 		BF012B17226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */; };
 		BF012B18226A1D7F003AEB55 /* AvfVideoCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */; };
@@ -185,6 +184,7 @@
 		BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
 		BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BF67C86524373BD700D7492E /* CoreMediaIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF67C86424373BD600D7492E /* CoreMediaIO.framework */; };
 		BF76106A226B6E5C00762F15 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF76106B226B6E5F00762F15 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B6D226A31F2003AEB55 /* CoreServices.framework */; };
 		BF76106C226B6E6200762F15 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B36226A26AF003AEB55 /* CoreVideo.framework */; };
@@ -369,10 +369,17 @@
 		BF15204C23855BD500A70EBF /* SoyArray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoyArray.cpp; sourceTree = "<group>"; };
 		BF15205023855D8200A70EBF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		BF15205223855F1F00A70EBF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		BF1826A424226836006FEB93 /* magic_enum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = magic_enum.hpp; path = Source/MagicEnum/include/magic_enum.hpp; sourceTree = "<group>"; };
 		BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TestAppInfo.plist; path = Source/TestAppInfo.plist; sourceTree = "<group>"; };
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
-		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Source/PopCameraDevice.cs; sourceTree = "<group>"; };
+		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice.cs; sourceTree = "<group>"; };
 		BF4A6A141EA16D7D00613A64 /* PopCameraDevice.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PopCameraDevice.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF67C8552437364600D7492E /* PopOutputDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PopOutputDevice.cpp; path = Source/PopOutputDevice.cpp; sourceTree = "<group>"; };
+		BF67C8582437367F00D7492E /* TOutputDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TOutputDevice.cpp; path = Source/TOutputDevice.cpp; sourceTree = "<group>"; };
+		BF67C8592437367F00D7492E /* TOutputDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOutputDevice.h; path = Source/TOutputDevice.h; sourceTree = "<group>"; };
+		BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CoreMediaOutputDevice.mm; path = Source/CoreMediaOutputDevice.mm; sourceTree = "<group>"; };
+		BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreMediaOutputDevice.h; path = Source/CoreMediaOutputDevice.h; sourceTree = "<group>"; };
+		BF67C86424373BD600D7492E /* CoreMediaIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMediaIO.framework; path = System/Library/Frameworks/CoreMediaIO.framework; sourceTree = SDKROOT; };
 		BF8534B922B3FE360049C01B /* fwfetcher.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; name = fwfetcher.py; path = LibFreenect/src/fwfetcher.py; sourceTree = "<group>"; };
 		BF8534BA22B3FE360049C01B /* registration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = registration.h; path = LibFreenect/src/registration.h; sourceTree = "<group>"; };
 		BF8534BB22B3FE360049C01B /* registration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = registration.c; path = LibFreenect/src/registration.c; sourceTree = "<group>"; };
@@ -411,6 +418,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF67C86524373BD700D7492E /* CoreMediaIO.framework in Frameworks */,
 				BF108AF022972F29003DDC5F /* IOKit.framework in Frameworks */,
 				BF012B78226A3303003AEB55 /* AppKit.framework in Frameworks */,
 				BF012B6E226A31F3003AEB55 /* CoreServices.framework in Frameworks */,
@@ -544,6 +552,7 @@
 		BF012B05226A09EC003AEB55 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BF67C86424373BD600D7492E /* CoreMediaIO.framework */,
 				BF15205223855F1F00A70EBF /* UIKit.framework */,
 				BF15205023855D8200A70EBF /* CoreGraphics.framework */,
 				BF15204923855BAA00A70EBF /* CoreVideo.framework */,
@@ -669,35 +678,41 @@
 			children = (
 				BF012B01226A03C5003AEB55 /* Avf.h */,
 				BF012B02226A047F003AEB55 /* Avf.mm */,
+				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
+				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
 				BF012ACD2268DE24003AEB55 /* AvfCapture.h */,
 				BF012ACE2268DE24003AEB55 /* AvfCapture.mm */,
 				BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */,
-				BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */,
-				BFEE8DE922B006CE00F89A39 /* Freenect2.h */,
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF012AAE2268DBF8003AEB55 /* BundleInfo.plist */,
 				BF012AA92268DBF7003AEB55 /* FrameworkInfo.plist */,
-				BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */,
 				BF108A872296F476003DDC5F /* Freenect.cpp */,
 				BF108A862296F476003DDC5F /* Freenect.h */,
+				BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */,
+				BFEE8DE922B006CE00F89A39 /* Freenect2.h */,
 				BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */,
 				BF108A8C2296F4BE003DDC5F /* Kinect2.h */,
+				BF1826A424226836006FEB93 /* magic_enum.hpp */,
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
 				BF012AAA2268DBF7003AEB55 /* MfCapture.h */,
 				BF012AAD2268DBF7003AEB55 /* MfDecoder.cpp */,
-				BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */,
 				BF012AAB2268DBF7003AEB55 /* MfDecoder.h */,
-				BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */,
-				BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */,
-				BF012AB22268DBF8003AEB55 /* PopCameraDevice.h */,
 				BF15201F2385555500A70EBF /* PopCameraDevice_Ios.xcconfig */,
 				BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */,
+				BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */,
+				BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */,
+				BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */,
+				BF012AB22268DBF8003AEB55 /* PopCameraDevice.h */,
 				BF012AB62268DBF8003AEB55 /* PopCameraDeviceFramework.h */,
+				BF67C8552437364600D7492E /* PopOutputDevice.cpp */,
 				BF012AD52269FC5C003AEB55 /* SoyLib */,
 				BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */,
 				BF012AAF2268DBF8003AEB55 /* TCameraDevice.h */,
+				BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */,
 				BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */,
 				BF012AB12268DBF8003AEB55 /* TestDevice.h */,
+				BF67C8582437367F00D7492E /* TOutputDevice.cpp */,
+				BF67C8592437367F00D7492E /* TOutputDevice.h */,
 				BFD607731EA16EFC0035C814 /* Unity */,
 			);
 			name = Source;
@@ -747,7 +762,6 @@
 				BF012B5F226A30A6003AEB55 /* SoyVector.h in Headers */,
 				BF012AF82269FE3F003AEB55 /* SoyTypes.h in Headers */,
 				BF012B00226A0108003AEB55 /* SoyTime.h in Headers */,
-				BF012B0F226A141E003AEB55 /* TCameraDevice.h in Headers */,
 				BF012B4B226A270A003AEB55 /* SoyMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -847,22 +861,22 @@
 				TargetAttributes = {
 					BF012AC42268DC95003AEB55 = {
 						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = X52DR36JY2;
+						DevelopmentTeam = 2HGDT7H2KX;
 						ProvisioningStyle = Manual;
 					};
 					BF108A9522970C92003DDC5F = {
 						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = X52DR36JY2;
+						DevelopmentTeam = 2HGDT7H2KX;
 						ProvisioningStyle = Manual;
 					};
 					BF15200F2384861D00A70EBF = {
 						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = X52DR36JY2;
+						DevelopmentTeam = 2HGDT7H2KX;
 						ProvisioningStyle = Automatic;
 					};
 					BF4A6A131EA16D7C00613A64 = {
 						CreatedOnToolsVersion = 8.1;
-						DevelopmentTeam = X52DR36JY2;
+						DevelopmentTeam = 2HGDT7H2KX;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -1152,7 +1166,6 @@
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1169,7 +1182,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1198,7 +1211,6 @@
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1215,7 +1227,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1243,7 +1255,6 @@
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1257,7 +1268,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/TestAppInfo.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -1278,7 +1289,6 @@
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1292,7 +1302,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_STYLE = Manual;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/TestAppInfo.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -1313,7 +1323,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1329,11 +1338,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = PopCameraDevice_Ios/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1356,7 +1364,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1372,11 +1379,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = PopCameraDevice_Ios/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
@@ -1397,7 +1403,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -1434,7 +1440,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1444,7 +1450,7 @@
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -1475,6 +1481,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1485,7 +1492,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/BundleInfo.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LIBRARY_SEARCH_PATHS = (
@@ -1506,7 +1513,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = X52DR36JY2;
+				DEVELOPMENT_TEAM = 2HGDT7H2KX;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/BundleInfo.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				LIBRARY_SEARCH_PATHS = (

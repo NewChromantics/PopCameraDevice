@@ -5,9 +5,11 @@
 
 class TestDevice : public PopCameraDevice::TDevice
 {
+public:
 	static inline const char* DeviceName = "Test";
 public:
 	TestDevice(const std::string& Format);
+	~TestDevice();
 
 	static void											EnumDeviceNames(std::function<void(const std::string&)> Enum);
 
@@ -16,4 +18,8 @@ public:
 
 	SoyPixelsMeta	mMeta = SoyPixelsMeta(16, 16, SoyPixelsFormat::Greyscale);
 	size_t			mFrameRate = 30;
+	size_t			mFrameNumber = 0;
+	bool			mRunning = true;
+	
+	std::shared_ptr<SoyThread>	mThread;
 };

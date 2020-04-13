@@ -17,9 +17,29 @@ TestDevice::TestDevice(const std::string& Format)
 
 	GenerateFrame();
 
-	//	todo: start a thread!
+	auto Iteration = [this]()
+	{
+		this->GenerateFrame();
+		
+		auto Sleepf = 1000.0f / static_cast<float>(this->mFrameRate);
+		auto Sleepms = static_cast<int>(Sleepf);
+		std::this_thread::sleep_for( std::chrono::milliseconds(Sleepms));
+		
+		return this->mRunning;
+	};
+
+	mThread.reset( new SoyThreadLambda( std::string(DeviceName) + Format, Iteration ) );
 }
 
+TestDevice::~TestDevice()
+{
+	mRunning = false;
+	if ( mThread )
+	{
+		mThread->Stop(true);
+		mThread.reset();
+	}
+}
 
 void TestDevice::GenerateFrame()
 {
@@ -37,7 +57,7 @@ void TestDevice::GenerateFrame()
 	Pixels.SplitPlanes(GetArrayBridge(Planes));
 
 	BufferArray<uint8_t, 4> Components;
-	Components.PushBack(128);
+	Components.PushBack( mFrameNumber % 256 );
 	Components.PushBack(0);
 	Components.PushBack(255);
 	Components.PushBack(255);
@@ -48,6 +68,7 @@ void TestDevice::GenerateFrame()
 	}
 
 	this->PushFrame(pPixelBuffer, Pixels.mMeta, FrameTime, std::string() );
+	mFrameNumber++;
 }
 
 void TestDevice::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
