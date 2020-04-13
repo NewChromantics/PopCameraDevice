@@ -22,7 +22,7 @@ SoyPixelsFormat::Type Kinect2::GetPixelFormat(int BytesPerPixel)
 		return SoyPixelsFormat::Greyscale;
 
 	if (BytesPerPixel == 2)
-		return SoyPixelsFormat::KinectDepth;
+		return SoyPixelsFormat::Depth16mm;
 
 	std::stringstream Error;
 	Error << "Unhandled kinect pixel format for BytesPerPixel=" << BytesPerPixel;
