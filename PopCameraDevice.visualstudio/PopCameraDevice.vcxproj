@@ -249,7 +249,7 @@
     <PostBuildEvent />
     <Link>
       <Profile>true</Profile>
-      <DelayLoadDLLs>kinect20.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>kinect20.dll;k4a.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -263,7 +263,7 @@
     <PostBuildEvent />
     <Link>
       <Profile>true</Profile>
-      <DelayLoadDLLs>kinect20.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>kinect20.dll;k4a.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -277,7 +277,7 @@
     <PostBuildEvent />
     <Link>
       <Profile>true</Profile>
-      <DelayLoadDLLs>kinect20.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>kinect20.dll;k4a.dll</DelayLoadDLLs>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>

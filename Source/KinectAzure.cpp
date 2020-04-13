@@ -445,9 +445,19 @@ void KinectAzure::InitDebugHandler()
 
 void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&,ArrayBridge<std::string>&&)> Enum)
 {
+	//	gr: if this throws, the dll is probbaly missing
+	try
+	{
+		LoadDll();
+	}
+	catch (std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << "; " << e.what() << std::endl;
+		return;
+	}
+
 	auto DeviceCount = k4a_device_get_installed_count();
 	std::Debug << "KinectDevice count: " << DeviceCount << std::endl;
-
 	//	formats are known
 	//	todo: support depth & colour as seperate planes inheritely as multiple images
 	Array<std::string> Formats;
