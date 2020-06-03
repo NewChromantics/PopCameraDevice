@@ -400,6 +400,8 @@
 		BF8534F022B402600049C01B /* libfreenect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect.h; sourceTree = "<group>"; };
 		BF8534F122B402600049C01B /* libfreenect_audio.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect_audio.h; sourceTree = "<group>"; };
 		BF8534F222B402600049C01B /* libfreenect_registration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect_registration.h; sourceTree = "<group>"; };
+		BFB2EE362487B36F00EB634F /* SoyFourcc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoyFourcc.cpp; sourceTree = "<group>"; };
+		BFB2EE372487B37000EB634F /* SoyFourcc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyFourcc.h; sourceTree = "<group>"; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
 		BFD607761EA16F0A0035C814 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D11.h; path = Source/Unity/IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
@@ -522,6 +524,8 @@
 				BF012B38226A26E9003AEB55 /* SoyOpengl.cpp */,
 				BF012B39226A26E9003AEB55 /* SoyOpengl.h */,
 				BF012B2B226A2232003AEB55 /* SoyOpenglContext.cpp */,
+				BFB2EE362487B36F00EB634F /* SoyFourcc.cpp */,
+				BFB2EE372487B37000EB634F /* SoyFourcc.h */,
 				BF012B2A226A222B003AEB55 /* SoyOpenglContext.h */,
 				BF012AD82269FC83003AEB55 /* SoyPixels.cpp */,
 				BF012AD62269FC83003AEB55 /* SoyPixels.h */,

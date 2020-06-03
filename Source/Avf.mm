@@ -146,18 +146,38 @@ Avf::TDeviceMeta GetMeta(AVCaptureDevice* Device)
 
 void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 {
-	auto Devices = [AVCaptureDevice devices];
-	for ( AVCaptureDevice* Device in Devices )
+	auto EnumDevices = [&](AVCaptureDeviceType DeviceType,SoyPixelsFormat::Type SpecialFormat)
 	{
-		if ( !Device )
-			continue;
+		auto* DeviceTypeArray = [NSArray arrayWithObjects: DeviceType,nil];
+		//auto MediaType = AVMediaTypeDepthData;
+		auto MediaType = AVMediaTypeVideo;
+		auto Position = AVCaptureDevicePositionUnspecified;
+		auto* Discovery = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:DeviceTypeArray mediaType:AVMediaTypeDepthData position:Position];
+		auto Devices = [Discovery devices];
+		for ( AVCaptureDevice* Device in Devices )
+		{
+			if ( !Device )
+				continue;
 		
-		auto Meta = GetMeta( Device );
-		if ( !Meta.mHasVideo )
-			continue;
+			auto Meta = GetMeta( Device );
+			if ( SpecialFormat )
+			{
+				//	gr: copy w/h?
+				TCaptureFormatMeta CaptureMeta;
+				CaptureMeta.mPixelMeta.DumbSetFormat(SpecialFormat);
+				Meta.mFormats.PushBack(CaptureMeta);
+			}
+			if ( !Meta.mHasVideo )
+				continue;
 		
-		Enum( Meta );
-	}
+			Enum( Meta );
+		}
+	};
+
+	EnumDevices(AVCaptureDeviceTypeBuiltInWideAngleCamera,SoyPixelsFormat::Invalid);
+	EnumDevices(AVCaptureDeviceTypeBuiltInTelephotoCamera,SoyPixelsFormat::Invalid);
+	EnumDevices(AVCaptureDeviceTypeBuiltInDualCamera,SoyPixelsFormat::Invalid);
+	EnumDevices(AVCaptureDeviceTypeBuiltInTrueDepthCamera,SoyPixelsFormat::Depth16mm);
 }
 
 std::string GetFormatString(const Avf::TCaptureFormatMeta& Meta)

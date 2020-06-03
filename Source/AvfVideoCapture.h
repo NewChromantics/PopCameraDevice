@@ -11,6 +11,7 @@
 
 #if defined(__OBJC__)
 @class VideoCaptureProxy;
+@class DepthCaptureProxy;
 #endif
 
 
@@ -74,16 +75,22 @@ protected:
 	
 private:
 	void		Shutdown();
-	void		Run(const std::string& Serial,TVideoQuality::Type Quality,bool KeepOldFrames);
+	void		Run(const std::string& Serial,TVideoQuality::Type Quality);
+	
+	void	CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat);
+	void	CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat);
+
 	
 public:
 	ObjcPtr<AVCaptureDevice>			mDevice;
 	ObjcPtr<AVCaptureSession>			mSession;
-	ObjcPtr<VideoCaptureProxy>			mProxy;
-	ObjcPtr<AVCaptureVideoDataOutput>	mOutput;
-	dispatch_queue_t					mQueue;
-	bool								mDiscardOldFrames;
-	bool								mForceNonPlanarOutput;
+	ObjcPtr<VideoCaptureProxy>			mProxyColour;
+	ObjcPtr<DepthCaptureProxy>			mProxyDepth;
+	ObjcPtr<AVCaptureVideoDataOutput>	mOutputColour;
+	ObjcPtr<AVCaptureDepthDataOutput>	mOutputDepth;
+	dispatch_queue_t					mQueue = nullptr;
+	bool								mDiscardOldFrames = true;
+	bool								mForceNonPlanarOutput = false;
 
 };
 #endif

@@ -12,6 +12,7 @@
 #include "SoyOpenglContext.h"
 #include "SoyOpenglContext.h"
 #include "Avf.h"
+#include "SoyFourcc.h"
 
 
 namespace Avf
@@ -23,6 +24,7 @@ namespace Avf
 
 
 @class VideoCaptureProxy;
+@class DepthCaptureProxy;
 
 
 
@@ -40,6 +42,7 @@ namespace Avf
 - (void)onVideoError:(NSNotification *)notification;
 
 @end
+
 
 
 
@@ -98,8 +101,7 @@ AvfVideoCapture::AvfVideoCapture(const TMediaExtractorParams& Params,std::shared
 	mDiscardOldFrames		( Params.mDiscardOldFrames ),
 	mForceNonPlanarOutput	( Params.mForceNonPlanarOutput )
 {
-	bool KeepOldFrames = !mDiscardOldFrames;
-	Run( Params.mFilename, TVideoQuality::High, KeepOldFrames );
+	Run( Params.mFilename, TVideoQuality::High );
 	StartStream();
 }
 
@@ -112,11 +114,16 @@ AvfVideoCapture::~AvfVideoCapture()
 	Shutdown();
 
 	//	release queue and proxy from output
-	if ( mOutput )
+	if ( mOutputDepth )
 	{
-		//[mOutput setSampleBufferDelegate:mProxy queue: nil];
-		[mOutput setSampleBufferDelegate:nil queue: nil];
-		mOutput.Release();
+		[mOutputDepth setDelegate:nil callbackQueue:nil];
+		mOutputDepth.Release();
+	}
+	
+	if ( mOutputColour )
+	{
+		[mOutputColour setSampleBufferDelegate:nil queue: nil];
+		mOutputColour.Release();
 	}
 	
 	//	delete queue
@@ -129,8 +136,9 @@ AvfVideoCapture::~AvfVideoCapture()
 	}
 	
 	mSession.Release();
-	mProxy.Release();
-	
+	mProxyColour.Release();
+	mProxyDepth.Release();
+
 	
 }
 
@@ -175,7 +183,164 @@ NSString* GetAVCaptureSessionQuality(TVideoQuality::Type Quality)
 }
 
 
-void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQuality,bool KeepOldFrames)
+void GetOutputFormats(AVCaptureVideoDataOutput* Output,ArrayBridge<Soy::TFourcc>&& Formats)
+{
+	auto EnumFormat = [&](NSNumber* FormatNumber)
+	{
+		auto FormatInt = [FormatNumber integerValue];
+		OSType FormatOSType = static_cast<OSType>( FormatInt );
+		Soy::TFourcc Fourcc(FormatOSType);
+		Formats.PushBack(Fourcc);
+	};
+
+	NSArray<NSNumber*>* AvailibleFormats = [Output availableVideoCVPixelFormatTypes];
+	Platform::NSArray_ForEach<NSNumber*>(AvailibleFormats,EnumFormat);
+}
+
+
+void GetOutputCodecs(AVCaptureVideoDataOutput* Output,ArrayBridge<std::string>&& Codecs)
+{
+	auto EnumCodec = [&](AVVideoCodecType CodecType)
+	{
+		auto CodecName = Soy::NSStringToString(CodecType);
+		Codecs.PushBack(CodecName);
+	};
+	
+	NSArray<AVVideoCodecType>* Availible = [Output availableVideoCodecTypes];
+	Platform::NSArray_ForEach<AVVideoCodecType>(Availible,EnumCodec);
+}
+
+void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat)
+{
+	mOutputDepth.Retain( [[AVCaptureDepthDataOutput alloc] init] );
+	if ( !mOutputDepth )
+		throw Soy::AssertException("Failed to allocate AVCaptureDepthDataOutput");
+
+	auto& Output = mOutputDepth.mObject;
+	//	gr: debug all these
+	//Array<std::string> Codecs;
+	//GetOutputCodecs(Output,GetArrayBridge(Codecs));
+	//Array<Soy::TFourcc> Formats;
+	//GetOutputFormats(Output,GetArrayBridge(Formats));
+	
+	bool KeepOldFrames = !mDiscardOldFrames;
+	Output.alwaysDiscardsLateDepthData = KeepOldFrames ? NO : YES;
+	/*
+	Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+							[NSNumber numberWithInt:Format], kCVPixelBufferPixelFormatTypeKey, nil];
+	*/
+	if ( ![Session canAddOutput:Output] )
+		throw Soy::AssertException("Cannot add depth output");
+	
+	//	compatible, add
+	[Session addOutput:Output];
+	std::Debug << "Added depth output" << std::endl;
+
+	//	todo:
+	//auto& Proxy = mProxy.mObject;
+	//[Output setDelegate:Proxy queue: mQueue];
+}
+
+void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat)
+{
+	auto Serial = "SomeCamera";
+
+	mOutputColour.Retain( [[AVCaptureVideoDataOutput alloc] init] );
+	if ( !mOutputColour )
+		throw Soy::AssertException("Failed to allocate AVCaptureVideoDataOutput");
+
+	auto& Output = mOutputColour.mObject;
+	
+	//	todo: get output codecs
+	//	gr: debug all these
+	Array<std::string> Codecs;
+	GetOutputCodecs(Output,GetArrayBridge(Codecs));
+	Array<Soy::TFourcc> Formats;
+	GetOutputFormats(Output,GetArrayBridge(Formats));
+
+	NSArray<AVVideoCodecType>* AvailibleCodecs = [Output availableVideoCodecTypes];
+	
+	//	loop through formats for ones we can handle that are accepted
+	//	https://developer.apple.com/library/mac/documentation/AVFoundation/Reference/AVCaptureVideoDataOutput_Class/#//apple_ref/occ/instp/AVCaptureVideoDataOutput/availableVideoCVPixelFormatTypes
+	//	The first format in the returned list is the most efficient output format.
+	Array<OSType> TryPixelFormats;
+	{
+		NSArray* AvailibleFormats = [Output availableVideoCVPixelFormatTypes];
+		Soy::Assert( AvailibleFormats != nullptr, "availableVideoCVPixelFormatTypes returned null array" );
+		
+		//	filter pixel formats
+		std::stringstream Debug;
+		Debug << "Device " << Serial << " supports x" << AvailibleFormats.count << " formats: ";
+		
+		for (NSNumber* FormatCv in AvailibleFormats)
+		{
+			auto FormatInt = [FormatCv integerValue];
+			OSType Format = static_cast<OSType>( FormatInt );
+			
+			auto FormatSoy = Avf::GetPixelFormat( Format );
+			
+			Debug << Avf::GetPixelFormatString( FormatCv ) << '/' << FormatSoy;
+			
+			if ( FormatSoy == SoyPixelsFormat::Invalid )
+			{
+				Debug << "(Not supported by soy), ";
+				continue;
+			}
+			
+			//	don't allow YUV formats
+			if ( mForceNonPlanarOutput )
+			{
+				Array<SoyPixelsFormat::Type> Planes;
+				SoyPixelsFormat::GetFormatPlanes( FormatSoy, GetArrayBridge(Planes) );
+				if ( Planes.GetSize() > 1 )
+				{
+					Debug << "(Skipped due to planar format), ";
+					continue;
+				}
+			}
+			
+			Debug << ", ";
+			TryPixelFormats.PushBack( Format );
+		}
+		std::Debug << Debug.str() << std::endl;
+	}
+	
+	bool KeepOldFrames = !mDiscardOldFrames;
+	bool AddedOutput = false;
+	for ( int i=0;	i<TryPixelFormats.GetSize();	i++ )
+	{
+		OSType Format = TryPixelFormats[i];
+		
+		auto PixelFormat = Avf::GetPixelFormat( Format );
+		
+		//	should have alreayd filtered this
+		if ( PixelFormat == SoyPixelsFormat::Invalid )
+		continue;
+		
+		Output.alwaysDiscardsLateVideoFrames = KeepOldFrames ? NO : YES;
+		Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+								[NSNumber numberWithInt:Format], kCVPixelBufferPixelFormatTypeKey, nil];
+		if ( ![Session canAddOutput:Output] )
+		{
+			std::Debug << "Device " << Serial << " does not support pixel format " << PixelFormat << " (despite claiming it does)" << std::endl;
+			continue;
+		}
+		
+		//	compatible, add
+		[Session addOutput:Output];
+		std::Debug << "Device " << Serial << " added " << PixelFormat << " output" << std::endl;
+		AddedOutput = true;
+		break;
+	}
+	
+	if ( !AddedOutput )
+	throw Soy::AssertException("Could not find compatible pixel format");
+	
+	auto& Proxy = mProxyColour.mObject;
+	[Output setSampleBufferDelegate:Proxy queue: mQueue];
+}
+
+void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQuality)
 {
 	NSError* error = nil;
 	
@@ -206,7 +371,8 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	}
 		
 	//	make proxy
-	mProxy.Retain( [[VideoCaptureProxy alloc] initWithVideoCapturePrivate:this] );
+	mProxyColour.Retain( [[VideoCaptureProxy alloc] initWithVideoCapturePrivate:this] );
+	//mProxyDepth.Retain( [[DepthCaptureProxy alloc] initWithVideoCapturePrivate:this] );
 	
 	
 	
@@ -214,7 +380,6 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	//	make session
 	mSession.Retain( [[AVCaptureSession alloc] init] );
 	auto& Session = mSession.mObject;
-	auto& Proxy = mProxy.mObject;
 	
 	static bool MarkBeginConfig = false;
 	if ( MarkBeginConfig )
@@ -259,93 +424,43 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	}
 	[Session addInput:_input];
 	
-	mOutput.Retain( [[AVCaptureVideoDataOutput alloc] init] );
-	auto& Output = mOutput.mObject;
 	
 	
+	//	register for notifications from errors
+	auto& Proxy = mProxyColour.mObject;
+	NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+	[notify addObserver: Proxy
+			   selector: @selector(onVideoError:)
+				   name: AVCaptureSessionRuntimeErrorNotification
+				 object: Session];
 	
-	//	todo: get output codecs
-	NSArray<AVVideoCodecType>* AvailibleCodecs = [Output availableVideoCodecTypes];
+	//	create a queue to handle callbacks
+	//	gr: can this be used for the movie decoder? should this use a thread like the movie decoder?
+	//	make our own queue, not the main queue
+	//[_output setSampleBufferDelegate:_proxy queue:dispatch_get_main_queue()];
+	if ( !mQueue )
+		mQueue = dispatch_queue_create("AvfVideoCapture_Queue", NULL);
 	
 	
+
 	
-	//	loop through formats for ones we can handle that are accepted
-	//	https://developer.apple.com/library/mac/documentation/AVFoundation/Reference/AVCaptureVideoDataOutput_Class/#//apple_ref/occ/instp/AVCaptureVideoDataOutput/availableVideoCVPixelFormatTypes
-	//	The first format in the returned list is the most efficient output format.
-	Array<OSType> TryPixelFormats;
+	
+	//	split requested format into "planes" (colour & depth)
+	//	and try and add their outputs
+	auto RequestedOutputDepthFormat = SoyPixelsFormat::Depth16mm;
+	auto RequestedOutputColourFormat = SoyPixelsFormat::RGBA;
+	bool HasDepthFormat = true;
+	bool HasColourFormat = true;
+	
+	if ( HasDepthFormat )
 	{
-		NSArray* AvailibleFormats = [Output availableVideoCVPixelFormatTypes];
-		Soy::Assert( AvailibleFormats != nullptr, "availableVideoCVPixelFormatTypes returned null array" );
-
-		//	filter pixel formats
-		std::stringstream Debug;
-		Debug << "Device " << Serial << " supports x" << AvailibleFormats.count << " formats: ";
-	
-		for (NSNumber* FormatCv in AvailibleFormats)
-		{
-			auto FormatInt = [FormatCv integerValue];
-			OSType Format = static_cast<OSType>( FormatInt );
-
-			auto FormatSoy = Avf::GetPixelFormat( Format );
-			
-			Debug << Avf::GetPixelFormatString( FormatCv ) << '/' << FormatSoy;
-			
-			if ( FormatSoy == SoyPixelsFormat::Invalid )
-			{
-				Debug << "(Not supported by soy), ";
-				continue;
-			}
-
-			//	don't allow YUV formats
-			if ( mForceNonPlanarOutput )
-			{
-				Array<SoyPixelsFormat::Type> Planes;
-				SoyPixelsFormat::GetFormatPlanes( FormatSoy, GetArrayBridge(Planes) );
-				if ( Planes.GetSize() > 1 )
-				{
-					Debug << "(Skipped due to planar format), ";
-					continue;
-				}
-			}
-			
-			Debug << ", ";
-			TryPixelFormats.PushBack( Format );
-		}
-		std::Debug << Debug.str() << std::endl;
+		CreateAndAddOutputDepth(Session,RequestedOutputDepthFormat);
 	}
-
-	bool AddedOutput = false;
-	for ( int i=0;	i<TryPixelFormats.GetSize();	i++ )
+	
+	if ( HasColourFormat )
 	{
-		OSType Format = TryPixelFormats[i];
-
-		auto PixelFormat = Avf::GetPixelFormat( Format );
-		
-		//	should have alreayd filtered this
-		if ( PixelFormat == SoyPixelsFormat::Invalid )
-			continue;
-
-		Output.alwaysDiscardsLateVideoFrames = KeepOldFrames ? NO : YES;
-		Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
-								 [NSNumber numberWithInt:Format], kCVPixelBufferPixelFormatTypeKey, nil];
-		if ( ![Session canAddOutput:Output] )
-		{
-			std::Debug << "Device " << Serial << " does not support pixel format " << PixelFormat << " (despite claiming it does)" << std::endl;
-			continue;
-		}
-		
-		//	compatible, add
-		[Session addOutput:Output];
-		std::Debug << "Device " << Serial << " added " << PixelFormat << " output" << std::endl;
-		AddedOutput = true;
-		break;
+		CreateAndAddOutputColour(Session,RequestedOutputColourFormat);
 	}
-
-	if ( !AddedOutput )
-		throw Soy::AssertException("Could not find compatible pixel format");
-
-	
-	
 	
 /*
 	[Session beginConfiguration];
@@ -361,24 +476,9 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 	[Session commitConfiguration];
 */
 	
-	//	register for notifications from errors
-	NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
-	[notify addObserver: Proxy
-			   selector: @selector(onVideoError:)
-				   name: AVCaptureSessionRuntimeErrorNotification
-				 object: Session];
-
-	//	create a queue to handle callbacks
-	//	gr: can this be used for the movie decoder? should this use a thread like the movie decoder?
-	//	make our own queue, not the main queue
-	//[_output setSampleBufferDelegate:_proxy queue:dispatch_get_main_queue()];
-	if ( !mQueue )
-		mQueue = dispatch_queue_create("camera_queue", NULL);
-	
 	if ( MarkBeginConfig )
 		[Session commitConfiguration];
 	
-	[Output setSampleBufferDelegate:Proxy queue: mQueue];
 }
 
 void AvfVideoCapture::StartStream()
