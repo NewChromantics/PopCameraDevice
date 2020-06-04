@@ -47,7 +47,7 @@ void TestDevice::GenerateFrame()
 	auto& PixelBuffer = dynamic_cast<TDumbPixelBuffer&>(*pPixelBuffer);
 	auto& Pixels = PixelBuffer.mPixels;
 
-	SoyTime FrameTime(true);
+	SoyTime FrameTime = SoyTime::UpTime();
 
 	//	set the type, alloc pixels, then fill the test planes
 	Pixels.mMeta = mMeta;

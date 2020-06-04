@@ -8,6 +8,7 @@ namespace Avf
 {
 	TCaptureFormatMeta	GetMeta(AVCaptureDeviceFormat* Format);
 	vec2f				GetMinMaxFrameRate(AVCaptureDeviceFormat* Format);
+	void				EnumCaptureDevices(NSArray<AVCaptureDevice*>* Devices,std::function<void(const Avf::TDeviceMeta&)>& Enum,ArrayBridge<TCaptureFormatMeta>&& AdditionalFormats);
 }
 
 
@@ -60,12 +61,25 @@ Avf::TCaptureFormatMeta Avf::GetMeta(AVCaptureDeviceFormat* Format)
 	if ( !Format )
 		throw Soy::AssertException("GetMeta AVCaptureDeviceFormat null format");
 	
-	//	lots of work already in here
-	auto StreamMeta = Avf::GetStreamMeta( Format.formatDescription );
-
+	
 	TCaptureFormatMeta Meta;
-	Meta.mPixelMeta = StreamMeta.mPixelMeta;
 
+	auto FormatDesc = Format.formatDescription;
+	auto Fourcc = CMFormatDescriptionGetMediaSubType(FormatDesc);
+	Meta.mCodec = Soy::TFourcc(Fourcc);
+		
+	Boolean usePixelAspectRatio = false;
+	Boolean useCleanAperture = false;
+	auto Dim = CMVideoFormatDescriptionGetPresentationDimensions( FormatDesc, usePixelAspectRatio, useCleanAperture );
+	Meta.mPixelMeta.DumbSetWidth( Dim.width );
+	Meta.mPixelMeta.DumbSetHeight( Dim.height );
+	
+	auto PixelFormat = Avf::GetPixelFormat(Fourcc);
+	Meta.mPixelMeta.DumbSetFormat(PixelFormat);
+	
+	//	get specific bits
+	//GetExtension( Desc, "FullRangeVideo", mMeta.mFullRangeYuv );
+		
 	try
 	{
 		auto FrameRateRange = GetMinMaxFrameRate( Format );
@@ -144,8 +158,38 @@ Avf::TDeviceMeta GetMeta(AVCaptureDevice* Device)
 	return Meta;
 }
 
+void Avf::EnumCaptureDevices(NSArray<AVCaptureDevice*>* Devices,std::function<void(const Avf::TDeviceMeta&)>& Enum,ArrayBridge<TCaptureFormatMeta>&& AdditionalFormats)
+{
+	for ( AVCaptureDevice* Device in Devices )
+	{
+		if ( !Device )
+			continue;
+		
+		//	gr: just to aid debugging, skip non-video ones early
+		{
+			auto HasVideo = YES == [Device hasMediaType:AVMediaTypeVideo];
+			if ( !HasVideo )
+				continue;
+		}
+		
+		auto Meta = GetMeta( Device );
+		Meta.mFormats.PushBackArray(AdditionalFormats);
+		
+		if ( !Meta.mHasVideo )
+			continue;
+
+		Enum( Meta );
+	}
+
+}
+
 void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 {
+#if defined(TARGET_OSX)
+	BufferArray<TCaptureFormatMeta,1> SpecialFormats;
+	auto Devices = [AVCaptureDevice devices];
+	EnumCaptureDevices(Devices,Enum,GetArrayBridge(SpecialFormats));
+#else
 	auto EnumDevices = [&](AVCaptureDeviceType DeviceType,SoyPixelsFormat::Type SpecialFormat)
 	{
 		auto* DeviceTypeArray = [NSArray arrayWithObjects: DeviceType,nil];
@@ -154,30 +198,24 @@ void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 		auto Position = AVCaptureDevicePositionUnspecified;
 		auto* Discovery = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:DeviceTypeArray mediaType:AVMediaTypeDepthData position:Position];
 		auto Devices = [Discovery devices];
-		for ( AVCaptureDevice* Device in Devices )
+		
+		BufferArray<TCaptureFormatMeta,1> SpecialFormats;
+		if ( SpecialFormat )
 		{
-			if ( !Device )
-				continue;
-		
-			auto Meta = GetMeta( Device );
-			if ( SpecialFormat )
-			{
-				//	gr: copy w/h?
-				TCaptureFormatMeta CaptureMeta;
-				CaptureMeta.mPixelMeta.DumbSetFormat(SpecialFormat);
-				Meta.mFormats.PushBack(CaptureMeta);
-			}
-			if ( !Meta.mHasVideo )
-				continue;
-		
-			Enum( Meta );
+			//	gr: copy w/h?
+			TCaptureFormatMeta CaptureMeta;
+			CaptureMeta.mPixelMeta.DumbSetFormat(SpecialFormat);
+			SpecialFormats.PushBack(CaptureMeta);
 		}
+		
+		EnumCaptureDevices(Devices,Enum,GetArrayBridge(SpecialFormats));
 	};
 
 	EnumDevices(AVCaptureDeviceTypeBuiltInWideAngleCamera,SoyPixelsFormat::Invalid);
 	EnumDevices(AVCaptureDeviceTypeBuiltInTelephotoCamera,SoyPixelsFormat::Invalid);
 	EnumDevices(AVCaptureDeviceTypeBuiltInDualCamera,SoyPixelsFormat::Invalid);
 	EnumDevices(AVCaptureDeviceTypeBuiltInTrueDepthCamera,SoyPixelsFormat::Depth16mm);
+#endif
 }
 
 std::string GetFormatString(const Avf::TCaptureFormatMeta& Meta)

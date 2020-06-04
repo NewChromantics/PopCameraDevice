@@ -87,7 +87,9 @@ public:
 	ObjcPtr<VideoCaptureProxy>			mProxyColour;
 	ObjcPtr<DepthCaptureProxy>			mProxyDepth;
 	ObjcPtr<AVCaptureVideoDataOutput>	mOutputColour;
+#if !defined(TARGET_OSX)
 	ObjcPtr<AVCaptureDepthDataOutput>	mOutputDepth;
+#endif
 	dispatch_queue_t					mQueue = nullptr;
 	bool								mDiscardOldFrames = true;
 	bool								mForceNonPlanarOutput = false;

@@ -114,11 +114,13 @@ AvfVideoCapture::~AvfVideoCapture()
 	Shutdown();
 
 	//	release queue and proxy from output
+#if !defined(TARGET_OSX)
 	if ( mOutputDepth )
 	{
 		[mOutputDepth setDelegate:nil callbackQueue:nil];
 		mOutputDepth.Release();
 	}
+#endif
 	
 	if ( mOutputColour )
 	{
@@ -138,7 +140,6 @@ AvfVideoCapture::~AvfVideoCapture()
 	mSession.Release();
 	mProxyColour.Release();
 	mProxyDepth.Release();
-
 	
 }
 
@@ -212,6 +213,9 @@ void GetOutputCodecs(AVCaptureVideoDataOutput* Output,ArrayBridge<std::string>&&
 
 void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat)
 {
+#if defined(TARGET_OSX)
+	throw Soy::AssertException("No depth output on osx");
+#else
 	mOutputDepth.Retain( [[AVCaptureDepthDataOutput alloc] init] );
 	if ( !mOutputDepth )
 		throw Soy::AssertException("Failed to allocate AVCaptureDepthDataOutput");
@@ -239,6 +243,7 @@ void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixel
 	//	todo:
 	//auto& Proxy = mProxy.mObject;
 	//[Output setDelegate:Proxy queue: mQueue];
+#endif
 }
 
 void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat)

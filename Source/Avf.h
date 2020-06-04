@@ -5,6 +5,7 @@
 #include "SoyLib/src/Array.hpp"
 #include "SoyLib/src/HeapArray.hpp"
 #include "SoyPixels.h"
+#include "SoyFourcc.h"
 
 
 
@@ -31,7 +32,7 @@ public:
 	size_t	mMinFps = 0;
 	
 	SoyPixelsMeta	mPixelMeta;
-	std::string		mCodec;
+	Soy::TFourcc	mCodec;
 };
 
 //	this can probably be generic device meta...
