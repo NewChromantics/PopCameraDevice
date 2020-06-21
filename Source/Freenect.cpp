@@ -1297,9 +1297,9 @@ freenect_video_format Freenect::GetColourFormat(SoyPixelsFormat::Type Format)
 {
 	switch ( Format )
 	{
-		//case SoyPixelsFormat::RGB:	return FREENECT_VIDEO_RGB;
-		case SoyPixelsFormat::RGB:	return FREENECT_VIDEO_YUV_RGB;
-		case SoyPixelsFormat::uyvy:	return FREENECT_VIDEO_YUV_RAW;
+		//case SoyPixelsFormat::RGB:		return FREENECT_VIDEO_RGB;
+		case SoyPixelsFormat::RGB:			return FREENECT_VIDEO_YUV_RGB;
+		case SoyPixelsFormat::uyvy_8888:	return FREENECT_VIDEO_YUV_RAW;
 
 		default:
 			break;
@@ -1335,7 +1335,7 @@ SoyPixelsFormat::Type Freenect::GetFormat(freenect_video_format Format)
 	{
 		case FREENECT_VIDEO_RGB:		return SoyPixelsFormat::RGB;
 		case FREENECT_VIDEO_YUV_RGB:	return SoyPixelsFormat::RGB;
-		case FREENECT_VIDEO_YUV_RAW:	return SoyPixelsFormat::uyvy;
+		case FREENECT_VIDEO_YUV_RAW:	return SoyPixelsFormat::uyvy_8888;
 		default:
 			break;
 	}
@@ -1593,7 +1593,7 @@ Freenect::TSource::TSource(const std::string& DeviceName)
 
 	if ( Soy::StringTrimRight( Serial, DeviceName_Colour_Suffix, true ) )
 	{
-		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::uyvy );
+		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::uyvy_8888 );
 		mListener = Context.CreateListener( Serial, Meta );
 	}
 	else if ( Soy::StringTrimRight( Serial, DeviceName_Depth_Suffix, true ) )
