@@ -484,6 +484,8 @@ void AvfVideoCapture::CreateStream(const Avf::TCaptureParams& Params)
 	//	todo: if camera has depth support
 	DepthFormats.PushBack(SoyPixelsFormat::DepthFloatMetres);
 	DepthFormats.PushBack(SoyPixelsFormat::DepthHalfMetres);
+	DepthFormats.PushBack(SoyPixelsFormat::DepthDisparityFloat);
+	DepthFormats.PushBack(SoyPixelsFormat::DepthDisparityHalf);
 	//	filter these based Params.Desired formats
 	if ( Params.mPixelFormat.GetFormat() != SoyPixelsFormat::Invalid )
 	{
@@ -711,7 +713,7 @@ void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,s
 	}
 
 	//	convert to the format we want, then call again
-	Soy::TFourcc DepthFormat( DepthData.depthDataType );
+	Soy::TFourcc DepthFormat(DepthData.depthDataType);
 	auto DepthPixelFormat = Avf::GetPixelFormat(DepthFormat.mFourcc32);
 	SoyPixelsFormat::Type OutputFormat = SoyPixelsFormat::DepthFloatMetres;
 	if ( DepthPixelFormat != OutputFormat )
@@ -729,7 +731,7 @@ void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,s
 	//	convert format
 	SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
 	auto DepthPixels = DepthData.depthDataMap;
-	//Soy::TFourcc DepthFormat( DepthData.depthDataType );
+	//Soy::TFourcc DepthFormat(DepthData.depthDataType);
 	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
 	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
 	auto IsFiltered = DepthData.depthDataFiltered;
