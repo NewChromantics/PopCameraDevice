@@ -48,7 +48,7 @@ void PushJson(std::stringstream& Json, const char* Key, bool Boolean, int PreTab
 {
 	PushJsonKey(Json, Key, PreTab);
 
-	Json << Boolean ? "true" : "false";
+	Json << (Boolean ? "true" : "false");
 
 	if (TrailingComma)
 		Json << ',';
@@ -392,7 +392,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 #if defined(TARGET_WINDOWS)
 		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
 #elif defined(TARGET_OSX) || defined(TARGET_IOS)
-		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name));
+		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name,Format));
 #endif
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);

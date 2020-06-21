@@ -14,6 +14,10 @@
 @class DepthCaptureProxy;
 #endif
 
+namespace Avf
+{
+	class TCaptureParams;
+}
 
 namespace TVideoQuality
 {
@@ -26,12 +30,20 @@ namespace TVideoQuality
 };
 
 
+class Avf::TCaptureParams
+{
+public:
+	bool			mDiscardOldFrames = true;
+	size_t			mFrameRate = 0;	//	0 = any
+	SoyPixelsMeta	mPixelFormat;	//	invalid = any
+};
+
 
 #if defined(__OBJC__)
 class AvfMediaExtractor
 {
 public:
-	AvfMediaExtractor(const TMediaExtractorParams& Params,std::shared_ptr<Opengl::TContext>& OpenglContext);
+	AvfMediaExtractor(std::shared_ptr<Opengl::TContext>& OpenglContext);
 	
 	void			OnSampleBuffer(CMSampleBufferRef SampleBufferRef,size_t StreamIndex,bool DoRetain);
 	void			OnSampleBuffer(CVPixelBufferRef PixelBufferRef,SoyTime Timestamp,size_t StreamIndex,bool DoRetain);
@@ -48,8 +60,6 @@ public:
 	std::shared_ptr<Opengl::TContext>	mOpenglContext;
 	std::shared_ptr<AvfDecoderRenderer>	mRenderer;	//	persistent rendering data
 
-	bool			mDiscardOldFrames = false;
-	
 	std::function<void(const SoyTime,size_t)>	mOnPacketQueued;
 	std::mutex								mPacketQueueLock;
 	Array<std::shared_ptr<TMediaPacket>>	mPacketQueue;	//	extracted frames
@@ -63,7 +73,7 @@ public:
 	friend class AVCaptureSessionWrapper;
 	
 public:
-	AvfVideoCapture(const TMediaExtractorParams& Params,std::shared_ptr<Opengl::TContext> OpenglContext);
+	AvfVideoCapture(const std::string& Serial,const Avf::TCaptureParams& Params,std::shared_ptr<Opengl::TContext> OpenglContext);
 	virtual ~AvfVideoCapture();
 
 	//	configure funcs
@@ -76,10 +86,11 @@ protected:
 	
 private:
 	void		Shutdown();
-	void		Run(const std::string& Serial,TVideoQuality::Type Quality);
+	void		CreateDevice(const std::string& Serial);
+	void		CreateStream(const Avf::TCaptureParams& Params);
 	
-	void	CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat);
-	void	CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat);
+	void	CreateAndAddOutputDepth(AVCaptureSession* Session,const Avf::TCaptureParams& Params);
+	void	CreateAndAddOutputColour(AVCaptureSession* Session,const Avf::TCaptureParams& Params);
 
 	
 public:
@@ -92,8 +103,5 @@ public:
 	ObjcPtr<AVCaptureDepthDataOutput>	mOutputDepth;
 #endif
 	dispatch_queue_t					mQueue = nullptr;
-	bool								mDiscardOldFrames = true;
-	bool								mForceNonPlanarOutput = false;
-
 };
 #endif

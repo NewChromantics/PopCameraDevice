@@ -164,13 +164,12 @@ namespace Avf
 @end
 
 
-AvfVideoCapture::AvfVideoCapture(const TMediaExtractorParams& Params,std::shared_ptr<Opengl::TContext> OpenglContext) :
-	AvfMediaExtractor		( Params, OpenglContext ),
-	mQueue					( nullptr ),
-	mDiscardOldFrames		( Params.mDiscardOldFrames ),
-	mForceNonPlanarOutput	( Params.mForceNonPlanarOutput )
+AvfVideoCapture::AvfVideoCapture(const std::string& Serial,const Avf::TCaptureParams& Params,std::shared_ptr<Opengl::TContext> OpenglContext) :
+	AvfMediaExtractor		( OpenglContext ),
+	mQueue					( nullptr )
 {
-	Run( Params.mFilename, TVideoQuality::High );
+	CreateDevice(Serial);
+	CreateStream(Params );
 	StartStream();
 }
 
@@ -280,7 +279,7 @@ void GetOutputCodecs(AVCaptureVideoDataOutput* Output,ArrayBridge<std::string>&&
 	Platform::NSArray_ForEach<AVVideoCodecType>(Availible,EnumCodec);
 }
 
-void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat)
+void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,const Avf::TCaptureParams& Params)
 {
 #if defined(TARGET_OSX)
 	throw Soy::AssertException("No depth output on osx");
@@ -296,7 +295,7 @@ void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixel
 	//Array<Soy::TFourcc> Formats;
 	//GetOutputFormats(Output,GetArrayBridge(Formats));
 	
-	bool KeepOldFrames = !mDiscardOldFrames;
+	bool KeepOldFrames = !Params.mDiscardOldFrames;
 	Output.alwaysDiscardsLateDepthData = KeepOldFrames ? NO : YES;
 	/*
 	Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -314,7 +313,7 @@ void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixel
 #endif
 }
 
-void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type RequestedFormat)
+void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,const Avf::TCaptureParams& Params)
 {
 	auto Serial = "SomeCamera";
 
@@ -359,26 +358,14 @@ void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixe
 				Debug << "(Not supported by soy), ";
 				continue;
 			}
-			
-			//	don't allow YUV formats
-			if ( mForceNonPlanarOutput )
-			{
-				Array<SoyPixelsFormat::Type> Planes;
-				SoyPixelsFormat::GetFormatPlanes( FormatSoy, GetArrayBridge(Planes) );
-				if ( Planes.GetSize() > 1 )
-				{
-					Debug << "(Skipped due to planar format), ";
-					continue;
-				}
-			}
-			
+				
 			Debug << ", ";
 			TryPixelFormats.PushBack( Format );
 		}
 		std::Debug << Debug.str() << std::endl;
 	}
 	
-	bool KeepOldFrames = !mDiscardOldFrames;
+	bool KeepOldFrames = !Params.mDiscardOldFrames;
 	bool AddedOutput = false;
 	for ( int i=0;	i<TryPixelFormats.GetSize();	i++ )
 	{
@@ -388,7 +375,7 @@ void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixe
 		
 		//	should have alreayd filtered this
 		if ( PixelFormat == SoyPixelsFormat::Invalid )
-		continue;
+			continue;
 		
 		Output.alwaysDiscardsLateVideoFrames = KeepOldFrames ? NO : YES;
 		Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -411,14 +398,20 @@ void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixe
 	
 	auto& Proxy = mProxyColour.mObject;
 	[Output setSampleBufferDelegate:Proxy queue: mQueue];
+	
+	
+	//	register for notifications from errors
+	NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+	[notify addObserver: Proxy
+			   selector: @selector(onVideoError:)
+				   name: AVCaptureSessionRuntimeErrorNotification
+				 object: Session];
+
 }
 
-void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQuality)
+
+void AvfVideoCapture::CreateDevice(const std::string& Serial)
 {
-	NSError* error = nil;
-	
-	//	grab the device and get some meta
-	
 	// Find a suitable AVCaptureDevice
 	auto SerialString = Soy::StringToNSString( Serial );
 	mDevice.Retain( [AVCaptureDevice deviceWithUniqueID:SerialString] );
@@ -428,8 +421,36 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 		Error << "Failed to get AVCapture Device with serial " << Serial;
 		throw Soy::AssertException( Error.str() );
 	}
-	auto& Device = mDevice.mObject;
 
+	//	make session
+	{
+		auto& Device = mDevice.mObject;
+
+		mSession.Retain( [[AVCaptureSession alloc] init] );
+		auto& Session = mSession.mObject;
+		
+		//	make our own queue, not the main queue
+		if ( !mQueue )
+			mQueue = dispatch_queue_create("AvfVideoCapture_Queue", NULL);
+		
+		NSError* Error = nil;
+		//	assign intput to session
+		AVCaptureDeviceInput* _input = [AVCaptureDeviceInput deviceInputWithDevice:Device error:&Error];
+		if ( !_input || ![Session canAddInput:_input])
+		{
+			throw Soy::AssertException("Cannot add AVCaptureDeviceInput");
+		}
+		[Session addInput:_input];
+	}
+}
+
+void AvfVideoCapture::CreateStream(const Avf::TCaptureParams& Params)
+{
+	if ( !mDevice )
+		throw Soy::AssertException("CreateStream with no device");
+	
+	auto& Device = mDevice.mObject;
+	
 	
 	//	enum all frame rates
 	{
@@ -443,26 +464,50 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 		Platform::NSArray_ForEach<AVCaptureDeviceFormat*>( [Device formats], EnumFormat );
 	}
 		
-	//	make proxy
+	//	make proxys (even if they're not used)
 	mProxyColour.Retain( [[VideoCaptureProxy alloc] initWithVideoCapturePrivate:this] );
 	mProxyDepth.Retain( [[DepthCaptureProxy alloc] initWithVideoCapturePrivate:this] );
 	
-	
-
-	//	make session
-	mSession.Retain( [[AVCaptureSession alloc] init] );
 	auto& Session = mSession.mObject;
+
 	
 	static bool MarkBeginConfig = false;
 	if ( MarkBeginConfig )
 		[Session beginConfiguration];
 
 	
+	//	now; see if the user desires a format
+	//	make a list of all our formats, and whether its colour or depth
+	Array<SoyPixelsFormat::Type> ColourFormats;
+	Array<SoyPixelsFormat::Type> DepthFormats;
 
+	//	todo: if camera has depth support
+	DepthFormats.PushBack(SoyPixelsFormat::DepthFloatMetres);
+	DepthFormats.PushBack(SoyPixelsFormat::DepthHalfMetres);
+	//	filter these based Params.Desired formats
+	if ( Params.mPixelFormat.GetFormat() != SoyPixelsFormat::Invalid )
+	{
+		
+	}
+
+	//	create output streams
+	//	should be able to make both?
+	if ( !DepthFormats.IsEmpty() )
+	{
+		auto TryParams = Params;
+		TryParams.mPixelFormat.DumbSetFormat(DepthFormats[0]);
+		CreateAndAddOutputDepth(Session,TryParams);
+	}
 	
+	if ( !ColourFormats.IsEmpty() )
+	{
+		auto TryParams = Params;
+		TryParams.mPixelFormat.DumbSetFormat(ColourFormats[0]);
+		CreateAndAddOutputColour(Session,TryParams);
+	}
 	
-	
-	
+
+	/*
 	//	try all the qualitys
 	Array<TVideoQuality::Type> Qualitys;
 	Qualitys.PushBack( DesiredQuality );
@@ -485,54 +530,8 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 
 	if ( !Session.sessionPreset )
 		throw Soy::AssertException("Failed to set session quality");
-	
-	
-	
-	
-	AVCaptureDeviceInput* _input = [AVCaptureDeviceInput deviceInputWithDevice:Device error:&error];
-	if ( !_input || ![Session canAddInput:_input])
-	{
-		throw Soy::AssertException("Cannot add AVCaptureDeviceInput");
-	}
-	[Session addInput:_input];
-	
-	
-	
-	//	register for notifications from errors
-	auto& Proxy = mProxyColour.mObject;
-	NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
-	[notify addObserver: Proxy
-			   selector: @selector(onVideoError:)
-				   name: AVCaptureSessionRuntimeErrorNotification
-				 object: Session];
-	
-	//	create a queue to handle callbacks
-	//	gr: can this be used for the movie decoder? should this use a thread like the movie decoder?
-	//	make our own queue, not the main queue
-	//[_output setSampleBufferDelegate:_proxy queue:dispatch_get_main_queue()];
-	if ( !mQueue )
-		mQueue = dispatch_queue_create("AvfVideoCapture_Queue", NULL);
-	
-	
+	*/
 
-	
-	
-	//	split requested format into "planes" (colour & depth)
-	//	and try and add their outputs
-	auto RequestedOutputDepthFormat = SoyPixelsFormat::Depth16mm;
-	auto RequestedOutputColourFormat = SoyPixelsFormat::RGBA;
-	bool HasDepthFormat = true;
-	bool HasColourFormat = true;
-	
-	if ( HasDepthFormat )
-	{
-		CreateAndAddOutputDepth(Session,RequestedOutputDepthFormat);
-	}
-	
-	if ( HasColourFormat )
-	{
-		CreateAndAddOutputColour(Session,RequestedOutputColourFormat);
-	}
 	
 /*
 	[Session beginConfiguration];
@@ -626,12 +625,6 @@ void AvfMediaExtractor::QueuePacket(std::shared_ptr<TMediaPacket>& Packet)
 	{
 		std::lock_guard<std::mutex> Lock( mPacketQueueLock );
 	
-		//	only save latest
-		//	gr: check in case this causes too much stuttering and maybe keep 2
-		//	todo: filter stream indexes!
-		if ( mDiscardOldFrames )
-			mPacketQueue.Clear();
-
 		mPacketQueue.PushBack( Packet );
 	}
 
@@ -641,10 +634,9 @@ void AvfMediaExtractor::QueuePacket(std::shared_ptr<TMediaPacket>& Packet)
 }
 
 
-AvfMediaExtractor::AvfMediaExtractor(const TMediaExtractorParams& Params,std::shared_ptr<Opengl::TContext>& OpenglContext) :
+AvfMediaExtractor::AvfMediaExtractor(std::shared_ptr<Opengl::TContext>& OpenglContext) :
 	mOpenglContext		( OpenglContext ),
-	mRenderer			( new AvfDecoderRenderer() ),
-	mDiscardOldFrames	( Params.mDiscardOldFrames )
+	mRenderer			( new AvfDecoderRenderer() )
 {
 	
 }
@@ -718,14 +710,31 @@ void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,s
 		return;
 	}
 
+	//	convert to the format we want, then call again
+	Soy::TFourcc DepthFormat( DepthData.depthDataType );
+	auto DepthPixelFormat = Avf::GetPixelFormat(DepthFormat.mFourcc32);
+	SoyPixelsFormat::Type OutputFormat = SoyPixelsFormat::DepthFloatMetres;
+	if ( DepthPixelFormat != OutputFormat )
+	{
+		auto OutputFourcc = Avf::GetPlatformPixelFormat(OutputFormat);
+		auto NewDepthData = [DepthData depthDataByConvertingToDepthDataType:OutputFourcc];
+		if ( !NewDepthData )
+			throw Soy::AssertException("Failed to convert depth data to desired format");
+		//	gr: need to be careful about recursion here
+		OnDepthFrame(NewDepthData,CmTimestamp, StreamIndex, DoRetain);
+		return;
+	}
+
+	
+	//	convert format
 	SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
 	auto DepthPixels = DepthData.depthDataMap;
-	Soy::TFourcc DepthFormat( DepthData.depthDataType );
+	//Soy::TFourcc DepthFormat( DepthData.depthDataType );
 	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
 	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
 	auto IsFiltered = DepthData.depthDataFiltered;
 	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
-	
+		
 	std::Debug << "Depth format " << DepthFormat << " quality=" << Quality << " Accuracy=" << Accuracy << " IsFiltered=" << IsFiltered << std::endl;
 	OnSampleBuffer( DepthPixels, Timestamp, StreamIndex, DoRetain );
 }

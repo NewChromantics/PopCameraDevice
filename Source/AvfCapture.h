@@ -17,7 +17,7 @@ class AvfVideoCapture;
 class Avf::TCamera : public  PopCameraDevice::TDevice
 {
 public:
-	TCamera(const std::string& DeviceName);
+	TCamera(const std::string& DeviceName,const std::string& Format);
 
 	void			PushLatestFrame(size_t StreamIndex);
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;

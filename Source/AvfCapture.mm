@@ -3,7 +3,7 @@
 
 
 
-Avf::TCamera::TCamera(const std::string& DeviceName)
+Avf::TCamera::TCamera(const std::string& DeviceName,const std::string& Format)
 {
 	//	for AVF, name has to be serial
 	std::string Serial;
@@ -24,15 +24,14 @@ Avf::TCamera::TCamera(const std::string& DeviceName)
 		throw Soy::AssertException( Error.str() );
 	}
 	
-	TMediaExtractorParams Params(Serial);
 	
-	//	gr: pitch padding is crashing, my padding code might be wrong... but none of my cameras are giving out unaligned images...
-	Params.mApplyHeightPadding = false;
-	Params.mApplyWidthPadding = false;
+	Avf::TCaptureParams Params;
+
+	PopCameraDevice::DecodeFormatString( Format, Params.mPixelFormat, Params.mFrameRate );
 	
 	std::shared_ptr<Opengl::TContext> OpenglContext;
 	
-	mExtractor.reset(new AvfVideoCapture(Params,OpenglContext));
+	mExtractor.reset(new AvfVideoCapture( Serial, Params, OpenglContext ));
 	
 	mExtractor->mOnPacketQueued = [this](const SoyTime,size_t StreamIndex)
 	{
