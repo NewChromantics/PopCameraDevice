@@ -13,7 +13,7 @@
 #include "SoyOpenglContext.h"
 #include "Avf.h"
 #include "SoyFourcc.h"
-
+#include "MagicEnum/include/magic_enum.hpp"
 
 namespace Avf
 {
@@ -93,6 +93,75 @@ namespace Avf
 
 @end
 
+
+
+
+@interface DepthCaptureProxy : NSObject <AVCaptureDepthDataOutputDelegate>
+{
+	AvfVideoCapture*	mParent;
+	size_t				mStreamIndex;
+}
+
+- (id)initWithVideoCapturePrivate:(AvfVideoCapture*)parent;
+
+- (void)depthDataOutput:(AVCaptureDepthDataOutput *)output didOutputDepthData:(AVDepthData *)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection;
+- (void)depthDataOutput:(AVCaptureDepthDataOutput *)output didDropDepthData:(AVDepthData *)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection reason:(AVCaptureOutputDataDroppedReason)reason;
+//- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
+//- (void)captureOutput:(AVCaptureOutput *)captureOutput didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
+- (void)onVideoError:(NSNotification *)notification;
+
+@end
+
+
+
+
+@implementation DepthCaptureProxy
+
+- (void)onVideoError:(NSNotification *)notification
+{
+	//	gr: handle this properly - got it when disconnecting USB hub
+	/*
+	 Exception Name: NSInvalidArgumentException
+	 Description: -[NSError UTF8String]: unrecognized selector sent to instance 0x618000847350
+	 User Info: (null)
+	 */
+	try
+	{
+		NSString* Error = notification.userInfo[AVCaptureSessionErrorKey];
+		auto ErrorStr = Soy::NSStringToString( Error );
+		std::Debug << "Video error: "  << ErrorStr << std::endl;
+	}
+	catch(...)
+	{
+		std::Debug << "Some video error" << std::endl;
+	}
+}
+
+- (id)initWithVideoCapturePrivate:(AvfVideoCapture*)parent
+{
+	self = [super init];
+	if (self)
+	{
+		mParent = parent;
+		mStreamIndex = 0;
+	}
+	return self;
+}
+
+
+- (void)depthDataOutput:(AVCaptureDepthDataOutput *)captureOutput didOutputDepthData:(AVDepthData*)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection
+{
+	static bool DoRetain = true;
+	mParent->OnDepthFrame( depthData, timestamp, mStreamIndex, DoRetain );
+}
+
+
+- (void)depthDataOutput:(AVCaptureDepthDataOutput *)output didDropDepthData:(AVDepthData *)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection reason:(AVCaptureOutputDataDroppedReason)reason;
+{
+	std::Debug << "dropped depth sample" << std::endl;
+}
+
+@end
 
 
 AvfVideoCapture::AvfVideoCapture(const TMediaExtractorParams& Params,std::shared_ptr<Opengl::TContext> OpenglContext) :
@@ -239,10 +308,9 @@ void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,SoyPixel
 	//	compatible, add
 	[Session addOutput:Output];
 	std::Debug << "Added depth output" << std::endl;
-
-	//	todo:
-	//auto& Proxy = mProxy.mObject;
-	//[Output setDelegate:Proxy queue: mQueue];
+	
+	auto& Proxy = mProxyDepth.mObject;
+	[Output setDelegate:Proxy callbackQueue: mQueue];
 #endif
 }
 
@@ -377,8 +445,7 @@ void AvfVideoCapture::Run(const std::string& Serial,TVideoQuality::Type DesiredQ
 		
 	//	make proxy
 	mProxyColour.Retain( [[VideoCaptureProxy alloc] initWithVideoCapturePrivate:this] );
-	//mProxyDepth.Retain( [[DepthCaptureProxy alloc] initWithVideoCapturePrivate:this] );
-	
+	mProxyDepth.Retain( [[DepthCaptureProxy alloc] initWithVideoCapturePrivate:this] );
 	
 	
 
@@ -637,6 +704,30 @@ void AvfMediaExtractor::OnSampleBuffer(CVPixelBufferRef sampleBufferRef,SoyTime 
 		return;
 	}
 
+}
+
+void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,size_t StreamIndex,bool DoRetain)
+{
+	//	gr: I think stalling too long here can make USB bus crash (killing bluetooth, hid, audio etc)
+	Soy::TScopeTimerPrint Timer(__PRETTY_FUNCTION__,5);
+	
+	//Soy::Assert( sampleBufferRef != nullptr, "Expected sample buffer ref");
+	if ( !DepthData )
+	{
+		std::Debug << __PRETTY_FUNCTION__ << " null depth data" << std::endl;
+		return;
+	}
+
+	SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
+	auto DepthPixels = DepthData.depthDataMap;
+	Soy::TFourcc DepthFormat( DepthData.depthDataType );
+	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
+	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
+	auto IsFiltered = DepthData.depthDataFiltered;
+	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
+	
+	std::Debug << "Depth format " << DepthFormat << " quality=" << Quality << " Accuracy=" << Accuracy << " IsFiltered=" << IsFiltered << std::endl;
+	OnSampleBuffer( DepthPixels, Timestamp, StreamIndex, DoRetain );
 }
 
 

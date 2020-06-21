@@ -35,6 +35,7 @@ public:
 	
 	void			OnSampleBuffer(CMSampleBufferRef SampleBufferRef,size_t StreamIndex,bool DoRetain);
 	void			OnSampleBuffer(CVPixelBufferRef PixelBufferRef,SoyTime Timestamp,size_t StreamIndex,bool DoRetain);
+	void			OnDepthFrame(AVDepthData* DepthData,CMTime Timestamp,size_t StreamIndex,bool DoRetain);
 
 	std::shared_ptr<TMediaPacket>	PopPacket(size_t StreamIndex);
 	
