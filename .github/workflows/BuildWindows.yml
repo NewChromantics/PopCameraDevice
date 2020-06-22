@@ -5,7 +5,7 @@ env:
   BuildPlatform: x64
   BuildConfiguration: Debug
 # would be nice to extract this from visual studio
-  BuildDirectory: PopCameraDevice.visualstudio\x64\Debug
+  BuildDirectory: Build\Debug_x64
 
 on: 
   push:
@@ -15,12 +15,12 @@ on:
 
 jobs:
   buildwindows:
-    runs-on: [self-hosted]
+    runs-on: [self-hosted, windows]
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
-        submodules: true
+        submodules: 'recursive'
         
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.0
@@ -41,15 +41,5 @@ jobs:
     # do not use env here: ##[error]Path does not exist d:\a\PopH264\PopH264\$Env:GITHUB_WORKSPACE\PopH264.visualstudio\Debug
     - uses: actions/upload-artifact@v1
       with:
-        name: PopCameraDevice.dll
-        path: ${{env.BuildDirectory}}\PopCameraDevice.dll
-    - uses: actions/upload-artifact@v1
-      with:
-        name: PopCameraDevice.lib
-        path: ${{env.BuildDirectory}}\PopCameraDevice.lib
-    - uses: actions/upload-artifact@v1
-      with:
-        name: PopCameraDevice.h
-        path: Source/PopCameraDevice.h
-        
-#PopH264.visualstudio\Debug\PopH264.dll
+        name: PopCameraDevice
+        path: ${{env.BuildDirectory}}
