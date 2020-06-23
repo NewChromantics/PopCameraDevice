@@ -194,9 +194,10 @@ void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 	{
 		auto* DeviceTypeArray = [NSArray arrayWithObjects: DeviceType,nil];
 		//auto MediaType = AVMediaTypeDepthData;
-		auto MediaType = AVMediaTypeVideo;
+		//auto MediaType = AVMediaTypeVideo;
+		AVMediaType MediaType = nil;	//	any
 		auto Position = AVCaptureDevicePositionUnspecified;
-		auto* Discovery = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:DeviceTypeArray mediaType:AVMediaTypeDepthData position:Position];
+		auto* Discovery = [AVCaptureDeviceDiscoverySession discoverySessionWithDeviceTypes:DeviceTypeArray mediaType:MediaType position:Position];
 		auto Devices = [Discovery devices];
 		
 		BufferArray<TCaptureFormatMeta,1> SpecialFormats;
@@ -215,6 +216,12 @@ void Avf::EnumCaptureDevices(std::function<void(const Avf::TDeviceMeta&)> Enum)
 	EnumDevices(AVCaptureDeviceTypeBuiltInTelephotoCamera,SoyPixelsFormat::Invalid);
 	EnumDevices(AVCaptureDeviceTypeBuiltInDualCamera,SoyPixelsFormat::Invalid);
 	EnumDevices(AVCaptureDeviceTypeBuiltInTrueDepthCamera,SoyPixelsFormat::Depth16mm);
+	/*
+	//	gr: the functions above don't find the back camera
+	auto AllDevices = [AVCaptureDevice devices];
+	BufferArray<TCaptureFormatMeta,1> SpecialFormats;
+	EnumCaptureDevices(AllDevices,Enum,GetArrayBridge(SpecialFormats));
+	 */
 #endif
 }
 
