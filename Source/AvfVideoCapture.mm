@@ -596,12 +596,80 @@ TStreamMeta AvfMediaExtractor::GetFrameMeta(CMSampleBufferRef SampleBuffer,size_
 
 TStreamMeta AvfMediaExtractor::GetFrameMeta(CVPixelBufferRef SampleBuffer,size_t StreamIndex)
 {
+	auto PixelBuffer = SampleBuffer;
 	TStreamMeta Meta;
 	Meta.mStreamIndex = StreamIndex;
 	
-	//CMTime CmTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBufferRef);
-	//SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
-
+	//	gr: code duplicated from  AvfPixelBuffer::Lock
+	//	if this is multiple planes, maybe we need to merge it back in again
+	auto PlaneCount = CVPixelBufferGetPlaneCount( PixelBuffer );
+	if ( PlaneCount >= 1 )
+	{
+		std::Debug << __PRETTY_FUNCTION__ << " needs to handle multiple plane data" << std::endl;
+	/*
+		BufferArray<SoyPixelsFormat::Type,2> PlaneFormats;
+		auto Format = CVPixelBufferGetPixelFormatType( PixelBuffer );
+		auto SoyFormat = Avf::GetPixelFormat( Format );
+		SoyPixelsFormat::GetFormatPlanes( SoyFormat, GetArrayBridge(PlaneFormats) );
+		auto PixelBufferDataSize = CVPixelBufferGetDataSize(PixelBuffer);
+		for ( size_t PlaneIndex=0;	PlaneIndex<PlaneCount;	PlaneIndex++ )
+		{
+			//	gr: although the blitter can split this for us, I assume there MAY be a case where planes are not contiguous, so for this platform handle it explicitly
+			auto Width = CVPixelBufferGetWidthOfPlane( PixelBuffer, PlaneIndex );
+			auto Height = CVPixelBufferGetHeightOfPlane( PixelBuffer, PlaneIndex );
+			auto* Pixels = CVPixelBufferGetBaseAddressOfPlane( PixelBuffer, PlaneIndex );
+			auto BytesPerRow = CVPixelBufferGetBytesPerRowOfPlane( PixelBuffer, PlaneIndex );
+			auto PlaneFormat = PlaneFormats[PlaneIndex];
+			
+			//	gr: should this throw?
+			if ( !Pixels )
+			{
+				std::Debug << "Image plane #" << PlaneIndex << "/" << PlaneCount << " " << Width << "x" << Height << " return null" << std::endl;
+				continue;
+			}
+			
+			//	data size here is for the whole image, so we need to calculate (ie. ASSUME) it ourselves.
+			SoyPixelsMeta PlaneMeta( Width, Height, PlaneFormat );
+			
+			//	should be LESS as there are multiple plaens in the total buffer, but we'll do = just for the sake of the safety
+			Soy::Assert( PlaneMeta.GetDataSize() <= PixelBufferDataSize, "Plane's calcualted data size exceeds the total buffer size" );
+			
+			//	gr: currently we only have one transform... so... only apply to main plane (and hope they're the same)
+			float3x3 DummyTransform;
+			float3x3& PlaneTransform = (PlaneIndex == 0) ? Transform : DummyTransform;
+			
+			LockPixels( Planes, Pixels, BytesPerRow, PlaneMeta, PlaneTransform );
+		}
+	 */
+	}
+	else
+	{
+		//	get the "non-planar" image
+		auto Height = CVPixelBufferGetHeight( PixelBuffer );
+		auto Width = CVPixelBufferGetWidth( PixelBuffer );
+		//auto* Pixels = CVPixelBufferGetBaseAddress(PixelBuffer);
+		auto Format = CVPixelBufferGetPixelFormatType( PixelBuffer );
+		//Soy::TFourcc FormatFourcc(Format);
+		//auto DataSize = CVPixelBufferGetDataSize(PixelBuffer);
+		auto SoyFormat = Avf::GetPixelFormat( Format );
+		/*
+		auto BytesPerRow = CVPixelBufferGetBytesPerRow( PixelBuffer );
+		if ( SoyFormat == SoyPixelsFormat::Invalid )
+		{
+			std::stringstream Error;
+			Error << "Trying to lock plane but pixel format(" << Format << "/" << FormatFourcc <<") is unsupported(" << SoyFormat << ")";
+			throw Soy::AssertException(Error.str());
+		}
+		
+		if ( !Pixels )
+		throw Soy::AssertException("Failed to get pixel buffer address");
+		
+		SoyPixelsMeta Meta( Width, Height, SoyFormat );
+		LockPixels( Planes, Pixels, BytesPerRow, Meta, Transform, DataSize );
+		*/
+		Meta.mPixelMeta = SoyPixelsMeta( Width, Height, SoyFormat );
+	}
+		
 	return Meta;
 }
 
