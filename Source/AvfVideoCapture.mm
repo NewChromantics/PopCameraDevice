@@ -620,24 +620,24 @@ TStreamMeta AvfMediaExtractor::GetFrameMeta(CVPixelBufferRef SampleBuffer,size_t
 			auto* Pixels = CVPixelBufferGetBaseAddressOfPlane( PixelBuffer, PlaneIndex );
 			auto BytesPerRow = CVPixelBufferGetBytesPerRowOfPlane( PixelBuffer, PlaneIndex );
 			auto PlaneFormat = PlaneFormats[PlaneIndex];
-			
+	 
 			//	gr: should this throw?
 			if ( !Pixels )
 			{
 				std::Debug << "Image plane #" << PlaneIndex << "/" << PlaneCount << " " << Width << "x" << Height << " return null" << std::endl;
 				continue;
 			}
-			
+	 
 			//	data size here is for the whole image, so we need to calculate (ie. ASSUME) it ourselves.
 			SoyPixelsMeta PlaneMeta( Width, Height, PlaneFormat );
-			
+	 
 			//	should be LESS as there are multiple plaens in the total buffer, but we'll do = just for the sake of the safety
 			Soy::Assert( PlaneMeta.GetDataSize() <= PixelBufferDataSize, "Plane's calcualted data size exceeds the total buffer size" );
-			
+	 
 			//	gr: currently we only have one transform... so... only apply to main plane (and hope they're the same)
 			float3x3 DummyTransform;
 			float3x3& PlaneTransform = (PlaneIndex == 0) ? Transform : DummyTransform;
-			
+	 
 			LockPixels( Planes, Pixels, BytesPerRow, PlaneMeta, PlaneTransform );
 		}
 	 */
@@ -669,7 +669,7 @@ TStreamMeta AvfMediaExtractor::GetFrameMeta(CVPixelBufferRef SampleBuffer,size_t
 		*/
 		Meta.mPixelMeta = SoyPixelsMeta( Width, Height, SoyFormat );
 	}
-		
+	
 	return Meta;
 }
 
@@ -805,7 +805,7 @@ void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,s
 	auto IsFiltered = DepthData.depthDataFiltered;
 	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
 		
-	std::Debug << "Depth format " << DepthFormat << " quality=" << Quality << " Accuracy=" << Accuracy << " IsFiltered=" << IsFiltered << std::endl;
+	//std::Debug << "Depth format " << DepthFormat << " quality=" << Quality << " Accuracy=" << Accuracy << " IsFiltered=" << IsFiltered << std::endl;
 	OnSampleBuffer( DepthPixels, Timestamp, StreamIndex, DoRetain );
 }
 
