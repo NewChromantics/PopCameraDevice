@@ -206,8 +206,8 @@ k4a_depth_mode_t KinectAzure::GetDepthMode(SoyPixelsMeta Format, size_t& FrameRa
 	//	note: res will/should match colour, not dept
 	switch (Format.GetFormat())
 	{
-	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:	return K4A_DEPTH_MODE_NFOV_UNBINNED;
-	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:		return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	case SoyPixelsFormat::Yuv_8_88_Depth16:	return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	case SoyPixelsFormat::Yuv_844_Depth16:		return K4A_DEPTH_MODE_NFOV_UNBINNED;
 	case SoyPixelsFormat::BGRA_Depth16:				return K4A_DEPTH_MODE_NFOV_UNBINNED;
 	}
 
@@ -237,17 +237,16 @@ k4a_color_resolution_t KinectAzure::GetLargestColourResolution(SoyPixelsFormat::
 	switch (Format)
 	{
 		//	this doesn't work at all
-	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:
+	case SoyPixelsFormat::Yuv_844_Depth16:
 		return K4A_COLOR_RESOLUTION_OFF;
 
-	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:
+	case SoyPixelsFormat::Yuv_8_88_Depth16:
 		return K4A_COLOR_RESOLUTION_720P;
 
 	case SoyPixelsFormat::BGRA_Depth16:
 		return K4A_COLOR_RESOLUTION_1536P;
 
-	case SoyPixelsFormat::Yuv_844_Ntsc:
-	case SoyPixelsFormat::Yuv_8_88_Ntsc:
+	case SoyPixelsFormat::Nv12:
 		return K4A_COLOR_RESOLUTION_3072P;
 	}
 	//	needs to throw?
@@ -333,8 +332,8 @@ SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
 		return SoyPixelsFormat::Depth16mm;
 
 	case K4A_IMAGE_FORMAT_COLOR_BGRA32:	return SoyPixelsFormat::BGRA;
-	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Yuv_8_88_Ntsc;
-	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::Yuv_844_Ntsc;
+	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Nv12;
+	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::YUY2;
 	case K4A_IMAGE_FORMAT_CUSTOM8:		return SoyPixelsFormat::Greyscale;
 
 	default:
@@ -361,12 +360,12 @@ k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
 	case SoyPixelsFormat::BGRA_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
-	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:
-	case SoyPixelsFormat::Yuv_8_88_Ntsc:
+	case SoyPixelsFormat::Yuv_8_88_Depth16:
+	case SoyPixelsFormat::Nv12:
 		return K4A_IMAGE_FORMAT_COLOR_NV12;
 
-	case SoyPixelsFormat::Yuv_844_Ntsc:
-	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:
+	case SoyPixelsFormat::YUY2:
+	case SoyPixelsFormat::Yuv_844_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_YUY2;
 
 		//	return YUV for luma?
@@ -478,7 +477,7 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 		Formats.PushBack(FormatString);
 	};
 
-	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::Yuv_8_88_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::BGRA_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_1080P, SoyPixelsFormat::BGRA_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_1440P, SoyPixelsFormat::BGRA_Depth16);
