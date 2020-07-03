@@ -226,7 +226,6 @@
 		BFEE8DFE22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
-		BFFAE20024AFE811006C999C /* KinectAzure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1009,7 +1008,6 @@
 				BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
 				BF012B64226A30C7003AEB55 /* SoyShader.cpp in Sources */,
 				BF012AD22269FAE2003AEB55 /* PopCameraDevice.cpp in Sources */,
-				BFFAE20024AFE811006C999C /* KinectAzure.cpp in Sources */,
 				BF012ADF2269FC83003AEB55 /* SoyAssert.cpp in Sources */,
 				BF012B59226A2FE0003AEB55 /* SoyWave.cpp in Sources */,
 				BF012ADD2269FC83003AEB55 /* SoyPixels.cpp in Sources */,
@@ -1268,6 +1266,7 @@
 		};
 		BF108A9B22970C92003DDC5F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1301,6 +1300,7 @@
 		};
 		BF108A9C22970C92003DDC5F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
