@@ -413,6 +413,9 @@
 		BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyAutoReleasePtr.h; sourceTree = "<group>"; };
 		BFEE8DFB22B125AA00F89A39 /* SoyJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoyJson.h; sourceTree = "<group>"; };
 		BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoyJson.cpp; sourceTree = "<group>"; };
+		BFFAE1FB24AFE4C7006C999C /* Libs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Libs; path = Source/Libs; sourceTree = "<group>"; };
+		BFFAE1FC24AFE4E8006C999C /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		BFFAE1FD24AFE694006C999C /* packages.config */ = {isa = PBXFileReference; lastKnownFileType = text; path = packages.config; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -580,6 +583,7 @@
 		BF108A902296F7BD003DDC5F /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				BFFAE1FD24AFE694006C999C /* packages.config */,
 				BF108AD0229726B9003DDC5F /* LibFreenect */,
 				BF108A9D2297136F003DDC5F /* LibFreenect2 */,
 				BF108A912296F7D6003DDC5F /* LibFreenect2 */,
@@ -622,7 +626,9 @@
 		BF4A6A0B1EA16D7C00613A64 = {
 			isa = PBXGroup;
 			children = (
+				BFFAE1FC24AFE4E8006C999C /* Readme.md */,
 				BF108A902296F7BD003DDC5F /* Libs */,
+				BFFAE1FB24AFE4C7006C999C /* Libs */,
 				BF0A19C21EA428F4007EBC95 /* Unity */,
 				BFD6076D1EA16ED20035C814 /* Source */,
 				BF1520112384861D00A70EBF /* PopCameraDevice_Ios */,
