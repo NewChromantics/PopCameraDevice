@@ -226,6 +226,7 @@
 		BFEE8DFE22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BFEE8E0022B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
+		BFFAE20024AFE811006C999C /* KinectAzure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -416,6 +417,8 @@
 		BFFAE1FB24AFE4C7006C999C /* Libs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Libs; path = Source/Libs; sourceTree = "<group>"; };
 		BFFAE1FC24AFE4E8006C999C /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		BFFAE1FD24AFE694006C999C /* packages.config */ = {isa = PBXFileReference; lastKnownFileType = text; path = packages.config; sourceTree = "<group>"; };
+		BFFAE1FE24AFE7FB006C999C /* KinectAzure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KinectAzure.h; path = Source/KinectAzure.h; sourceTree = "<group>"; };
+		BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = KinectAzure.cpp; path = Source/KinectAzure.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -688,13 +691,13 @@
 			children = (
 				BF012B01226A03C5003AEB55 /* Avf.h */,
 				BF012B02226A047F003AEB55 /* Avf.mm */,
-				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
-				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
 				BF012ACD2268DE24003AEB55 /* AvfCapture.h */,
 				BF012ACE2268DE24003AEB55 /* AvfCapture.mm */,
 				BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */,
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF012AAE2268DBF8003AEB55 /* BundleInfo.plist */,
+				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
+				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
 				BF012AA92268DBF7003AEB55 /* FrameworkInfo.plist */,
 				BF108A872296F476003DDC5F /* Freenect.cpp */,
 				BF108A862296F476003DDC5F /* Freenect.h */,
@@ -702,6 +705,8 @@
 				BFEE8DE922B006CE00F89A39 /* Freenect2.h */,
 				BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */,
 				BF108A8C2296F4BE003DDC5F /* Kinect2.h */,
+				BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */,
+				BFFAE1FE24AFE7FB006C999C /* KinectAzure.h */,
 				BF1826A424226836006FEB93 /* magic_enum.hpp */,
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
 				BF012AAA2268DBF7003AEB55 /* MfCapture.h */,
@@ -1004,6 +1009,7 @@
 				BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
 				BF012B64226A30C7003AEB55 /* SoyShader.cpp in Sources */,
 				BF012AD22269FAE2003AEB55 /* PopCameraDevice.cpp in Sources */,
+				BFFAE20024AFE811006C999C /* KinectAzure.cpp in Sources */,
 				BF012ADF2269FC83003AEB55 /* SoyAssert.cpp in Sources */,
 				BF012B59226A2FE0003AEB55 /* SoyWave.cpp in Sources */,
 				BF012ADD2269FC83003AEB55 /* SoyPixels.cpp in Sources */,
@@ -1262,7 +1268,6 @@
 		};
 		BF108A9B22970C92003DDC5F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1296,7 +1301,6 @@
 		};
 		BF108A9C22970C92003DDC5F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -1459,7 +1463,6 @@
 		};
 		BF4A6A191EA16D7D00613A64 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";

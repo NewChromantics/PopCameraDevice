@@ -8,10 +8,12 @@ Kinect Azure
 ============
 - Windows compiles with SDK path
 - Linux comes via nuget package (Comes with windows, so we should switch to that)
+- Added a `packages.config` in `/Source/Libs/`
 - Osx
 	- `brew install nuget`
-	- `
+	- `cd Source/Libs`
+	- `nuget install`
 - Linux
 	- `sudo apt install nuget`
-	- `nuget install Microsoft.Azure.Kinect.Sensor --version 1.4.1`
-
+- Windows
+	- We should be able to add packages.config to the project...

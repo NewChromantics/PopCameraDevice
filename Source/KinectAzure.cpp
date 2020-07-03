@@ -1,13 +1,20 @@
 #include "KinectAzure.h"
-#include <k4abt.h>
+//#include <k4abt.h>
 #include <k4a/k4a.h>
 #include "SoyDebug.h"
 #include "HeapArray.hpp"
 #include "MagicEnum/include/magic_enum.hpp"
-#include "SoyRuntimeLibrary.h"
 #include "SoyThread.h"
 #include "SoyMedia.h"
+#include <cmath>	//	fabsf
 
+#if defined(TARGET_WINDOWS)
+#define K4A_DLL	"k4a.dll"
+#endif
+
+#if defined(K4A_DLL)
+#include "SoyRuntimeLibrary.h"
+#endif
 
 #if !defined(ENABLE_KINECTAZURE)
 #error Expected ENABLE_KINECTAZURE to be defined
@@ -413,11 +420,13 @@ void KinectAzure::LoadDll()
 	if (DllLoaded)
 		return;
 
+#if defined(K4A_DLL)
 	//	we should just try, because if the parent process has loaded it, this
 	//	will just load
-	Soy::TRuntimeLibrary DllK4a("k4a.dll");
+	Soy::TRuntimeLibrary DllK4a(K4A_DLL);
 	//Soy::TRuntimeLibrary DllK4abt("k4abt.dll");
-
+#endif
+	
 	DllLoaded = true;
 }
 
@@ -527,7 +536,7 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 {
 	ssize_t SerialIndex = -1;
 	size_t RunningIndex = 0;
-	auto EnumName = [&](const std::string& DeviceSerial,ArrayBridge<std::string>& Formats)
+	auto EnumName = [&](const std::string& DeviceSerial,ArrayBridge<std::string>&& Formats)
 	{
 		if (SerialIndex >= 0)
 			return;
