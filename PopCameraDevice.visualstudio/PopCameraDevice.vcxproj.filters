@@ -295,9 +295,6 @@
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in">
       <Filter>Libs\LibFreenect</Filter>
     </None>
-    <None Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
-      <Filter>Unity</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
@@ -324,6 +321,9 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\Source\Libs\KinectAzure\depthengine_2_0.dll">
       <Filter>Libs\KinectAzure</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Unity\PopCameraDevice\Assets\PopCameraDevice\PopCameraDevice.cs">
+      <Filter>Unity</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>
