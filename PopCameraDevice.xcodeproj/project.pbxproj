@@ -413,6 +413,11 @@
 		BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyAutoReleasePtr.h; sourceTree = "<group>"; };
 		BFEE8DFB22B125AA00F89A39 /* SoyJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoyJson.h; sourceTree = "<group>"; };
 		BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SoyJson.cpp; sourceTree = "<group>"; };
+		BFFAE1FB24AFE4C7006C999C /* Libs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Libs; path = Source/Libs; sourceTree = "<group>"; };
+		BFFAE1FC24AFE4E8006C999C /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
+		BFFAE1FD24AFE694006C999C /* packages.config */ = {isa = PBXFileReference; lastKnownFileType = text; path = packages.config; sourceTree = "<group>"; };
+		BFFAE1FE24AFE7FB006C999C /* KinectAzure.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KinectAzure.h; path = Source/KinectAzure.h; sourceTree = "<group>"; };
+		BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = KinectAzure.cpp; path = Source/KinectAzure.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -580,6 +585,7 @@
 		BF108A902296F7BD003DDC5F /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				BFFAE1FD24AFE694006C999C /* packages.config */,
 				BF108AD0229726B9003DDC5F /* LibFreenect */,
 				BF108A9D2297136F003DDC5F /* LibFreenect2 */,
 				BF108A912296F7D6003DDC5F /* LibFreenect2 */,
@@ -622,7 +628,9 @@
 		BF4A6A0B1EA16D7C00613A64 = {
 			isa = PBXGroup;
 			children = (
+				BFFAE1FC24AFE4E8006C999C /* Readme.md */,
 				BF108A902296F7BD003DDC5F /* Libs */,
+				BFFAE1FB24AFE4C7006C999C /* Libs */,
 				BF0A19C21EA428F4007EBC95 /* Unity */,
 				BFD6076D1EA16ED20035C814 /* Source */,
 				BF1520112384861D00A70EBF /* PopCameraDevice_Ios */,
@@ -682,13 +690,13 @@
 			children = (
 				BF012B01226A03C5003AEB55 /* Avf.h */,
 				BF012B02226A047F003AEB55 /* Avf.mm */,
-				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
-				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
 				BF012ACD2268DE24003AEB55 /* AvfCapture.h */,
 				BF012ACE2268DE24003AEB55 /* AvfCapture.mm */,
 				BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */,
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF012AAE2268DBF8003AEB55 /* BundleInfo.plist */,
+				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
+				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
 				BF012AA92268DBF7003AEB55 /* FrameworkInfo.plist */,
 				BF108A872296F476003DDC5F /* Freenect.cpp */,
 				BF108A862296F476003DDC5F /* Freenect.h */,
@@ -696,6 +704,8 @@
 				BFEE8DE922B006CE00F89A39 /* Freenect2.h */,
 				BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */,
 				BF108A8C2296F4BE003DDC5F /* Kinect2.h */,
+				BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */,
+				BFFAE1FE24AFE7FB006C999C /* KinectAzure.h */,
 				BF1826A424226836006FEB93 /* magic_enum.hpp */,
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
 				BF012AAA2268DBF7003AEB55 /* MfCapture.h */,
@@ -865,13 +875,13 @@
 				TargetAttributes = {
 					BF012AC42268DC95003AEB55 = {
 						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = 2HGDT7H2KX;
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = X52DR36JY2;
+						ProvisioningStyle = Automatic;
 					};
 					BF108A9522970C92003DDC5F = {
 						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = 2HGDT7H2KX;
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = X52DR36JY2;
+						ProvisioningStyle = Automatic;
 					};
 					BF15200F2384861D00A70EBF = {
 						CreatedOnToolsVersion = 10.1;
@@ -1181,12 +1191,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				DEVELOPMENT_TEAM = X52DR36JY2;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1199,6 +1209,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Source/Libs/LibFreenect",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCameraDevice;
@@ -1226,12 +1237,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				DEVELOPMENT_TEAM = X52DR36JY2;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1244,6 +1255,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Source/Libs/LibFreenect",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCameraDevice;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -1270,9 +1282,10 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				DEVELOPMENT_TEAM = X52DR36JY2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/TestAppInfo.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -1282,7 +1295,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.PopCameraDevice.TestApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCameraDevice.TestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -1304,9 +1317,10 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = YES;
-				DEVELOPMENT_TEAM = 2HGDT7H2KX;
+				DEVELOPMENT_TEAM = X52DR36JY2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "$(SRCROOT)/Source/TestAppInfo.plist";
 				LIBRARY_SEARCH_PATHS = (
@@ -1315,7 +1329,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.PopCameraDevice.TestApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.NewChromantics.PopCameraDevice.TestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -1453,7 +1467,6 @@
 		};
 		BF4A6A191EA16D7D00613A64 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";

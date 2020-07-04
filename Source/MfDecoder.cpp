@@ -3,6 +3,8 @@
 #include <Codecapi.h>
 #include <SoyH264.h>
 #include <Propvarutil.h>
+#include <SoyMath.h>
+#include "MagicEnum/include/magic_enum.hpp"
 
 GUID GUID_Invalid = {0};
 
@@ -394,6 +396,9 @@ TStreamMeta MediaFoundation::GetStreamMeta(IMFMediaType& MediaType,bool VerboseD
 			//	gr: sometimes we have invalid pixel format (mjpeg!), so cannot convert pixel format (invalid) to Full/Ntsc/SMPTE etc
 			try
 			{
+				//	gr: as we've removed ntsc/full/smptec from the formats this now needs to be meta data
+				std::Debug << "Todo: handle YUV matrix; " << magic_enum::enum_name(Mode) << std::endl;
+				/*
 				if ( Mode == MFVideoTransferMatrix_BT709 )
 				{
 					auto NewFormat = SoyPixelsFormat::GetYuvFull( Meta.mPixelMeta.GetFormat() );
@@ -413,6 +418,7 @@ TStreamMeta MediaFoundation::GetStreamMeta(IMFMediaType& MediaType,bool VerboseD
 				{
 					throw Soy::AssertException("Unknown matrix format");
 				}
+				*/
 			}
 			catch(std::exception& e)
 			{
@@ -666,25 +672,16 @@ bool MfExtractor::OnSeek()
 void MediaFoundation::GetSupportedFormats(ArrayBridge<SoyPixelsFormat::Type>&& Formats)
 {
 	//	gr: this is more to do with the parent decoder and it's shader support... so this applies to all platforms...
-	Formats.PushBack( SoyPixelsFormat::Yuv_8_8_8_Full );
-	Formats.PushBack( SoyPixelsFormat::Yuv_8_8_8_Ntsc );
-	Formats.PushBack( SoyPixelsFormat::Yuv_8_8_8_Smptec );
+	Formats.PushBack( SoyPixelsFormat::Yuv_8_8_8 );
 	Formats.PushBack( SoyPixelsFormat::RGBA );
 	Formats.PushBack( SoyPixelsFormat::RGB );
-	Formats.PushBack( SoyPixelsFormat::Yuv_8_88_Full );
-	Formats.PushBack( SoyPixelsFormat::Yuv_8_88_Ntsc );
-	Formats.PushBack( SoyPixelsFormat::Yuv_8_88_Smptec );
+	Formats.PushBack( SoyPixelsFormat::Yuv_8_88 );
+	Formats.PushBack( SoyPixelsFormat::YYuv_8888 );
 
-	Formats.PushBack( SoyPixelsFormat::YYuv_8888_Full );
-	Formats.PushBack( SoyPixelsFormat::YYuv_8888_Ntsc );
-	Formats.PushBack( SoyPixelsFormat::YYuv_8888_Smptec );
+	Formats.PushBack( SoyPixelsFormat::Uvy_844 );
+	Formats.PushBack( SoyPixelsFormat::Yuv_844 );
 
-	Formats.PushBack( SoyPixelsFormat::Uvy_844_Full );
-	Formats.PushBack( SoyPixelsFormat::Yuv_844_Full );
-	Formats.PushBack( SoyPixelsFormat::Yuv_844_Ntsc );
-	Formats.PushBack( SoyPixelsFormat::Yuv_844_Smptec );
-
-	Formats.PushBack( SoyPixelsFormat::uyvy );
+	Formats.PushBack( SoyPixelsFormat::uyvy_8888);
 }
 
 
@@ -832,6 +829,8 @@ void MfExtractor::ConfigureVideoStream(TStreamMeta& Stream)
 		//	force override
 		if ( mParams.mForceYuvColourFormat != SoyPixelsFormat::Invalid )
 		{
+			throw Soy::AssertException("Todo: handle mParams.mForceYuvColourFormat now we have no YUV colour spaces");
+				/*
 			try
 			{
 				auto NewTryFormat = SoyPixelsFormat::ChangeYuvColourRange( TryFormat, mParams.mForceYuvColourFormat );
@@ -842,6 +841,7 @@ void MfExtractor::ConfigureVideoStream(TStreamMeta& Stream)
 			{
 				std::Debug << "Failed to forcing YUV format; " << e.what() << std::endl;
 			}
+			*/
 		}
 
 		//	stream's format has changed with SetCurrentMediaType

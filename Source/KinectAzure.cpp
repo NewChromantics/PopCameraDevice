@@ -1,13 +1,20 @@
 #include "KinectAzure.h"
-#include <k4abt.h>
+//#include <k4abt.h>
 #include <k4a/k4a.h>
 #include "SoyDebug.h"
 #include "HeapArray.hpp"
 #include "MagicEnum/include/magic_enum.hpp"
-#include "SoyRuntimeLibrary.h"
 #include "SoyThread.h"
 #include "SoyMedia.h"
+#include <cmath>	//	fabsf
 
+#if defined(TARGET_WINDOWS)
+#define K4A_DLL	"k4a.dll"
+#endif
+
+#if defined(K4A_DLL)
+#include "SoyRuntimeLibrary.h"
+#endif
 
 #if !defined(ENABLE_KINECTAZURE)
 #error Expected ENABLE_KINECTAZURE to be defined
@@ -206,8 +213,8 @@ k4a_depth_mode_t KinectAzure::GetDepthMode(SoyPixelsMeta Format, size_t& FrameRa
 	//	note: res will/should match colour, not dept
 	switch (Format.GetFormat())
 	{
-	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:	return K4A_DEPTH_MODE_NFOV_UNBINNED;
-	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:		return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	case SoyPixelsFormat::Yuv_8_88_Depth16:	return K4A_DEPTH_MODE_NFOV_UNBINNED;
+	case SoyPixelsFormat::Yuv_844_Depth16:		return K4A_DEPTH_MODE_NFOV_UNBINNED;
 	case SoyPixelsFormat::BGRA_Depth16:				return K4A_DEPTH_MODE_NFOV_UNBINNED;
 	}
 
@@ -237,17 +244,16 @@ k4a_color_resolution_t KinectAzure::GetLargestColourResolution(SoyPixelsFormat::
 	switch (Format)
 	{
 		//	this doesn't work at all
-	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:
+	case SoyPixelsFormat::Yuv_844_Depth16:
 		return K4A_COLOR_RESOLUTION_OFF;
 
-	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:
+	case SoyPixelsFormat::Yuv_8_88_Depth16:
 		return K4A_COLOR_RESOLUTION_720P;
 
 	case SoyPixelsFormat::BGRA_Depth16:
 		return K4A_COLOR_RESOLUTION_1536P;
 
-	case SoyPixelsFormat::Yuv_844_Ntsc:
-	case SoyPixelsFormat::Yuv_8_88_Ntsc:
+	case SoyPixelsFormat::Nv12:
 		return K4A_COLOR_RESOLUTION_3072P;
 	}
 	//	needs to throw?
@@ -333,8 +339,8 @@ SoyPixelsFormat::Type KinectAzure::GetFormat(k4a_image_format_t Format)
 		return SoyPixelsFormat::Depth16mm;
 
 	case K4A_IMAGE_FORMAT_COLOR_BGRA32:	return SoyPixelsFormat::BGRA;
-	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Yuv_8_88_Ntsc;
-	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::Yuv_844_Ntsc;
+	case K4A_IMAGE_FORMAT_COLOR_NV12:	return SoyPixelsFormat::Nv12;
+	case K4A_IMAGE_FORMAT_COLOR_YUY2:	return SoyPixelsFormat::YUY2;
 	case K4A_IMAGE_FORMAT_CUSTOM8:		return SoyPixelsFormat::Greyscale;
 
 	default:
@@ -361,12 +367,12 @@ k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
 	case SoyPixelsFormat::BGRA_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
-	case SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16:
-	case SoyPixelsFormat::Yuv_8_88_Ntsc:
+	case SoyPixelsFormat::Yuv_8_88_Depth16:
+	case SoyPixelsFormat::Nv12:
 		return K4A_IMAGE_FORMAT_COLOR_NV12;
 
-	case SoyPixelsFormat::Yuv_844_Ntsc:
-	case SoyPixelsFormat::Yuv_844_Ntsc_Depth16:
+	case SoyPixelsFormat::YUY2:
+	case SoyPixelsFormat::Yuv_844_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_YUY2;
 
 		//	return YUV for luma?
@@ -414,11 +420,13 @@ void KinectAzure::LoadDll()
 	if (DllLoaded)
 		return;
 
+#if defined(K4A_DLL)
 	//	we should just try, because if the parent process has loaded it, this
 	//	will just load
-	Soy::TRuntimeLibrary DllK4a("k4a.dll");
+	Soy::TRuntimeLibrary DllK4a(K4A_DLL);
 	//Soy::TRuntimeLibrary DllK4abt("k4abt.dll");
-
+#endif
+	
 	DllLoaded = true;
 }
 
@@ -478,7 +486,7 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 		Formats.PushBack(FormatString);
 	};
 
-	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::Yuv_8_88_Ntsc_Depth16);
+	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::Yuv_8_88_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::BGRA_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_1080P, SoyPixelsFormat::BGRA_Depth16);
 	PushColourFormat(K4A_COLOR_RESOLUTION_1440P, SoyPixelsFormat::BGRA_Depth16);
@@ -528,7 +536,7 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 {
 	ssize_t SerialIndex = -1;
 	size_t RunningIndex = 0;
-	auto EnumName = [&](const std::string& DeviceSerial,ArrayBridge<std::string>& Formats)
+	auto EnumName = [&](const std::string& DeviceSerial,ArrayBridge<std::string>&& Formats)
 	{
 		if (SerialIndex >= 0)
 			return;

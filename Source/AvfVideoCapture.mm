@@ -95,8 +95,11 @@ namespace Avf
 
 
 
-
+#if defined(TARGET_IOS)
 @interface DepthCaptureProxy : NSObject <AVCaptureDepthDataOutputDelegate>
+#elif defined(TARGET_OSX)
+@interface DepthCaptureProxy : NSObject
+#endif
 {
 	AvfVideoCapture*	mParent;
 	size_t				mStreamIndex;
@@ -104,11 +107,13 @@ namespace Avf
 
 - (id)initWithVideoCapturePrivate:(AvfVideoCapture*)parent;
 
+#if defined(TARGET_IOS)
 - (void)depthDataOutput:(AVCaptureDepthDataOutput *)output didOutputDepthData:(AVDepthData *)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection;
 - (void)depthDataOutput:(AVCaptureDepthDataOutput *)output didDropDepthData:(AVDepthData *)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection reason:(AVCaptureOutputDataDroppedReason)reason;
 //- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 //- (void)captureOutput:(AVCaptureOutput *)captureOutput didDropSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
 - (void)onVideoError:(NSNotification *)notification;
+#endif
 
 @end
 
@@ -148,18 +153,20 @@ namespace Avf
 	return self;
 }
 
-
+#if defined(TARGET_IOS)
 - (void)depthDataOutput:(AVCaptureDepthDataOutput *)captureOutput didOutputDepthData:(AVDepthData*)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection
 {
 	static bool DoRetain = true;
 	mParent->OnDepthFrame( depthData, timestamp, mStreamIndex, DoRetain );
 }
+#endif
 
-
+#if defined(TARGET_IOS)
 - (void)depthDataOutput:(AVCaptureDepthDataOutput *)output didDropDepthData:(AVDepthData *)depthData timestamp:(CMTime)timestamp connection:(AVCaptureConnection *)connection reason:(AVCaptureOutputDataDroppedReason)reason;
 {
 	std::Debug << "dropped depth sample" << std::endl;
 }
+#endif
 
 @end
 
