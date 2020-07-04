@@ -243,7 +243,7 @@ void GetObjectJson(const SoyPixelsMeta& PlaneMeta, std::stringstream& Json, int 
 
 	PushJson(Json, "Width", PlaneMeta.GetWidth(), Tabs, true);
 	PushJson(Json, "Height", PlaneMeta.GetHeight(), Tabs, true);
-	PushJson(Json, "Format", PlaneMeta.GetFormat(), Tabs, true);
+	PushJson(Json, "Format", SoyPixelsFormat::ToString(PlaneMeta.GetFormat()), Tabs, true);
 	PushJson(Json, "DataSize", PlaneMeta.GetDataSize(), Tabs, true);
 	PushJson(Json, "Channels", PlaneMeta.GetChannels(), Tabs, false);
 
