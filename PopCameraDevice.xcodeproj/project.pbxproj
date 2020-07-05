@@ -408,6 +408,8 @@
 		BFD607771EA16F0A0035C814 /* IUnityGraphicsD3D12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D12.h; path = Source/Unity/IUnityGraphicsD3D12.h; sourceTree = "<group>"; };
 		BFD607781EA16F0A0035C814 /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsMetal.h; path = Source/Unity/IUnityGraphicsMetal.h; sourceTree = "<group>"; };
 		BFD607791EA16F0A0035C814 /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityInterface.h; path = Source/Unity/IUnityInterface.h; sourceTree = "<group>"; };
+		BFE462BC24B1D89000D04A4C /* SoyEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyEnum.h; sourceTree = "<group>"; };
+		BFE462BD24B1D92E00D04A4C /* magic_enum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = magic_enum.hpp; path = magic_enum/include/magic_enum.hpp; sourceTree = "<group>"; };
 		BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Freenect2.cpp; path = Source/Freenect2.cpp; sourceTree = "<group>"; };
 		BFEE8DE922B006CE00F89A39 /* Freenect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Freenect2.h; path = Source/Freenect2.h; sourceTree = "<group>"; };
 		BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyAutoReleasePtr.h; sourceTree = "<group>"; };
@@ -494,6 +496,7 @@
 		BF012AD52269FC5C003AEB55 /* SoyLib */ = {
 			isa = PBXGroup;
 			children = (
+				BFE462BD24B1D92E00D04A4C /* magic_enum.hpp */,
 				BF012B1A226A1FD3003AEB55 /* AvfPixelBuffer.h */,
 				BF39C0C9240089E9000C7E56 /* Array.hpp */,
 				BF012B1B226A1FD3003AEB55 /* AvfPixelBuffer.mm */,
@@ -508,6 +511,7 @@
 				BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */,
 				BF012B25226A21C0003AEB55 /* SoyAvf.h */,
 				BF012B26226A21C0003AEB55 /* SoyAvf.mm */,
+				BFE462BC24B1D89000D04A4C /* SoyEnum.h */,
 				BF012AEF2269FE13003AEB55 /* SoyDebug.cpp */,
 				BF012AEE2269FE13003AEB55 /* SoyDebug.h */,
 				BF012AED2269FE12003AEB55 /* SoyDebug.mm */,
