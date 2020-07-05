@@ -161,6 +161,9 @@ public static class PopCameraDevice
 			//	special/currently unhandled case, c++ code gives out 16bit, 1 component data
 			if (PixelFormat == PixelFormat.Depth16mm)
 				return TextureFormat.R16;
+				
+			if (PixelFormat == PopX.PixelFormat.DepthFloatMetres)
+				return TextureFormat.RFloat;
 
 			switch (ComponentCount)
 			{
