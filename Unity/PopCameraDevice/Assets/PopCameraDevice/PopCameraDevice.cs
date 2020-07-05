@@ -12,8 +12,16 @@ using PopX;		//	for PopX.PixelFormat, replace this and provide your own pixelfor
 /// </summary>
 public static class PopCameraDevice
 {
+#if UNITY_UWP
+	private const string PluginName = "PopCameraDevice.Uwp";
+#elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+	private const string PluginName = "Assets/PopCameraDevice/PopCameraDevice_Osx.framework/Versions/A/PopCameraDevice_Osx";
+#elif UNITY_IOS
+	private const string PluginName = "__Internal";
+#else
 	private const string PluginName = "PopCameraDevice";
-
+#endif
+	
 	//	use byte as System.Char is a unicode char (2 bytes), then convert to Unicode Char
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern void PopCameraDevice_EnumCameraDevicesJson([In, Out] byte[] StringBuffer,int StringBufferLength);
