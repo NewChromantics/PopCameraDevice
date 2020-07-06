@@ -45,6 +45,8 @@ $(SOY_PATH)/src/SoyImage.cpp \
 $(SOY_PATH)/src/SoyStreamBuffer.cpp \
 $(SOY_PATH)/src/SoyFourcc.cpp \
 $(SOY_PATH)/src/SoyMedia.cpp \
+$(SOY_PATH)/src/SoyMediaFormat.cpp \
+$(SOY_PATH)/src/SoyWave.cpp \
 $(SOY_PATH)/src/SoyThread.cpp
 
 TESTAPP_SRC_FILES =	\
@@ -72,9 +74,11 @@ lib: $(OUT_LIBRARY)
 .PHONY: lib
 
 $(OUT_EXECUTABLE): $(TESTAPP_OBJECTS) $(OUT_LIBRARY)
+	echo "Building test app $(OUT_EXECUTABLE)"
 	$(CC) $(LDFLAGS) $^ -o $@ $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 
 $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS) 
+	echo "Building library $(OUT_LIBRARY)"
 	g++ -shared -o $@ $(LIB_OBJECTS)
 	#ar rcs $@ $(LIB_OBJECTS)
 
@@ -83,6 +87,7 @@ $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS)
 
 clean:
 	# clean build files, anything .o
+	echo "Cleaning files"
 	rm -f $(TESTAPP_OBJECTS)
 	rm -f $(LIB_OBJECTS)	
 	#find ../ -type f -name '*.o' -delete
