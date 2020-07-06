@@ -20,9 +20,7 @@ $(SRC)/Source/Libs/KinectAzure/Linux/lib/native/arm64/release/libk4a.so
 
 LOCAL_LINK_LIBS = \
 -lk4a	\
--lk4arecord.so.1.4.1	\
--ldepthengine	\
--ldepthengine.so.2.0
+-ldepthengine	
 
 LOCAL_SRC_FILES  = \
 $(SRC)/Source/PopCameraDevice.cpp \
@@ -58,7 +56,7 @@ LOCAL_DEFINES = \
 
 # PIC means position independent code, required for dynamically loaded symbols
 CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17 -fPIC
-LDFLAGS = -static -pthread $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
+LDFLAGS = -pthread 
 
 OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o) $(LOCAL_BUILD_FILES:.cpp=.o)
 LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
@@ -75,9 +73,9 @@ lib: $(OUT_LIBRARY)
 .PHONY: lib
 
 $(OUT_EXECUTABLE): $(BUILD_OBJECTS) $(OUT_LIBRARY)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $^ -o $@ $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 
-$(OUT_LIBRARY): $(K4A_LIB) $(OBJECTS) 
+$(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS) 
 	g++ -shared -o $@ $(LIB_OBJECTS)
 	#ar rcs $@ $(LIB_OBJECTS)
 
