@@ -9,17 +9,20 @@ SOY_PATH = $(SRC)/Source/SoyLib
 LOCAL_C_INCLUDES = \
 -I$(SRC)/Source	\
 -I$(SOY_PATH)/src	\
--I$(SRC)/Source/MagicEnum/include
+-I$(SRC)/Source/MagicEnum/include \
 -I$(SRC)/Source/Libs/KinectAzure/build/native/include
-../Source/Libs/KinectAzure/linux/lib/native/arm64/release/
-libdepthengine.so  libdepthengine.so.2.0  libk4arecord.so.1.4.1  libk4a.so.1.4.1
 
 LOCAL_LINK_DIRS = \
 -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/
 
+K4ALIB = \
+$(SRC)/Source/Libs/KinectAzure/Linux/lib/native/arm64/release/libk4a.so.1.4.1
+
 LOCAL_LINK_LIBS = \
 -lk4a.so.1.4.1	\
+-lk4arecord.so.1.4.1	\
 -ldepthengine.so	\
+-ldepthengine.so.2.0
 
 LOCAL_SRC_FILES  = \
 $(SRC)/Source/PopCameraDevice.cpp \
@@ -49,7 +52,11 @@ $(SOY_PATH)/src/SoyThread.cpp
 LOCAL_BUILD_FILES =	\
 $(SRC)/Source/PopCameraDevice_TestApp.cpp 
 
-CFLAGS = -c -DTARGET_LINUX -DENABLE_KINECTAZURE $(LOCAL_C_INCLUDES) -std=gnu++17
+LOCAL_DEFINES = \
+-DTARGET_LINUX	\
+-DENABLE_KINECTAZURE	\
+
+CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17
 LDFLAGS = -static -pthread $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 
 OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o) $(LOCAL_BUILD_FILES:.cpp=.o)
@@ -69,7 +76,7 @@ lib: $(OUT_LIBRARY) clean
 $(OUT_EXECUTABLE): $(BUILD_OBJECTS) $(OUT_LIBRARY)
 	$(CC) $(LDFLAGS) $^ -o $@
 
- $(OUT_LIBRARY): $(OBJECTS) Dependencies
+$(OUT_LIBRARY): $(K4A_LIB) $(OBJECTS) 
 	ar rcs $@ $(LIB_OBJECTS)
 
 .cpp.o:
@@ -83,7 +90,7 @@ clean:
 cleanExec:
 	mv $(OUT_EXECUTABLE) ./libs/$(ARCHITECTURE)/
 
-Dependencies:
+$(K4A_LIB):
 # sudo apt-get install nuget
 #	nuget restore ../Libs/
 	wget https://www.nuget.org/api/v2/package/Microsoft.Azure.Kinect.Sensor/1.4.1 -O ../Source/Libs/MicrosoftAzureKinectSensor.zip
