@@ -65,13 +65,13 @@ LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
 BUILD_OBJECTS=$(LOCAL_BUILD_FILES:.cpp=.o)
 
 ARCHITECTURE=${archTarget}
-OUT_LIBRARY=PopCameraDevice.a
+OUT_LIBRARY=PopCameraDevice.so
 OUT_EXECUTABLE=PopCameraTest
 
-exec: $(OUT_EXECUTABLE) clean cleanExec
+exec: $(OUT_EXECUTABLE) 
 .PHONY: exec
 
-lib: $(OUT_LIBRARY) clean
+lib: $(OUT_LIBRARY) 
 .PHONY: lib
 
 $(OUT_EXECUTABLE): $(BUILD_OBJECTS) $(OUT_LIBRARY)
@@ -85,12 +85,11 @@ $(OUT_LIBRARY): $(K4A_LIB) $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
-	mkdir -p ./libs/$(ARCHITECTURE)/objects/
-	mv $(OBJECTS) ./libs/$(ARCHITECTURE)/objects
-	mv $(LIBRARY) ./libs/$(ARCHITECTURE)/
+	# clean build files, anything .o
+	find ../ -type f -name '*.o' -delete
+	rm -f $(OUT_LIBRARY)
+	rm -f $(OUT_EXECUTABLE)
 
-cleanExec:
-	mv $(OUT_EXECUTABLE) ./libs/$(ARCHITECTURE)/
 
 $(K4A_LIB):
 # sudo apt-get install nuget
