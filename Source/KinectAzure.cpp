@@ -1,4 +1,8 @@
 #include "KinectAzure.h"
+
+#define K4A_DEPRECATED	__attribute__((deprecated))
+#define K4A_STATIC_DEFINE
+
 //#include <k4abt.h>
 #include <k4a/k4a.h>
 #include "SoyDebug.h"
