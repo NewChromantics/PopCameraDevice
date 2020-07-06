@@ -47,7 +47,7 @@ $(SOY_PATH)/src/SoyFourcc.cpp \
 $(SOY_PATH)/src/SoyMedia.cpp \
 $(SOY_PATH)/src/SoyThread.cpp
 
-LOCAL_BUILD_FILES =	\
+TESTAPP_SRC_FILES =	\
 $(SRC)/Source/PopCameraDevice_TestApp.cpp 
 
 LOCAL_DEFINES = \
@@ -58,9 +58,8 @@ LOCAL_DEFINES = \
 CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17 -fPIC
 LDFLAGS = -pthread 
 
-OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o) $(LOCAL_BUILD_FILES:.cpp=.o)
 LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
-BUILD_OBJECTS=$(LOCAL_BUILD_FILES:.cpp=.o)
+TESTAPP_OBJECTS=$(TESTAPP_SRC_FILES:.cpp=.o)
 
 ARCHITECTURE=${archTarget}
 OUT_LIBRARY=PopCameraDevice.so
@@ -72,7 +71,7 @@ exec: $(OUT_EXECUTABLE)
 lib: $(OUT_LIBRARY) 
 .PHONY: lib
 
-$(OUT_EXECUTABLE): $(BUILD_OBJECTS) $(OUT_LIBRARY)
+$(OUT_EXECUTABLE): $(TESTAPP_OBJECTS) $(OUT_LIBRARY)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 
 $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS) 
@@ -84,7 +83,9 @@ $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS)
 
 clean:
 	# clean build files, anything .o
-	find ../ -type f -name '*.o' -delete
+	rm -f $(TESTAPP_OBJECTS)
+	rm -f $(LIB_OBJECTS)	
+	#find ../ -type f -name '*.o' -delete
 	rm -f $(OUT_LIBRARY)
 	rm -f $(OUT_EXECUTABLE)
 
