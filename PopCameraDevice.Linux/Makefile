@@ -14,6 +14,7 @@ LOCAL_C_INCLUDES = \
 LOCAL_SRC_FILES  = \
 $(SRC)/Source/PopCameraDevice.cpp \
 $(SRC)/Source/TestDevice.cpp \
+$(SRC)/Source/KinectAzure.cpp \
 $(SRC)/Source/TCameraDevice.cpp \
 $(SRC)/Source/TOutputDevice.cpp 
 
@@ -38,7 +39,7 @@ $(SOY_PATH)/src/SoyThread.cpp
 LOCAL_BUILD_FILES =	\
 $(SRC)/Source/PopCameraDevice_TestApp.cpp 
 
-CFLAGS = -c -DTARGET_LINUX $(LOCAL_C_INCLUDES) -std=gnu++17
+CFLAGS = -c -DTARGET_LINUX -DENABLE_KINECTAZURE $(LOCAL_C_INCLUDES) -std=gnu++17
 LDFLAGS = -static -pthread
 
 OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o) $(LOCAL_BUILD_FILES:.cpp=.o)
