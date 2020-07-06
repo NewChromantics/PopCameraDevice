@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
-
+#include "soymedia.h"
 
 
 
@@ -393,6 +393,8 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
 #elif defined(TARGET_OSX) || defined(TARGET_IOS)
 		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name,Format));
+#else
+		std::shared_ptr<TDevice> Device;
 #endif
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);

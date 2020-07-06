@@ -1,0 +1,28 @@
+name: Build Linux
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  Build:
+    env:
+      archTarget: arm64
+    runs-on: ubuntu-latest
+    # This container can be modified to pull in the compiler for different architectures
+    # https://hub.docker.com/_/gcc?tab=tags
+    container: gcc
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Compile project
+        run: |
+          make lib -C $GITHUB_WORKSPACE/PopCameraDevice.Linux/
+      - name: Archive build
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.archTarget }}
+          path: PopCameraDevice.Linux/libs/${{ env.archTarget }}
