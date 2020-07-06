@@ -10,6 +10,16 @@ LOCAL_C_INCLUDES = \
 -I$(SRC)/Source	\
 -I$(SOY_PATH)/src	\
 -I$(SRC)/Source/MagicEnum/include
+-I$(SRC)/Source/Libs/KinectAzure/build/native/include
+../Source/Libs/KinectAzure/linux/lib/native/arm64/release/
+libdepthengine.so  libdepthengine.so.2.0  libk4arecord.so.1.4.1  libk4a.so.1.4.1
+
+LOCAL_LINK_DIRS = \
+-L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/
+
+LOCAL_LINK_LIBS = \
+-lk4a.so.1.4.1	\
+-ldepthengine.so	\
 
 LOCAL_SRC_FILES  = \
 $(SRC)/Source/PopCameraDevice.cpp \
@@ -40,26 +50,26 @@ LOCAL_BUILD_FILES =	\
 $(SRC)/Source/PopCameraDevice_TestApp.cpp 
 
 CFLAGS = -c -DTARGET_LINUX -DENABLE_KINECTAZURE $(LOCAL_C_INCLUDES) -std=gnu++17
-LDFLAGS = -static -pthread
+LDFLAGS = -static -pthread $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 
 OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o) $(LOCAL_BUILD_FILES:.cpp=.o)
 LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
 BUILD_OBJECTS=$(LOCAL_BUILD_FILES:.cpp=.o)
 
 ARCHITECTURE=${archTarget}
-LIBRARY=PopCameraDevice.a
-EXECUTABLE=pop
+OUT_LIBRARY=PopCameraDevice.a
+OUT_EXECUTABLE=PopCameraTest
 
-exec: $(EXECUTABLE) clean cleanExec
+exec: $(OUT_EXECUTABLE) clean cleanExec
 .PHONY: exec
 
-lib: $(LIBRARY) clean
+lib: $(OUT_LIBRARY) clean
 .PHONY: lib
 
-$(EXECUTABLE): $(BUILD_OBJECTS) $(LIBRARY)
+$(OUT_EXECUTABLE): $(BUILD_OBJECTS) $(OUT_LIBRARY)
 	$(CC) $(LDFLAGS) $^ -o $@
 
- $(LIBRARY): $(OBJECTS) Dependencies
+ $(OUT_LIBRARY): $(OBJECTS) Dependencies
 	ar rcs $@ $(LIB_OBJECTS)
 
 .cpp.o:
@@ -71,7 +81,7 @@ clean:
 	mv $(LIBRARY) ./libs/$(ARCHITECTURE)/
 
 cleanExec:
-	mv $(EXECUTABLE) ./libs/$(ARCHITECTURE)/
+	mv $(OUT_EXECUTABLE) ./libs/$(ARCHITECTURE)/
 
 Dependencies:
 # sudo apt-get install nuget
