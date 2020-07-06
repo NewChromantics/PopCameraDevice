@@ -201,15 +201,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BF108A9422970C92003DDC5F /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		BF5C4AD023FB04D1007D6393 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -790,7 +781,6 @@
 			buildPhases = (
 				BF108A9222970C92003DDC5F /* Sources */,
 				BF108A9322970C92003DDC5F /* Frameworks */,
-				BF108A9422970C92003DDC5F /* CopyFiles */,
 				BF5C4AD023FB04D1007D6393 /* Embed Frameworks */,
 			);
 			buildRules = (
