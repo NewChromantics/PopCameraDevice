@@ -13,15 +13,15 @@ LOCAL_C_INCLUDES = \
 -I$(SRC)/Source/Libs/KinectAzure/build/native/include
 
 LOCAL_LINK_DIRS = \
--L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/
+-L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
 
 K4ALIB = \
-$(SRC)/Source/Libs/KinectAzure/Linux/lib/native/arm64/release/libk4a.so.1.4.1
+$(SRC)/Source/Libs/KinectAzure/Linux/lib/native/arm64/release/libk4a.so
 
 LOCAL_LINK_LIBS = \
--lk4a.so.1.4.1	\
+-lk4a	\
 -lk4arecord.so.1.4.1	\
--ldepthengine.so	\
+-ldepthengine	\
 -ldepthengine.so.2.0
 
 LOCAL_SRC_FILES  = \
@@ -56,7 +56,8 @@ LOCAL_DEFINES = \
 -DTARGET_LINUX	\
 -DENABLE_KINECTAZURE	\
 
-CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17
+# PIC means position independent code, required for dynamically loaded symbols
+CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17 -fPIC
 LDFLAGS = -static -pthread $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 
 OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o) $(LOCAL_BUILD_FILES:.cpp=.o)
@@ -77,7 +78,8 @@ $(OUT_EXECUTABLE): $(BUILD_OBJECTS) $(OUT_LIBRARY)
 	$(CC) $(LDFLAGS) $^ -o $@
 
 $(OUT_LIBRARY): $(K4A_LIB) $(OBJECTS) 
-	ar rcs $@ $(LIB_OBJECTS)
+	g++ -shared -o $@ $(LIB_OBJECTS)
+	#ar rcs $@ $(LIB_OBJECTS)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
@@ -94,6 +96,7 @@ $(K4A_LIB):
 # sudo apt-get install nuget
 #	nuget restore ../Libs/
 	wget https://www.nuget.org/api/v2/package/Microsoft.Azure.Kinect.Sensor/1.4.1 -O ../Source/Libs/MicrosoftAzureKinectSensor.zip
-	unzip ../Source/Libs/MicrosoftAzureKinectSensor.zip -d ../Source/Libs/KinectAzure
+	unzip -o ../Source/Libs/MicrosoftAzureKinectSensor.zip -d ../Source/Libs/KinectAzure
+	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
 
 	
