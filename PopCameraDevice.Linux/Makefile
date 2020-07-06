@@ -58,7 +58,7 @@ lib: $(LIBRARY) clean
 $(EXECUTABLE): $(BUILD_OBJECTS) $(LIBRARY)
 	$(CC) $(LDFLAGS) $^ -o $@
 
- $(LIBRARY): $(OBJECTS)
+ $(LIBRARY): $(OBJECTS) Dependencies
 	ar rcs $@ $(LIB_OBJECTS)
 
 .cpp.o:
@@ -71,3 +71,11 @@ clean:
 
 cleanExec:
 	mv $(EXECUTABLE) ./libs/$(ARCHITECTURE)/
+
+Dependencies:
+# sudo apt-get install nuget
+#	nuget restore ../Libs/
+	wget https://www.nuget.org/api/v2/package/Microsoft.Azure.Kinect.Sensor/1.4.1 -O ../Source/Libs/MicrosoftAzureKinectSensor.zip
+	unzip ../Source/Libs/MicrosoftAzureKinectSensor.zip -d ../Source/Libs/KinectAzure
+
+	
