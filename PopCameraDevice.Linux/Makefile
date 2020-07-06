@@ -68,7 +68,6 @@ clean:
 	mkdir -p ./libs/$(ARCHITECTURE)/objects/
 	mv $(OBJECTS) ./libs/$(ARCHITECTURE)/objects
 	mv $(LIBRARY) ./libs/$(ARCHITECTURE)/
-	Build complete
 
 cleanExec:
 	mv $(EXECUTABLE) ./libs/$(ARCHITECTURE)/
