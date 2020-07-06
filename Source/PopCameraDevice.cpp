@@ -11,88 +11,6 @@
 
 
 
-void PushJsonKey(std::stringstream& Json, const char* Key, int PreTab = 1)
-{
-	for (auto t = 0; t < PreTab; t++)
-		Json << '\t';
-	Json << '"' << Key << '"' << ':';
-}
-
-template<typename TYPE>
-void PushJson(std::stringstream& Json, const char* Key, const TYPE& Value, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJsonKey(Json, Key, PreTab);
-
-	//	todo: escape string
-	Json << '"' << Value << '"';
-
-	if (TrailingComma)
-		Json << ',';
-	Json << '\n';
-}
-
-
-void PushJson(std::stringstream& Json, const char* Key, const char* String, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJsonKey(Json, Key, PreTab);
-
-	//	todo: escape string!
-	Json << '"' << String << '"';
-
-	if (TrailingComma)
-		Json << ',';
-	Json << '\n';
-}
-
-void PushJson(std::stringstream& Json, const char* Key, bool Boolean, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJsonKey(Json, Key, PreTab);
-
-	Json << (Boolean ? "true" : "false");
-
-	if (TrailingComma)
-		Json << ',';
-	Json << '\n';
-}
-
-void PushJson(std::stringstream& Json, const char* Key, int Number, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJsonKey(Json, Key, PreTab);
-
-	Json << Number;
-
-	if (TrailingComma)
-		Json << ',';
-	Json << '\n';
-}
-
-//	help the compiler
-void PushJson(std::stringstream& Json, const char* Key, size_t Number, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
-}
-
-void PushJson(std::stringstream& Json, const char* Key, uint8_t Number, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
-}
-
-
-void PushJson(std::stringstream& Json, const char* Key, float Number, int PreTab = 1, bool TrailingComma = false)
-{
-	PushJsonKey(Json, Key, PreTab);
-
-	//	todo: handle special cases
-	Json << Number;
-
-	if (TrailingComma)
-		Json << ',';
-	Json << '\n';
-}
-
-
-
-
 namespace PopCameraDevice
 {
 	const Soy::TVersion	Version(2, 0, 0);
@@ -201,6 +119,90 @@ public:
 
 	bool						operator==(const uint32_t& InstanceId) const	{	return mInstanceId == InstanceId;	}
 };
+
+
+
+void PushJsonKey(std::stringstream& Json, const char* Key, int PreTab = 1)
+{
+	for (auto t = 0; t < PreTab; t++)
+	Json << '\t';
+	Json << '"' << Key << '"' << ':';
+}
+
+template<typename TYPE>
+void PushJson(std::stringstream& Json, const char* Key, const TYPE& Value, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+	
+	//	todo: escape string
+	Json << '"' << Value << '"';
+	
+	if (TrailingComma)
+	Json << ',';
+	Json << '\n';
+}
+
+
+void PushJson(std::stringstream& Json, const char* Key, const char* String, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+	
+	//	todo: escape string!
+	Json << '"' << String << '"';
+	
+	if (TrailingComma)
+	Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json, const char* Key, bool Boolean, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+	
+	Json << (Boolean ? "true" : "false");
+	
+	if (TrailingComma)
+	Json << ',';
+	Json << '\n';
+}
+
+void PushJson(std::stringstream& Json, const char* Key, int Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+	
+	Json << Number;
+	
+	if (TrailingComma)
+	Json << ',';
+	Json << '\n';
+}
+
+//	help the compiler
+void PushJson(std::stringstream& Json, const char* Key, size_t Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
+}
+
+void PushJson(std::stringstream& Json, const char* Key, uint8_t Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJson(Json, Key, static_cast<int>(Number), PreTab, TrailingComma);
+}
+
+
+void PushJson(std::stringstream& Json, const char* Key, float Number, int PreTab = 1, bool TrailingComma = false)
+{
+	PushJsonKey(Json, Key, PreTab);
+	
+	//	todo: handle special cases
+	Json << Number;
+	
+	if (TrailingComma)
+	Json << ',';
+	Json << '\n';
+}
+
+
+
 
 const char* GetTabString(int TabCount)
 {
