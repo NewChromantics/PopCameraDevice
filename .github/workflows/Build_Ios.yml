@@ -10,7 +10,7 @@ on:
       - master
 
 jobs:
-  Build_Ios:
+  Build:
     runs-on: [self-hosted, macOS]
     
     steps:
