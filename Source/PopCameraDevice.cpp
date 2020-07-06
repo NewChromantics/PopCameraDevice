@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "SoyLib/src/HeapArray.hpp"
 #include "TestDevice.h"
-#include "soymedia.h"
+#include "Soymedia.h"
 
 
 
