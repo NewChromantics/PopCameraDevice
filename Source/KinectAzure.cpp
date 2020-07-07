@@ -16,7 +16,12 @@
 #define K4A_DLL	"k4a.dll"
 #endif
 
-#if defined(K4A_DLL)
+#if defined(TARGET_LINUX)
+#define K4A_DLL	"libk4a.so"
+#define DEPTHENGINE_DLL	"libdepthengine.so"
+#endif
+
+#if defined(K4A_DLL) || defined(DEPTHENGINE_DLL)
 #include "SoyRuntimeLibrary.h"
 #endif
 
