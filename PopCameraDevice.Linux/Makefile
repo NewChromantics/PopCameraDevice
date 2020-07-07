@@ -27,9 +27,10 @@ BUILD_COPY_FILES = \
 $(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/*	
 
 
-LOCAL_LINK_LIBS = \
+LIBRARY_LINK_LIBS = \
 -lk4a	\
 -ldepthengine	
+
 
 LOCAL_SRC_FILES  = \
 $(SRC)/Source/PopCameraDevice.cpp \
@@ -72,7 +73,8 @@ CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17 -fPIC
 # https://serverfault.com/a/402590
 # -Wl is a join-arguments-with-spaces thing
 LDFLAGS = -pthread 
-LDFLAGS += '-Wl,-rpath,$$ORIGIN'
+LDFLAGS += '-Wl,-rpath=$$ORIGIN'
+LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
 
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
 TEST_APP_LINK_FLAGS = $(LDFLAGS)
@@ -93,17 +95,28 @@ lib: $(OUT_LIBRARY)
 $(OUT_EXECUTABLE): $(TESTAPP_OBJECTS) $(OUT_LIBRARY)
 	echo "Building test app $(OUT_EXECUTABLE)"
 	mkdir -p $(BUILD_DIR)
-	$(CC) $(TEST_APP_LINK_FLAGS) $^ -o $@ $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
-	objdump -x $(OUT_EXECUTABLE) | grep RUNPATH
+	# gr: linking to buid/PopCameraDevice means the runtime loader expects it in that directory
+	# 	so we need to link locally (unless it was prefixed with lib)
+	cp $(OUT_LIBRARY) .	
+	$(CC) $(TEST_APP_LINK_FLAGS) $(TESTAPP_OBJECTS) -o $@ PopCameraDevice.so 
+	# we only want to rm if cwd isn't build_dir
+	rm ./PopCameraDevice.so
+	echo "We should see $$ORIGIN in the runtime path"
+	objdump -x $(OUT_EXECUTABLE) | grep PATH
+	echo "Listing dependencies"
+	ldd $(OUT_EXECUTABLE)
 
 $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS) 
 	echo "Building library $(OUT_LIBRARY)"
 	mkdir -p $(BUILD_DIR)
-	g++ $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
-	#ar rcs $@ $(LIB_OBJECTS)
 	# this should change to be a stage that copies some files to build dir
+	# but, we do need the k4a libs to link with (for now, we should dload() in code)
 	cp $(BUILD_COPY_FILES) $(BUILD_DIR)
-	objdump -x $(OUT_LIBRARY) | grep RUNPATH
+	g++ $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LOCAL_LINK_DIRS) $(LIBRARY_LINK_LIBS)
+	echo "We should see $$ORIGIN in the runtime path"
+	objdump -x $(OUT_LIBRARY) | grep PATH
+	echo "Listing dependencies"
+	ldd $(OUT_LIBRARY)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
