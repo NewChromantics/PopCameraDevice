@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
@@ -60,34 +60,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <LibraryPath>/usr/lib/aarch64-linux-gnu/</LibraryPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <Link />
-    <RemotePostBuildEvent>
-      <Command>
-      </Command>
-      <Message>
-      </Message>
-    </RemotePostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <Link>
-      <LibraryDependencies>wiringPi</LibraryDependencies>
-    </Link>
-    <RemotePostBuildEvent>
-      <Command>
-      </Command>
-      <Message>
-      </Message>
-    </RemotePostBuildEvent>
-    <ClCompile />
-    <PreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-  </ItemDefinitionGroup>
+   
   <ItemGroup>
     <ClCompile Include="..\Source\KinectAzure.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
@@ -163,43 +136,16 @@
     <ClInclude Include="..\Source\TestDevice.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\PopCameraDevice.Linux\Makefile">
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</RemoteCopyFile>
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</RemoteCopyFile>
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</RemoteCopyFile>
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</RemoteCopyFile>
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">cd PopCameraDevice.Linux &amp;&amp; make KinectAzureDependencies</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">cd PopCameraDevice.Linux &amp;&amp; make KinectAzureDependencies</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">cd PopCameraDevice.Linux &amp;&amp; make KinectAzureDependencies</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">cd PopCameraDevice.Linux &amp;&amp; make KinectAzureDependencies</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Run makefile KinectAzureDependencies</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Run makefile KinectAzureDependencies</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">Run makefile KinectAzureDependencies</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">Run makefile KinectAzureDependencies</Message>
-    </CustomBuild>
+    <None Include="..\PopCameraDevice.Linux\Makefile">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
+    </None>
   </ItemGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <ClCompile />
-    <PreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <ClCompile />
-    <PreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <ClCompile />
-    <PreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-    <RemotePreBuildEvent />
-  </ItemDefinitionGroup>
+  
+ 
+  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
