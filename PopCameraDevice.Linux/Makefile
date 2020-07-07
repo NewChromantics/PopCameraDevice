@@ -130,10 +130,14 @@ clean:
 	rm -f $(OUT_LIBRARY)
 	rm -f $(OUT_EXECUTABLE)
 
+KinectAzureDepedencies: $(K4A_LIB)
+
 
 $(K4A_LIB):
 # sudo apt-get install nuget
 #	nuget restore ../Libs/
+	mkdir -p ../Source/Libs/KinectAzure
+	echo "downloading Kinect package..."
 	wget https://www.nuget.org/api/v2/package/Microsoft.Azure.Kinect.Sensor/1.4.1 -O ../Source/Libs/MicrosoftAzureKinectSensor.zip
 	unzip -o ../Source/Libs/MicrosoftAzureKinectSensor.zip -d ../Source/Libs/KinectAzure
 	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 $(K4A_LIB)
