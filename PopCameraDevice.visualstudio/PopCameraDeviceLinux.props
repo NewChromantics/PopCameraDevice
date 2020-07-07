@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>./Source/SoyLib/src;./Source/Libs/KinectAzure/build/native/include</IncludePath>
+    <IncludePath>./Source/SoyLib/src;./Source/Libs/KinectAzure/build/native/include;SoyLib/src</IncludePath>
     <LibraryPath>./Source/Libs/KinectAzure/linux/lib/native/arm64/release</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -17,6 +17,16 @@
       <CppAdditionalWarning>no-reorder;no-unused-but-set-variable;no-unused-value;no-nonnull-compare;no-conversion;no-sign-compare;no-address;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <RemotePreBuildEvent />
+    <RemotePreBuildEvent>
+      <Command>cd PopCameraDevice.Linux &amp;&amp; make KinectAzureDependencies</Command>
+    </RemotePreBuildEvent>
+    <RemotePreBuildEvent>
+      <Message>Download kinect azure dependencies (todo: copy headers back)</Message>
+    </RemotePreBuildEvent>
+    <PreBuildEvent>
+      <AdditionalSourcesToCopyMapping>$(ProjectDir)..\PopCameraDevice.Linux\Makefile:=$(RemoteProjectDir)</AdditionalSourcesToCopyMapping>
+      <Message>Copy makefile to remote</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

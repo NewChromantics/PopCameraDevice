@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
@@ -76,6 +76,12 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyImage.cpp">
       <Filter>Source\SoyLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\SoyLib\src\SoyStream.cpp">
+      <Filter>Source\SoyLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\SoyLib\src\SoyProtocol.cpp">
+      <Filter>Source\SoyLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -117,9 +123,6 @@
       <Filter>Source\SoyLib</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\HeapArray.hpp">
-      <Filter>Source\SoyLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\MagicEnum\include\magic_enum.hpp">
       <Filter>Source\SoyLib</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\MemHeap.hpp">
@@ -233,15 +236,19 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyImage.h">
       <Filter>Source\SoyLib</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="..\Source\PopCameraDevice.h">
+    <ClInclude Include="..\Source\PopCameraDevice.h">
       <Filter>Source</Filter>
-    </CopyFileToFolders>
+    </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\SoyStream.h">
+      <Filter>Source\SoyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\SoyProtocol.h">
+      <Filter>Source\SoyLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\PopCameraDevice.Linux\Makefile">
+    <None Include="..\PopCameraDevice.Linux\Makefile">
       <Filter>PopCameraDevice.Linux</Filter>
-    </CustomBuild>
+    </None>
   </ItemGroup>
 </Project>

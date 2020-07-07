@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM">
@@ -106,7 +106,9 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyMediaFormat.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyPixels.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyPng.cpp" />
+    <ClCompile Include="..\Source\SoyLib\src\SoyProtocol.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyRuntimeLibrary.cpp" />
+    <ClCompile Include="..\Source\SoyLib\src\SoyStream.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyString.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyThread.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyTime.cpp" />
@@ -117,8 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\KinectAzure.h" />
-    <ClInclude Include="..\Source\MagicEnum\include\magic_enum.hpp" />
-    <CopyFileToFolders Include="..\Source\PopCameraDevice.h" />
+    <ClInclude Include="..\Source\PopCameraDevice.h" />
     <ClInclude Include="..\Source\SoyLib\src\Array.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\BufferArray.hpp" />
     <ClInclude Include="..\Source\SoyLib\src\HeapArray.hpp" />
@@ -145,8 +146,10 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyPixels.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyPng.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyPool.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyProtocol.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyRuntimeLibrary.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyScope.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyStream.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyString.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyThread.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyTime.h" />
