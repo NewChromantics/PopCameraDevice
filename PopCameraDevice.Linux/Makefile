@@ -5,6 +5,8 @@
 CC = g++
 SRC = ..
 SOY_PATH = $(SRC)/Source/SoyLib
+# gr: change this so its Linux$(ARCH)
+BUILD_DIR = ./Build
 
 LOCAL_C_INCLUDES = \
 -I$(SRC)/Source	\
@@ -20,6 +22,10 @@ $(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
 
 DEPTHENGINE_LIB = \
 $(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
+
+BUILD_COPY_FILES = \
+$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/*	
+
 
 LOCAL_LINK_LIBS = \
 -lk4a	\
@@ -68,12 +74,15 @@ CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17 -fPIC
 LDFLAGS = -pthread 
 LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 
+LIB_LINK_FLAGS = $(LDFLAGS) -shared
+TEST_APP_LINK_FLAGS = $(LDFLAGS)
+
 LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
 TESTAPP_OBJECTS=$(TESTAPP_SRC_FILES:.cpp=.o)
 
 ARCHITECTURE=${archTarget}
-OUT_LIBRARY=PopCameraDevice.so
-OUT_EXECUTABLE=PopCameraTest
+OUT_LIBRARY=$(BUILD_DIR)/PopCameraDevice.so
+OUT_EXECUTABLE=$(BUILD_DIR)/PopCameraTest
 
 exec: $(OUT_EXECUTABLE) 
 .PHONY: exec
@@ -83,15 +92,18 @@ lib: $(OUT_LIBRARY)
 
 $(OUT_EXECUTABLE): $(TESTAPP_OBJECTS) $(OUT_LIBRARY)
 	echo "Building test app $(OUT_EXECUTABLE)"
-	$(CC) $(LDFLAGS) $^ -o $@ $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(TEST_APP_LINK_FLAGS) $^ -o $@ $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
+	objdump -x $(OUT_EXECUTABLE) | grep RUNPATH
 
 $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS) 
 	echo "Building library $(OUT_LIBRARY)"
-	g++ -shared -o $@ $(LIB_OBJECTS)
+	mkdir -p $(BUILD_DIR)
+	g++ $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LOCAL_LINK_DIRS) $(LOCAL_LINK_LIBS)
 	#ar rcs $@ $(LIB_OBJECTS)
-	# when running, the kinect code is looking for the original name, but we renamed it for linking...
-	cp $(K4A_LIB) ./libk4a.so.1.4
-	cp $(DEPTHENGINE_LIB) .
+	# this should change to be a stage that copies some files to build dir
+	cp $(BUILD_COPY_FILES) $(BUILD_DIR)
+	objdump -x $(OUT_LIBRARY) | grep RUNPATH
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
@@ -112,5 +124,7 @@ $(K4A_LIB):
 	wget https://www.nuget.org/api/v2/package/Microsoft.Azure.Kinect.Sensor/1.4.1 -O ../Source/Libs/MicrosoftAzureKinectSensor.zip
 	unzip -o ../Source/Libs/MicrosoftAzureKinectSensor.zip -d ../Source/Libs/KinectAzure
 	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 $(K4A_LIB)
+	# at runtime the code(maybe depth engine?) tries to load libk4a.1.4 instead of 1.4.1
+	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4
 
 	
