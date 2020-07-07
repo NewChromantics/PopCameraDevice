@@ -7,9 +7,6 @@
 [submodule "Source/Libs/LibFreenect/LibFreenect"]
 	path = Source/Libs/LibFreenect/LibFreenect
 	url = https://github.com/OpenKinect/libfreenect.git
-[submodule "Source/MagicEnum"]
-	path = Source/MagicEnum
-	url = https://github.com/Neargye/magic_enum.git
 [submodule "Unity/PopCameraDevice/Assets/PopUnityYuvShader"]
 	path = Unity/PopCameraDevice/Assets/PopUnityYuvShader
 	url = https://github.com/NewChromantics/PopUnityYuvShader.git
