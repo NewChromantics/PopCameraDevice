@@ -167,9 +167,6 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyTypes_Windows.h">
       <Filter>SoyLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\SoyLib\src\string.hpp">
-      <Filter>SoyLib</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\SoyPng.h">
       <Filter>SoyLib</Filter>
     </ClInclude>
@@ -276,6 +273,9 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\MagicEnum\include\magic_enum.hpp">
+      <Filter>SoyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\string.hpp">
       <Filter>SoyLib</Filter>
     </ClInclude>
   </ItemGroup>

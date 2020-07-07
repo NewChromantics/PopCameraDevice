@@ -29,3 +29,5 @@ PopCameraDevice\.visualstudio/Master/
 *.user
 
 Source/Libs/Microsoft.Azure.Kinect.Sensor.1.4.1/
+
+PopCameraDevice.visualstudio/obj/ARM64/

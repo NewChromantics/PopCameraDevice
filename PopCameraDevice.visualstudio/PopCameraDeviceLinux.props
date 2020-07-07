@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <IncludePath>./Source/SoyLib/src;./Source/Libs/KinectAzure/build/native/include</IncludePath>
+    <LibraryPath>./Source/Libs/KinectAzure/linux/lib/native/arm64/release</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <LibraryDependencies>k4a;depthengine</LibraryDependencies>
+      <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>TARGET_LINUX;ENABLE_KINECTAZURE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
+      <CppAdditionalWarning>no-reorder;no-unused-but-set-variable;no-unused-value;no-nonnull-compare;no-conversion;no-sign-compare;no-address;%(CppAdditionalWarning)</CppAdditionalWarning>
+    </ClCompile>
+    <RemotePreBuildEvent />
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
