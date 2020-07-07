@@ -130,7 +130,7 @@ clean:
 	rm -f $(OUT_LIBRARY)
 	rm -f $(OUT_EXECUTABLE)
 
-KinectAzureDepedencies: $(K4A_LIB)
+KinectAzureDependencies: $(K4A_LIB)
 
 
 $(K4A_LIB):
