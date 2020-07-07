@@ -7,7 +7,7 @@
 #include <k4a/k4a.h>
 #include "SoyDebug.h"
 #include "HeapArray.hpp"
-#include "MagicEnum/include/magic_enum.hpp"
+#include <magic_enum/include/magic_enum.hpp>
 #include "SoyThread.h"
 #include "SoyMedia.h"
 #include <cmath>	//	fabsf

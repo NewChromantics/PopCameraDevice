@@ -4,9 +4,9 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include "SoyLib/src/HeapArray.hpp"
+#include <HeapArray.hpp>
 #include "TestDevice.h"
-#include "SoyMedia.h"
+#include <SoyMedia.h>
 
 
 

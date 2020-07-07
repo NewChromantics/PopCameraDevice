@@ -1,6 +1,6 @@
 #include "TCameraDevice.h"
-#include "SoyLib/src/SoyMedia.h"
-#include "magic_enum.hpp"
+#include <SoyMedia.h>
+#include <magic_enum/include/magic_enum.hpp>
 
 
 std::string PopCameraDevice::GetFormatString(SoyPixelsMeta Meta, size_t FrameRate)

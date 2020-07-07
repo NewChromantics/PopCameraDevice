@@ -13,7 +13,7 @@
 #include "SoyOpenglContext.h"
 #include "Avf.h"
 #include "SoyFourcc.h"
-#include "MagicEnum/include/magic_enum.hpp"
+#include <magic_enum/include/magic_enum.hpp>
 
 namespace Avf
 {

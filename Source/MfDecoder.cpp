@@ -4,7 +4,7 @@
 #include <SoyH264.h>
 #include <Propvarutil.h>
 #include <SoyMath.h>
-#include "MagicEnum/include/magic_enum.hpp"
+#include <magic_enum/include/magic_enum.hpp>
 
 GUID GUID_Invalid = {0};
 
