@@ -57,6 +57,7 @@ $(SOY_PATH)/src/SoyFourcc.cpp \
 $(SOY_PATH)/src/SoyMedia.cpp \
 $(SOY_PATH)/src/SoyMediaFormat.cpp \
 $(SOY_PATH)/src/SoyWave.cpp \
+$(SOY_PATH)/src/SoyRuntimeLibrary.cpp \
 $(SOY_PATH)/src/SoyThread.cpp
 
 TESTAPP_SRC_FILES =	\
