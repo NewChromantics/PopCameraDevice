@@ -15,7 +15,10 @@ LOCAL_C_INCLUDES = \
 -I$(SRC)/Source/Libs/KinectAzure/build/native/include
 
 LOCAL_LINK_DIRS = \
--L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
+-L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
+-L/usr/lib/aarch64-linux-gnu/	
+
+# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
 
 K4A_LIB = \
 $(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
@@ -112,7 +115,7 @@ $(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS)
 	mkdir -p $(BUILD_DIR)
 	# this should change to be a stage that copies some files to build dir
 	# but, we do need the k4a libs to link with (for now, we should dload() in code)
-	cp $(BUILD_COPY_FILES) $(BUILD_DIR)
+	#cp $(BUILD_COPY_FILES) $(BUILD_DIR)
 	g++ $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LOCAL_LINK_DIRS) $(LIBRARY_LINK_LIBS)
 	echo "We should see $$ORIGIN in the runtime path"
 	objdump -x $(OUT_LIBRARY) | grep PATH

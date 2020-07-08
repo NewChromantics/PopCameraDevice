@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include <sstream>
 #include "PopCameraDevice.h"
 #pragma comment(lib, "PopCameraDevice.lib")
 
@@ -60,10 +61,16 @@ void TestDeviceInstance(const std::string& Name,const std::string& Format,size_t
 			i--;
 			continue;
 		}
+		/*
 		if ( i==0)
 			if (FrameTime != FirstFrameTime && FirstFrameTime != -1)
 				throw std::runtime_error("Frame time doesn't match first frame time");
+		*/
+	
+		std::stringstream Debug;
+		Debug << "Got frame " << FrameTime << "(first=" << FirstFrameTime << ")";
 		//	todo: verify pixels
+		DebugPrint(Debug.str());
 	}
 
 	PopCameraDevice_FreeCameraDevice(Instance);
@@ -83,11 +90,11 @@ int main()
 	DebugPrint(EnumJson);
 
 	//	test device currently only pumps out one frame
-	TestDeviceInstance("Test", "RGBA^100x100@30", 1);
-	TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
-	TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
-	TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
-	TestDeviceInstance("KinectAzure_000396300112","BGRA_Depth16^2560x1440@30", 4);
+	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
+	TestDeviceInstance("KinectAzure_000396300112", "", 4);
+	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
+	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
+	//TestDeviceInstance("KinectAzure_000396300112","BGRA_Depth16^2560x1440@30", 4);
 	
 	//PopCameraDevice_Cleanup();
 	return 0;
