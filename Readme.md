@@ -26,6 +26,7 @@ Kinect Azure
 	- `sudo apt install libk4a1.4-dev`
 	- `sudo apt install k4a-tools`
 	- `sudo ln /usr/lib/aarch64-linux-gnu/libk4a1.4/libdepthengine.so.2.0 /usr/lib/aarch64-linux-gnu/libk4a1.4/libdepthengine.so`
+ 	- enable headless mode `export DISPLAY=:0` otherwise we get error 204 from the depth engine (this is for opengl support)
  
 - Windows
 	- We should be able to add packages.config to the project...
