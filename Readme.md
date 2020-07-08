@@ -25,6 +25,7 @@ Kinect Azure
 	- `sudo apt-get update`
 	- `sudo apt install libk4a1.4-dev`
 	- `sudo apt install k4a-tools`
+	- `sudo ln /usr/lib/aarch64-linux-gnu/libk4a1.4/libdepthengine.so.2.0 /usr/lib/aarch64-linux-gnu/libk4a1.4/libdepthengine.so`
  
 - Windows
 	- We should be able to add packages.config to the project...
