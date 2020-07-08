@@ -17,5 +17,6 @@ Kinect Azure
 	- `nuget install`
 - Linux
 	- `sudo apt install nuget`
+	- Install rules so KinectAzure can run without root access; https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/usage.md#linux-device-setup
 - Windows
 	- We should be able to add packages.config to the project...
