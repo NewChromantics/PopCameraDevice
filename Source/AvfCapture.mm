@@ -1,6 +1,6 @@
 #include "AvfCapture.h"
 #include "AvfVideoCapture.h"
-
+#include "SoyAvf.h"
 #import <ARKit/ARFrame.h>
 
 
@@ -103,8 +103,30 @@ void Avf::TArFrameProxy::ReadNativeHandle(void* ArFrameHandle)
 	//	gr: do some type check!
 	auto* Frame = (__bridge ARFrame*)(ArFrameHandle);
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
-	auto CapTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
-	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapTime << std::endl;
+	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
+	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
+	
+	//	read specific pixels
+	switch( mSource )
+	{
+		case ArFrameSource::capturedImage:
+			PushFrame( Frame.capturedImage, FrameTime );
+			return;
+		
+		case ArFrameSource::capturedDepthData:
+			PushFrame( Frame.capturedDepthData, CapDepthTime );
+			return;
+		
+		/* need ios14 sdk
+		case ArFrameSource::sceneDepth:
+			PushFrame( Frame.sceneDepth, FrameTime );
+			return;
+		 */
+	}
+	
+	std::stringstream Debug;
+	Debug << __PRETTY_FUNCTION__ << " unhandled source type " << mSource;
+	throw Soy::AssertException(Debug);
 }
 
 
@@ -113,4 +135,52 @@ void Avf::TArFrameProxy::EnableFeature(PopCameraDevice::TFeature::Type Feature,b
 	Soy_AssertTodo();
 }
 
+void Avf::TArFrameProxy::PushFrame(AVDepthData* DepthData,SoyTime Timestamp)
+{
+	if ( !DepthData )
+		throw Soy::AssertException("AVDepthData null");
+	
+	//	convert to the format we want, then call again
+	Soy::TFourcc DepthFormat(DepthData.depthDataType);
+	auto DepthPixelFormat = Avf::GetPixelFormat(DepthFormat.mFourcc32);
+	SoyPixelsFormat::Type OutputFormat = SoyPixelsFormat::DepthFloatMetres;
+	if ( DepthPixelFormat != OutputFormat )
+	{
+		auto OutputFourcc = Avf::GetPlatformPixelFormat(OutputFormat);
+		auto NewDepthData = [DepthData depthDataByConvertingToDepthDataType:OutputFourcc];
+		if ( !NewDepthData )
+			throw Soy::AssertException("Failed to convert depth data to desired format");
+		//	gr: need to be careful about recursion here
+		PushFrame(NewDepthData,Timestamp);
+		return;
+	}
+	
+	//	convert format
+	//SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
+	auto DepthPixels = DepthData.depthDataMap;
+	//Soy::TFourcc DepthFormat(DepthData.depthDataType);
+	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
+	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
+	auto IsFiltered = DepthData.depthDataFiltered;
+	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
+	
+	PushFrame(DepthPixels,Timestamp);
+}
+
+void Avf::TArFrameProxy::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp)
+{
+	auto Height = CVPixelBufferGetHeight( PixelBuffer );
+	auto Width = CVPixelBufferGetWidth( PixelBuffer );
+	auto Format = CVPixelBufferGetPixelFormatType( PixelBuffer );
+	auto SoyFormat = Avf::GetPixelFormat( Format );
+
+	float3x3 Transform;
+	auto DoRetain = true;
+	std::string FrameMeta;
+	SoyPixelsMeta PixelMeta( Width, Height, SoyFormat );
+	std::shared_ptr<AvfDecoderRenderer> Renderer;
+	
+	std::shared_ptr<TPixelBuffer> Buffer( new CVPixelBuffer( PixelBuffer, DoRetain, Renderer, Transform ) );
+	PopCameraDevice::TDevice::PushFrame( Buffer, PixelMeta, Timestamp, FrameMeta );
+}
 

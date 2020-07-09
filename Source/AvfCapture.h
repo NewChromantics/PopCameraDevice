@@ -4,7 +4,7 @@
 #include "Avf.h"
 #include "SoyMedia.h"
 #include "SoyEnum.h"
-
+#include "AvfPixelBuffer.h"
 
 
 namespace Avf
@@ -17,6 +17,11 @@ namespace Avf
 	void	EnumArFrameDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> EnumName);
 }
 class AvfVideoCapture;
+#if defined(__OBJC__)
+@class AVDepthData;
+#else
+class AVDepthData;
+#endif
 
 namespace ArFrameSource
 {
@@ -62,6 +67,10 @@ public:
 	
 	virtual void	ReadNativeHandle(void* ArFrameHandle) override;
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
+
+private:
+	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp);
+	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp);
 
 	ArFrameSource::Type	mSource = ArFrameSource::Default;
 };
