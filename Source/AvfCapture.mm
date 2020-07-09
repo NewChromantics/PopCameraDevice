@@ -2,6 +2,7 @@
 #include "AvfVideoCapture.h"
 #include "SoyAvf.h"
 #import <ARKit/ARFrame.h>
+#import <ARKit/ARSession.h>
 
 
 
@@ -95,38 +96,61 @@ Avf::TArFrameProxy::TArFrameProxy(const std::string& Format)
 	std::Debug << __PRETTY_FUNCTION__ << " using " << mSource << std::endl;
 }
 
+//	https://docs.unity3d.com/Packages/com.unity.xr.arfoundation@3.0/manual/extensions.html
+typedef struct UnityXRNativeSessionPtr
+{
+	int version;
+	void* session;
+} UnityXRNativeSessionPtr;
+
 void Avf::TArFrameProxy::ReadNativeHandle(void* ArFrameHandle)
 {
 	if ( !ArFrameHandle )
 		throw Soy::AssertException("ReadNativeHandle null");
 	
-	//	gr: do some type check!
-	auto* Frame = (__bridge ARFrame*)(ArFrameHandle);
-	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
-	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
-	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
-	
-	//	read specific pixels
-	switch( mSource )
+	auto& UnitySessionPtr = *reinterpret_cast<UnityXRNativeSessionPtr*>(ArFrameHandle);
+	@try
 	{
-		case ArFrameSource::capturedImage:
-			PushFrame( Frame.capturedImage, FrameTime );
-			return;
+		//	gr: do some type check!
+		auto* ArSession = (__bridge ARSession*)(UnitySessionPtr.session);
+		if ( !ArSession )
+			throw Soy::AssertException("Failed to cast bridged ARSession pointer");
 		
-		case ArFrameSource::capturedDepthData:
-			PushFrame( Frame.capturedDepthData, CapDepthTime );
-			return;
+		auto* Frame = ArSession.currentFrame;
+		if ( !Frame )
+			throw Soy::AssertException("Failed to cast bridged ARFrame pointer");
 		
-		/* need ios14 sdk
-		case ArFrameSource::sceneDepth:
-			PushFrame( Frame.sceneDepth, FrameTime );
-			return;
-		 */
+		auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
+		auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
+		std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
+		
+		//	read specific pixels
+		switch( mSource )
+		{
+			case ArFrameSource::capturedImage:
+				PushFrame( Frame.capturedImage, FrameTime );
+				return;
+			
+			case ArFrameSource::capturedDepthData:
+				PushFrame( Frame.capturedDepthData, CapDepthTime );
+				return;
+			/*
+			case ArFrameSource::sceneDepth:
+				PushFrame( Frame.sceneDepth, FrameTime );
+				return;
+			 */
+		}
+		
+		std::stringstream Debug;
+		Debug << __PRETTY_FUNCTION__ << " unhandled source type " << mSource;
+		throw Soy::AssertException(Debug);
 	}
-	
-	std::stringstream Debug;
-	Debug << __PRETTY_FUNCTION__ << " unhandled source type " << mSource;
-	throw Soy::AssertException(Debug);
+	@catch (NSException* e)
+	{
+		std::stringstream Debug;
+		Debug << "NSException " << Soy::NSErrorToString( e );
+		throw Soy::AssertException(Debug);
+	}
 }
 
 
