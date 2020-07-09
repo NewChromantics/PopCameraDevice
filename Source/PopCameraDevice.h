@@ -16,6 +16,11 @@
 
 #endif
 
+//	Version history (PopCameraDevice_GetVersion)
+//
+//	2.0.1	Added PopCameraDevice_ReadNativeHandle()
+//
+
 //	function pointer type for new frame callback
 typedef void PopCameraDevice_OnNewFrame(void* Meta);
 
@@ -48,6 +53,9 @@ __export void				PopCameraDevice_Cleanup();
 
 //	for internal building really
 __export void				PopCameraDevice_UnitTests();
+
+//	for ARFrameProxy, you can pass in an ARFrame pointer, to read depth images immediately for queuing up
+__export void				PopCameraDevice_ReadNativeHandle(int32_t Instance,void* Handle);
 
 
 

@@ -107,3 +107,8 @@ std::shared_ptr<TPixelBuffer> PopCameraDevice::TDevice::GetNextFrame(SoyPixelsMe
 	return PixelBuffer;
 
 }
+
+void PopCameraDevice::TDevice::ReadNativeHandle(void* Handle)
+{
+	throw Soy::AssertException("This device doesn't support ReadNativeHandle");
+}

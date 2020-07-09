@@ -53,6 +53,9 @@ public static class PopCameraDevice
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern void PopCameraDevice_Cleanup();
 
+	//	For ARFrameProxy, call this to pass in an ARFrame pointer (from version 2.0.1)
+	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+	private static extern void PopCameraDevice_ReadNativeHandle(Int32 Instance,System.IntPtr Handle);
 
 	//	PixelFormat^WidthxHeight@FrameRate
 	//	eg RGBA^640x480@30
@@ -271,6 +274,11 @@ public static class PopCameraDevice
 			return NextFrameTime;
 		}
 
+		//	todo: be more strict c# side!
+		public void ReadNativeHandle(System.IntPtr Handle)
+		{
+			PopCameraDevice_ReadNativeHandle( Instance.Value, Handle );
+		}
 	}
 }
 

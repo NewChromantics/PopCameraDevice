@@ -181,6 +181,7 @@
 		BF8534E322B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
 		BF8534E922B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BF8534EA22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
+		BFBD322124B7B1A50029951F /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFBD322024B7B1A40029951F /* ARKit.framework */; };
 		BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
@@ -322,7 +323,6 @@
 		BF15204C23855BD500A70EBF /* SoyArray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoyArray.cpp; sourceTree = "<group>"; };
 		BF15205023855D8200A70EBF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		BF15205223855F1F00A70EBF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		BF1826A424226836006FEB93 /* magic_enum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = magic_enum.hpp; path = Source/MagicEnum/include/magic_enum.hpp; sourceTree = "<group>"; };
 		BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TestAppInfo.plist; path = Source/TestAppInfo.plist; sourceTree = "<group>"; };
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice.cs; sourceTree = "<group>"; };
@@ -355,6 +355,7 @@
 		BF8534F222B402600049C01B /* libfreenect_registration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libfreenect_registration.h; sourceTree = "<group>"; };
 		BFB2EE362487B36F00EB634F /* SoyFourcc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoyFourcc.cpp; sourceTree = "<group>"; };
 		BFB2EE372487B37000EB634F /* SoyFourcc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyFourcc.h; sourceTree = "<group>"; };
+		BFBD322024B7B1A40029951F /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
 		BFD607761EA16F0A0035C814 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D11.h; path = Source/Unity/IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
@@ -407,6 +408,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFBD322124B7B1A50029951F /* ARKit.framework in Frameworks */,
 				BF15205323855F1F00A70EBF /* UIKit.framework in Frameworks */,
 				BF15205123855D8300A70EBF /* CoreGraphics.framework in Frameworks */,
 				BF15204A23855BAB00A70EBF /* CoreVideo.framework in Frameworks */,
@@ -509,6 +511,7 @@
 		BF012B05226A09EC003AEB55 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BFBD322024B7B1A40029951F /* ARKit.framework */,
 				BF67C86424373BD600D7492E /* CoreMediaIO.framework */,
 				BF15205223855F1F00A70EBF /* UIKit.framework */,
 				BF15205023855D8200A70EBF /* CoreGraphics.framework */,
@@ -655,7 +658,6 @@
 				BF108A8C2296F4BE003DDC5F /* Kinect2.h */,
 				BFFAE1FF24AFE7FB006C999C /* KinectAzure.cpp */,
 				BFFAE1FE24AFE7FB006C999C /* KinectAzure.h */,
-				BF1826A424226836006FEB93 /* magic_enum.hpp */,
 				BF012AB02268DBF8003AEB55 /* MfCapture.cpp */,
 				BF012AAA2268DBF7003AEB55 /* MfCapture.h */,
 				BF012AAD2268DBF7003AEB55 /* MfDecoder.cpp */,

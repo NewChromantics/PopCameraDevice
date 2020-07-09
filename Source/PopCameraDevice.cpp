@@ -13,7 +13,7 @@
 
 namespace PopCameraDevice
 {
-	const Soy::TVersion	Version(2, 0, 0);
+	const Soy::TVersion	Version(2, 1, 0);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
@@ -388,6 +388,15 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 	}
 #endif
 
+#if defined(TARGET_IOS)
+	if ( Name == Avf::TArFrameProxy::DeviceName )
+	{
+		std::shared_ptr<TDevice> Device(new Avf::TArFrameProxy(Format));
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+#endif
+	
 	//	do generic, non-prefixed names LAST
 	try
 	{
@@ -505,6 +514,13 @@ void PopCameraDevice::FreeInstance(uint32_t Instance)
 	}
 
 	Instances.RemoveBlock(InstanceIndex, 1);
+}
+
+
+void PopCameraDevice::ReadNativeHandle(int32_t Instance,void* Handle)
+{
+	auto& Device = GetCameraDevice(Instance);
+	Device.ReadNativeHandle(Handle);
 }
 
 
@@ -727,6 +743,17 @@ __export void PopCameraDevice_UnitTests()
 {
 	PopCameraDevice::DecodeFormatString_UnitTests();
 }
+
+__export void PopCameraDevice_ReadNativeHandle(int32_t Instance,void* Handle)
+{
+	auto Function = [&]()
+	{
+		PopCameraDevice::ReadNativeHandle( Instance, Handle );
+		return 0;
+	};
+	SafeCall(Function, __func__, 0);
+}
+
 
 
 __export void UnityPluginLoad(/*IUnityInterfaces*/void*)

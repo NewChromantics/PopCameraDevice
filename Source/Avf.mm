@@ -1,8 +1,8 @@
 #include "Avf.h"
-#include "SoyLib/src/SoyString.h"
+#include "SoyString.h"
 #include "SoyAvf.h"
 #include "TCameraDevice.h"
-
+#include "AvfCapture.h"
 
 namespace Avf
 {
@@ -244,5 +244,7 @@ void Avf::EnumCaptureDevices(std::function<void(const std::string&,ArrayBridge<s
 		EnumName( Meta.mCookie, GetArrayBridge(FormatStrings) );
 	};
 	EnumCaptureDevices( EnumMeta );
+
+	EnumArFrameDevices(EnumName);
 }
 

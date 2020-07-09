@@ -16,6 +16,7 @@ namespace PopCameraDevice
 	std::string	GetFormatString(SoyPixelsMeta Meta, size_t FrameRate = 0);
 	void		DecodeFormatString(std::string FormatString, SoyPixelsMeta& Meta, size_t& FrameRate);
 	void		DecodeFormatString_UnitTests();
+	void		ReadNativeHandle(int32_t Instance,void* Handle);
 
 	//	these features are currently all on/off.
 	//	but some cameras have options like ISO levels, which we should allow specific numbers of
@@ -53,7 +54,8 @@ public:
 	std::shared_ptr<TPixelBuffer>	GetNextFrame(SoyPixelsMeta& PixelMeta, SoyTime& FrameTime, std::string& FrameMeta,bool DeleteFrame);
 
 	virtual void					EnableFeature(TFeature::Type Feature,bool Enable)=0;	//	throws if unsupported
-	
+	virtual void					ReadNativeHandle(void* Handle);
+
 protected:
 	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,const std::string& FrameMeta);
 
