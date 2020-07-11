@@ -44,6 +44,10 @@ __export int32_t PopCameraDevice_GetVersion()
 #include "AvfCapture.h"
 #endif
 
+#if defined(TARGET_IOS)
+#include "ArkitCapture.h"
+#endif
+
 
 
 
@@ -273,6 +277,9 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 #elif defined(TARGET_OSX) || defined(TARGET_IOS)
 	Avf::EnumCaptureDevices(EnumDeviceAndFormats);
 #endif
+#if defined(TARGET_IOS)
+	Arkit::EnumDevices(EnumDeviceAndFormats);
+#endif
 	
 #if defined(ENABLE_FREENECT)
 	Freenect::EnumDeviceNames(EnumDevice);
@@ -389,9 +396,18 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 #endif
 
 #if defined(TARGET_IOS)
-	if ( Name == Avf::TArFrameProxy::DeviceName )
+	if ( Name == Arkit::TFrameProxyDevice::DeviceName )
 	{
-		std::shared_ptr<TDevice> Device(new Avf::TArFrameProxy(Format));
+		std::shared_ptr<TDevice> Device(new Arkit::TFrameProxyDevice(Format));
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+#endif
+
+#if defined(TARGET_IOS)
+	if ( Name == Arkit::TSessionCamera::DeviceName_SceneDepth || Name == Arkit::TSessionCamera::DeviceName_FrontDepth )
+	{
+		std::shared_ptr<TDevice> Device(new Arkit::TSessionCamera(Name,Format));
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}

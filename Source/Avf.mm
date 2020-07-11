@@ -12,6 +12,7 @@ namespace Avf
 }
 
 
+
 vec2f Avf::GetMinMaxFrameRate(AVCaptureDeviceFormat* Format)
 {
 	if ( !Format )
@@ -244,7 +245,35 @@ void Avf::EnumCaptureDevices(std::function<void(const std::string&,ArrayBridge<s
 		EnumName( Meta.mCookie, GetArrayBridge(FormatStrings) );
 	};
 	EnumCaptureDevices( EnumMeta );
-
-	EnumArFrameDevices(EnumName);
 }
 
+
+CVPixelBufferRef Avf::GetDepthPixelBuffer(AVDepthData* DepthData,SoyPixelsFormat::Type OutputFormat)
+{
+	if ( !DepthData )
+		throw Soy::AssertException("AVDepthData null");
+	
+	//	convert to the format we want, then call again
+	Soy::TFourcc DepthFormat(DepthData.depthDataType);
+	auto DepthPixelFormat = Avf::GetPixelFormat(DepthFormat.mFourcc32);
+	if ( DepthPixelFormat != OutputFormat )
+	{
+		auto OutputFourcc = Avf::GetPlatformPixelFormat(OutputFormat);
+		auto NewDepthData = [DepthData depthDataByConvertingToDepthDataType:OutputFourcc];
+		if ( !NewDepthData )
+			throw Soy::AssertException("Failed to convert depth data to desired format");
+		//	gr: need to be careful about recursion here
+		return GetDepthPixelBuffer(NewDepthData,OutputFormat);
+	}
+	
+	//	convert format
+	//SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
+	auto DepthPixels = DepthData.depthDataMap;
+	//Soy::TFourcc DepthFormat(DepthData.depthDataType);
+	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
+	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
+	auto IsFiltered = DepthData.depthDataFiltered;
+	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
+	
+	return DepthPixels;
+}

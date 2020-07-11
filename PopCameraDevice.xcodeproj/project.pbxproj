@@ -182,6 +182,8 @@
 		BF8534E922B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BF8534EA22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BFBD322124B7B1A50029951F /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFBD322024B7B1A40029951F /* ARKit.framework */; };
+		BFDBAB8424B9C64F00E8BCE1 /* ArkitCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */; };
+		BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */; };
 		BFEE8DEF22B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF722B013A500F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
@@ -362,6 +364,8 @@
 		BFD607771EA16F0A0035C814 /* IUnityGraphicsD3D12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D12.h; path = Source/Unity/IUnityGraphicsD3D12.h; sourceTree = "<group>"; };
 		BFD607781EA16F0A0035C814 /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsMetal.h; path = Source/Unity/IUnityGraphicsMetal.h; sourceTree = "<group>"; };
 		BFD607791EA16F0A0035C814 /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityInterface.h; path = Source/Unity/IUnityInterface.h; sourceTree = "<group>"; };
+		BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArkitCapture.h; path = Source/ArkitCapture.h; sourceTree = "<group>"; };
+		BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ArkitCapture.mm; path = Source/ArkitCapture.mm; sourceTree = "<group>"; };
 		BFE462BC24B1D89000D04A4C /* SoyEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyEnum.h; sourceTree = "<group>"; };
 		BFE462BD24B1D92E00D04A4C /* magic_enum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = magic_enum.hpp; path = magic_enum/include/magic_enum.hpp; sourceTree = "<group>"; };
 		BFE462C024B3C99D00D04A4C /* PopCameraDevice.Linux */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PopCameraDevice.Linux; sourceTree = "<group>"; };
@@ -640,6 +644,8 @@
 		BFD6076D1EA16ED20035C814 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */,
+				BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */,
 				BF012B01226A03C5003AEB55 /* Avf.h */,
 				BF012B02226A047F003AEB55 /* Avf.mm */,
 				BF012ACD2268DE24003AEB55 /* AvfCapture.h */,
@@ -735,6 +741,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFDBAB8424B9C64F00E8BCE1 /* ArkitCapture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1034,6 +1041,7 @@
 				BF15202E238559A200A70EBF /* SoyGraphics.cpp in Sources */,
 				BF152034238559A200A70EBF /* SoyOpenglContext.cpp in Sources */,
 				BF15204623855B8C00A70EBF /* SoyDebug.cpp in Sources */,
+				BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */,
 				BF152028238559A200A70EBF /* memheap.cpp in Sources */,
 				BF15201D2384863900A70EBF /* TCameraDevice.cpp in Sources */,
 				BF152031238559A200A70EBF /* SoyMedia.cpp in Sources */,

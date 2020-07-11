@@ -7,9 +7,12 @@
 #include "SoyPixels.h"
 #include "SoyFourcc.h"
 
-
-
-
+#include <CoreVideo/CVPixelBuffer.h>
+#if defined(__OBJC__)
+@class AVDepthData;
+#else
+class AVDepthData;
+#endif
 
 
 namespace Avf
@@ -17,8 +20,10 @@ namespace Avf
 	class TDeviceMeta;
 	class TCaptureFormatMeta;
 	
-	void	EnumCaptureDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> Enum);
-	void	EnumCaptureDevices(std::function<void(const TDeviceMeta&)> Enum);
+	void				EnumCaptureDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> Enum);
+	void				EnumCaptureDevices(std::function<void(const TDeviceMeta&)> Enum);
+	
+	CVPixelBufferRef	GetDepthPixelBuffer(AVDepthData* DepthData,SoyPixelsFormat::Type OutputFormat=SoyPixelsFormat::DepthFloatMetres);
 
 	std::ostream& operator<<(std::ostream& out,const TCaptureFormatMeta& in);
 }
