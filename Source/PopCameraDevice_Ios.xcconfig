@@ -14,4 +14,13 @@ SOYLIB_PATH = $(SRCROOT)/Source/SoyLib/src
 HEADER_SEARCH_PATHS = $(HEADER_SEARCH_PATHS) $(inherited) $(BROADWAY_PATH)/inc $(LIBFREENECT2_PATH)/LibFreenect2/include/ $(LIBFREENECT2_BUILD_PATH)/ $(LIBFREENECT_PATH)/ $(SOYLIB_PATH)
 LIBRARY_SEARCH_PATHS = $(LIBRARY_SEARCH_PATHS) $(inherited) $(LIBFREENECT2_BUILD_PATH)/lib/ $(LIBFREENECT_PATH)/
 
-OTHER_CFLAGS = -Wno-ambiguous-macro 
+//	this should add bitcode, but doesnt without BITCODE_GENERATION_MODE
+OTHER_CFLAGS = -Wno-ambiguous-macro -fembed-bitcode
+OTHER_LDFLAGS = -fembed-bitcode;
+
+//	need this to get rid of bitcode errors
+//	this should show bitcode sections
+//		otool -l binary_name | grep __bitcode
+//	but despite none showing, a build using this framework still succeeded
+//	with just -fenable_bitcode and enable bitcode, it failed
+BITCODE_GENERATION_MODE = bitcode
