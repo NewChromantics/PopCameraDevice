@@ -213,6 +213,7 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 
 void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp)
 {
+	Soy::TScopeTimerPrint Timer("PushFrame(AVDepthData",5);
 	auto DepthPixels = Avf::GetDepthPixelBuffer(DepthData);
 	
 	//	convert format
@@ -229,6 +230,7 @@ void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp)
 
 void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp)
 {
+	Soy::TScopeTimerPrint Timer("PushFrame(CVPixelBufferRef",5);
 	float3x3 Transform;
 	auto DoRetain = true;
 	std::string FrameMeta;
