@@ -113,7 +113,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 }
 #endif
 
-
+#if !defined(TARGET_WINDOWS)
+void __attribute__((destructor)) DllExit()
+{
+	PopCameraDevice::Shutdown(true);
+}
+#endif
 
 class PopCameraDevice::TDeviceInstance
 {
