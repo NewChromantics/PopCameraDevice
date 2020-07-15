@@ -7,11 +7,14 @@ env:
 # would be nice to extract this from visual studio
   BuildDirectory: PopCameraDevice.visualstudio\x64\Debug_NoKinect
 
-on: 
+on:
   push:
     branches:
       - master
-      - CI_*
+      - '*Test*'
+    paths:
+      - '**.yml'
+      - '**Makefile'
 
 jobs:
   Build:
