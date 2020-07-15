@@ -12,7 +12,7 @@ LIBFREENECT2_BUILD_PATH = $(LIBFREENECT2_PATH)/Build
 KINECTAZURE_PATH = $(SRCROOT)/Source/Libs/Microsoft.Azure.Kinect.Sensor.1.4.1
 SOYLIB_PATH = $(SRCROOT)/Source/SoyLib/src
 
-HEADER_SEARCH_PATHS = $(HEADER_SEARCH_PATHS) $(inherited) $(BROADWAY_PATH)/inc $(LIBFREENECT2_PATH)/LibFreenect2/include/ $(LIBFREENECT2_BUILD_PATH)/ $(LIBFREENECT_PATH)/ $(KINECTAZURE_PATH)/build/native/include/
+HEADER_SEARCH_PATHS = $(HEADER_SEARCH_PATHS) $(inherited) $(SOYLIB_PATH) $(BROADWAY_PATH)/inc $(LIBFREENECT2_PATH)/LibFreenect2/include/ $(LIBFREENECT2_BUILD_PATH)/ $(LIBFREENECT_PATH)/ $(KINECTAZURE_PATH)/build/native/include/
 LIBRARY_SEARCH_PATHS = $(LIBRARY_SEARCH_PATHS) $(inherited) $(LIBFREENECT2_BUILD_PATH)/lib/ $(LIBFREENECT_PATH)/
 
 //	-fdeclspec just as we're testing kinectazure headers on osx
