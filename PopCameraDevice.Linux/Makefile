@@ -40,7 +40,6 @@ $(SRC)/Source/PopCameraDevice.cpp \
 $(SRC)/Source/TestDevice.cpp \
 $(SRC)/Source/KinectAzure.cpp \
 $(SRC)/Source/TCameraDevice.cpp \
-$(SRC)/Source/TOutputDevice.cpp 
 
 # soy lib files
 LOCAL_SRC_FILES  += \
