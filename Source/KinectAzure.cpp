@@ -1,16 +1,17 @@
 #include "KinectAzure.h"
-
-#define K4A_DEPRECATED	__attribute__((deprecated))
-#define K4A_STATIC_DEFINE
-
-//#include <k4abt.h>
-#include <k4a/k4a.h>
 #include "SoyDebug.h"
 #include "HeapArray.hpp"
 #include <magic_enum/include/magic_enum.hpp>
 #include "SoyThread.h"
 #include "SoyMedia.h"
 #include <cmath>	//	fabsf
+
+//	these macros are missing on linux
+#if defined(TARGET_LINUX)
+#define K4A_DEPRECATED	__attribute__((deprecated))
+#define K4A_STATIC_DEFINE
+#endif
+#include <k4a/k4a.h>
 
 #if defined(TARGET_WINDOWS)
 #define K4A_DLL	"k4a.dll"
