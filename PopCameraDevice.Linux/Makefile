@@ -85,7 +85,7 @@ DEPTHENGINE_LIB = \
 $(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
 
 
-LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
+LIB_OBJECTS=$(LIB_SRC_FILES:.cpp=.o)
 APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
 
 OUT_LIB=$(BUILD_DIR)/lib${LIB_NAME}.so
@@ -116,13 +116,13 @@ $(OUT_FILES): $(OUT_FILE_SOURCES)
 	$(foreach SourceFilename,$(OUT_FILE_SOURCES),cp $(SourceFilename) ${BUILD_DIR})
 
 $(OUT_APP): $(APP_OBJECTS) $(OUT_LIB)
-	echo "Building app $(OUT_APP)"
+	$(info Building app $(OUT_APP))
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(APP_LINK_FLAGS) $(APP_OBJECTS) -o $@ -L$(BUILD_DIR) -l$(LIB_NAME)
 
 # $(K4A_LIB)
 $(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
-	echo "Building library $(OUT_LIB)"
+	$(info Building library $(OUT_LIB))
 	$(CC) $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LIB_LINK_LIBS)
 	$(info Listing dependencies of $(OUT_LIB))
 	ldd $(OUT_LIB)
@@ -132,7 +132,7 @@ $(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
 
 clean:
 	# clean build files, anything .o
-	echo "Cleaning files"
+	$(info Cleaning files)
 	rm -f $(APP_OBJECTS)
 	rm -f $(LIB_OBJECTS)
 	rm -f $(OUT_LIB)
