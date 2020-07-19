@@ -1,49 +1,35 @@
-# Raspberry Pi
-# CC = arm-linux-gnueabihf-g++
+LIB_NAME = PopCameraDevice
+APP_NAME = PopCameraDeviceTestApp
 
-# Standard
-CC = g++
-SRC = ..
-SOY_PATH = $(SRC)/Source/SoyLib
-# gr: change this so its Linux$(ARCH)
-BUILD_DIR = ./Build
+# X ?= if X env var isn't set, use this default
+compiler ?= g++
+CC = ${compiler}
 
-LOCAL_C_INCLUDES = \
--I$(SRC)/Source	\
+# archTarget is the target architecture
+# if unspecified, this becomes Linux_Linux/ pick something better :)
+archTarget ?= Linux
+BUILD_DIR = ../Build/Linux_$(archTarget)
+
+PROJECT_PATH = ..
+SRC_PATH = $(PROJECT_PATH)/Source
+SOY_PATH = $(PROJECT_PATH)/Source/SoyLib
+
+LIB_INCLUDES = \
+-I$(SRC_PATH)	\
 -I$(SOY_PATH)/src	\
--I$(SRC)/Source/MagicEnum/include \
--I$(SRC)/Source/Libs/KinectAzure/build/native/include
-
-LOCAL_LINK_DIRS = \
--L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
--L/usr/lib/aarch64-linux-gnu/	
-
-# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
-
-K4A_LIB = \
-$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
-
-DEPTHENGINE_LIB = \
-$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
-
-BUILD_COPY_FILES = \
-$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release/*	
+-I$(SRC_PATH)/MagicEnum/include \
+-I$(SRC_PATH)/Libs/KinectAzure/build/native/include
 
 
-LIBRARY_LINK_LIBS = \
--lk4a	\
--ldepthengine	
-
-
-LOCAL_SRC_FILES  = \
-$(SRC)/Source/PopCameraDevice.cpp \
-$(SRC)/Source/TestDevice.cpp \
-$(SRC)/Source/KinectAzure.cpp \
-$(SRC)/Source/TCameraDevice.cpp \
-$(SRC)/Source/TOutputDevice.cpp 
+LIB_SRC_FILES  = \
+$(SRC_PATH)/PopCameraDevice.cpp \
+$(SRC_PATH)/TestDevice.cpp \
+$(SRC_PATH)/KinectAzure.cpp \
+$(SRC_PATH)/TCameraDevice.cpp \
+$(SRC_PATH)/TOutputDevice.cpp 
 
 # soy lib files
-LOCAL_SRC_FILES  += \
+LIB_SRC_FILES  += \
 $(SOY_PATH)/src/SoyTypes.cpp \
 $(SOY_PATH)/src/SoyAssert.cpp \
 $(SOY_PATH)/src/SoyDebug.cpp \
@@ -63,77 +49,98 @@ $(SOY_PATH)/src/SoyWave.cpp \
 $(SOY_PATH)/src/SoyRuntimeLibrary.cpp \
 $(SOY_PATH)/src/SoyThread.cpp
 
-TESTAPP_SRC_FILES =	\
-$(SRC)/Source/PopCameraDevice_TestApp.cpp 
 
-LOCAL_DEFINES = \
+APP_SRC_FILES =	\
+$(SRC_PATH)/PopCameraDevice_TestApp.cpp 
+
+
+LIB_DEFINES = \
 -DTARGET_LINUX	\
 -DENABLE_KINECTAZURE	\
 
-# PIC means position independent code, required for dynamically loaded symbols
-CFLAGS = -c $(LOCAL_DEFINES) $(LOCAL_C_INCLUDES) -std=gnu++17 -fPIC
-
-# set the rpath (runtime library search path) to a special $ORIGIN so it looks in the same dir as the executable
-# https://serverfault.com/a/402590
-# -Wl is a join-arguments-with-spaces thing
-LDFLAGS = -pthread 
-LDFLAGS += '-Wl,-rpath=$$ORIGIN'
+# -g stops symbol stripping
+# -f[lag] PIC position independent code (for dyanmically loaded code)
+# -rpath $ORIGIN makes the shared object runtimepath be same place as executable
+CFLAGS = -c $(LIB_DEFINES) $(LIB_INCLUDES) -std=gnu++17 -fPIC -g
+LDFLAGS = -pthread
+LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
 
+
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
-TEST_APP_LINK_FLAGS = $(LDFLAGS)
+APP_LINK_FLAGS = $(LDFLAGS)
+
+LIB_LINK_LIBS = \
+-lk4a	\
+-ldepthengine	\
+-L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
+-L/usr/lib/aarch64-linux-gnu/	
+
+# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
+
+# gr: these are now installed in the OS
+K4A_LIB = \
+$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
+
+DEPTHENGINE_LIB = \
+$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
+
 
 LIB_OBJECTS=$(LOCAL_SRC_FILES:.cpp=.o)
-TESTAPP_OBJECTS=$(TESTAPP_SRC_FILES:.cpp=.o)
+APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
 
-ARCHITECTURE=${archTarget}
-OUT_LIBRARY=$(BUILD_DIR)/PopCameraDevice.so
-OUT_EXECUTABLE=$(BUILD_DIR)/PopCameraTest
+OUT_LIB=$(BUILD_DIR)/lib${LIB_NAME}.so
+OUT_APP=$(BUILD_DIR)/${APP_NAME}
 
-exec: $(OUT_EXECUTABLE) 
+# These files (without directory structure) get copied to build dir
+OUT_FILE_SOURCES = \
+$(SRC_PATH)/PopCameraDevice.h	\
+
+# convert to Build/xxx target files
+OUT_FILES = $(addprefix ${BUILD_DIR}/,$(notdir ${OUT_FILE_SOURCES}))
+#$(info out files...)
+#$(info ${OUT_FILES})
+
+
+
+
+exec: $(OUT_APP) 
 .PHONY: exec
 
-lib: $(OUT_LIBRARY) 
+lib: $(OUT_LIB) 
 .PHONY: lib
 
-$(OUT_EXECUTABLE): $(TESTAPP_OBJECTS) $(OUT_LIBRARY)
-	echo "Building test app $(OUT_EXECUTABLE)"
+# Copy other output files
+$(OUT_FILES): $(OUT_FILE_SOURCES)
 	mkdir -p $(BUILD_DIR)
-	# gr: linking to buid/PopCameraDevice means the runtime loader expects it in that directory
-	# 	so we need to link locally (unless it was prefixed with lib)
-	cp $(OUT_LIBRARY) .	
-	$(CC) $(TEST_APP_LINK_FLAGS) $(TESTAPP_OBJECTS) -o $@ PopCameraDevice.so 
-	# we only want to rm if cwd isn't build_dir
-	rm ./PopCameraDevice.so
-	echo "We should see $$ORIGIN in the runtime path"
-	objdump -x $(OUT_EXECUTABLE) | grep PATH
-	echo "Listing dependencies"
-	ldd $(OUT_EXECUTABLE)
+	$(info Copying output files $(OUT_FILES))
+	$(foreach SourceFilename,$(OUT_FILE_SOURCES),cp $(SourceFilename) ${BUILD_DIR})
 
-$(OUT_LIBRARY): $(K4A_LIB) $(LIB_OBJECTS) 
-	echo "Building library $(OUT_LIBRARY)"
+$(OUT_APP): $(APP_OBJECTS) $(OUT_LIB)
+	echo "Building app $(OUT_APP)"
 	mkdir -p $(BUILD_DIR)
-	# this should change to be a stage that copies some files to build dir
-	# but, we do need the k4a libs to link with (for now, we should dload() in code)
-	#cp $(BUILD_COPY_FILES) $(BUILD_DIR)
-	g++ $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LOCAL_LINK_DIRS) $(LIBRARY_LINK_LIBS)
-	echo "We should see $$ORIGIN in the runtime path"
-	objdump -x $(OUT_LIBRARY) | grep PATH
-	echo "Listing dependencies"
-	ldd $(OUT_LIBRARY)
+	$(CC) $(APP_LINK_FLAGS) $(APP_OBJECTS) -o $@ -L$(BUILD_DIR) -l$(LIB_NAME)
+
+# $(K4A_LIB)
+$(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
+	echo "Building library $(OUT_LIB)"
+	$(CC) $(LIB_LINK_FLAGS) -o $@ $(LIB_OBJECTS) $(LIB_LINK_LIBS)
+	$(info Listing dependencies of $(OUT_LIB))
+	ldd $(OUT_LIB)
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(APP_INCLUDES) $(LIB_INCLUDES) $< -o $@
 
 clean:
 	# clean build files, anything .o
 	echo "Cleaning files"
-	rm -f $(TESTAPP_OBJECTS)
-	rm -f $(LIB_OBJECTS)	
-	#find ../ -type f -name '*.o' -delete
-	rm -f $(OUT_LIBRARY)
-	rm -f $(OUT_EXECUTABLE)
+	rm -f $(APP_OBJECTS)
+	rm -f $(LIB_OBJECTS)
+	rm -f $(OUT_LIB)
+	rm -f $(OUT_APP)
 
+
+# gr: this is redundant now, as we have to install to OS
 KinectAzureDependencies: $(K4A_LIB)
 
 
