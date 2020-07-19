@@ -4,10 +4,11 @@ env:
   BuildProject: PopCameraDevice.xcodeproj
   BuildScheme: PopCameraDevice
 
-on: 
+on:
   push:
     branches:
       - master
+      - '*Test*'
 
 jobs:
   Build:

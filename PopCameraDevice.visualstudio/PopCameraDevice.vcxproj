@@ -142,6 +142,7 @@
     <ClInclude Include="..\Source\TestDevice.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\PopCameraDevice.Linux\Makefile" />
     <None Include="..\Source\Avf.mm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>

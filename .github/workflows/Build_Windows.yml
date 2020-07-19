@@ -7,11 +7,11 @@ env:
 # would be nice to extract this from visual studio
   BuildDirectory: Build\Debug_x64
 
-on: 
+on:
   push:
     branches:
       - master
-      - CI_*
+      - '*Test*'
 
 jobs:
   Build:

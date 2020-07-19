@@ -65,6 +65,7 @@ void PopCameraDevice::DecodeFormatString_UnitTests()
 void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,const std::string& FrameMeta)
 {
 	{
+		Soy::TScopeTimerPrint Timer("PopCameraDevice::TDevice::PushFrame Lock",5);
 		std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
 		mLastPixelBuffer = FramePixelBuffer;
 		mLastPixelsMeta = PixelMeta;
@@ -76,6 +77,7 @@ void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixe
 	{
 		try
 		{
+			Soy::TScopeTimerPrint Timer("PopCameraDevice::TDevice::PushFrame Callbacks",5);
 			auto& Callback = mOnNewFrameCallbacks[i];
 			Callback();
 		}
@@ -106,4 +108,9 @@ std::shared_ptr<TPixelBuffer> PopCameraDevice::TDevice::GetNextFrame(SoyPixelsMe
 
 	return PixelBuffer;
 
+}
+
+void PopCameraDevice::TDevice::ReadNativeHandle(void* Handle)
+{
+	throw Soy::AssertException("This device doesn't support ReadNativeHandle");
 }

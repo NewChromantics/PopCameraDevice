@@ -3,7 +3,8 @@
 #include "TCameraDevice.h"
 #include "Avf.h"
 #include "SoyMedia.h"
-
+#include "SoyEnum.h"
+#include "AvfPixelBuffer.h"
 
 
 namespace Avf
@@ -12,9 +13,34 @@ namespace Avf
 	class TCamera;
 }
 class AvfVideoCapture;
+#if defined(__OBJC__)
+@class AVDepthData;
+#else
+class AVDepthData;
+#endif
+
+namespace ArFrameSource
+{
+	enum Type
+	{
+		Invalid,
+		capturedImage,
+		capturedDepthData,
+		sceneDepth,
+		
+		FrontColour,	//	capturedImage
+		FrontDepth,		//	capturedDepthData
+		RearDepth,		//	sceneDepth
+		
+		Depth,			//	default
+	};
+	const static auto Default	= RearDepth;
+	
+	DECLARE_SOYENUM(ArFrameSource);
+}
 
 
-class Avf::TCamera : public  PopCameraDevice::TDevice
+class Avf::TCamera : public PopCameraDevice::TDevice
 {
 public:
 	TCamera(const std::string& DeviceName,const std::string& Format);
@@ -25,20 +51,4 @@ public:
 	std::shared_ptr<AvfVideoCapture>	mExtractor;
 };
 
-/*
-class Avf::TCaptureExtractor : public MfExtractor
-{
-public:
-	TCaptureExtractor(const TMediaExtractorParams& Params);
-	~TCaptureExtractor();
 
-protected:
-	virtual void		AllocSourceReader(const std::string& Filename) override;
-	virtual bool		CanSeek() override				{	return false;	}
-	virtual void		FilterStreams(ArrayBridge<TStreamMeta>& Streams) override;
-	virtual void		CorrectIncomingTimecode(TMediaPacket& Timecode) override;
-
-public:
-};
-
-*/

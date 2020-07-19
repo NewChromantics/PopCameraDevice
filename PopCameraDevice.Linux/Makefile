@@ -26,7 +26,6 @@ $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
 $(SRC_PATH)/KinectAzure.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
-$(SRC_PATH)/TOutputDevice.cpp 
 
 # soy lib files
 LIB_SRC_FILES  += \

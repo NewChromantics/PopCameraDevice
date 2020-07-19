@@ -22,6 +22,9 @@
     <Filter Include="Unity">
       <UniqueIdentifier>{1ba6344e-446c-4c80-8640-edf3db7faa5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PopCameraDevice.Linux">
+      <UniqueIdentifier>{78d892bd-989c-4f4c-95cc-c9d559e8d044}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
@@ -294,6 +297,9 @@
     </None>
     <None Include="..\Source\Libs\LibFreenect\LibFreenect\src\libfreenect.pc.in">
       <Filter>Libs\LibFreenect</Filter>
+    </None>
+    <None Include="..\PopCameraDevice.Linux\Makefile">
+      <Filter>PopCameraDevice.Linux</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

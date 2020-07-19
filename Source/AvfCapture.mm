@@ -1,5 +1,11 @@
 #include "AvfCapture.h"
 #include "AvfVideoCapture.h"
+#include "SoyAvf.h"
+
+#if defined(TARGET_IOS)
+#import <ARKit/ARFrame.h>
+#import <ARKit/ARSession.h>
+#endif
 
 
 
@@ -64,4 +70,6 @@ void Avf::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool En
 	throw Soy::AssertException(Error.str());
 
 }
+
+
 

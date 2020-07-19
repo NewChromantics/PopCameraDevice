@@ -13,7 +13,7 @@
 
 namespace PopCameraDevice
 {
-	const Soy::TVersion	Version(2, 0, 0);
+	const Soy::TVersion	Version(2, 1, 0);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
@@ -42,6 +42,10 @@ __export int32_t PopCameraDevice_GetVersion()
 
 #if defined(TARGET_OSX) || defined(TARGET_IOS)
 #include "AvfCapture.h"
+#endif
+
+#if defined(TARGET_IOS)
+#include "ArkitCapture.h"
 #endif
 
 
@@ -109,7 +113,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 }
 #endif
 
-
+#if !defined(TARGET_WINDOWS)
+void __attribute__((destructor)) DllExit()
+{
+	PopCameraDevice::Shutdown(true);
+}
+#endif
 
 class PopCameraDevice::TDeviceInstance
 {
@@ -273,6 +282,9 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 #elif defined(TARGET_OSX) || defined(TARGET_IOS)
 	Avf::EnumCaptureDevices(EnumDeviceAndFormats);
 #endif
+#if defined(TARGET_IOS)
+	Arkit::EnumDevices(EnumDeviceAndFormats);
+#endif
 	
 #if defined(ENABLE_FREENECT)
 	Freenect::EnumDeviceNames(EnumDevice);
@@ -388,6 +400,24 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 	}
 #endif
 
+#if defined(TARGET_IOS)
+	if ( Name == Arkit::TFrameProxyDevice::DeviceName )
+	{
+		std::shared_ptr<TDevice> Device(new Arkit::TFrameProxyDevice(Format));
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+#endif
+
+#if defined(TARGET_IOS)
+	if ( Name == Arkit::TSessionCamera::DeviceName_SceneDepth || Name == Arkit::TSessionCamera::DeviceName_FrontDepth )
+	{
+		std::shared_ptr<TDevice> Device(new Arkit::TSessionCamera(Name,Format));
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+#endif
+	
 	//	do generic, non-prefixed names LAST
 	try
 	{
@@ -505,6 +535,13 @@ void PopCameraDevice::FreeInstance(uint32_t Instance)
 	}
 
 	Instances.RemoveBlock(InstanceIndex, 1);
+}
+
+
+void PopCameraDevice::ReadNativeHandle(int32_t Instance,void* Handle)
+{
+	auto& Device = GetCameraDevice(Instance);
+	Device.ReadNativeHandle(Handle);
 }
 
 
@@ -727,6 +764,17 @@ __export void PopCameraDevice_UnitTests()
 {
 	PopCameraDevice::DecodeFormatString_UnitTests();
 }
+
+__export void PopCameraDevice_ReadNativeHandle(int32_t Instance,void* Handle)
+{
+	auto Function = [&]()
+	{
+		PopCameraDevice::ReadNativeHandle( Instance, Handle );
+		return 0;
+	};
+	SafeCall(Function, __func__, 0);
+}
+
 
 
 __export void UnityPluginLoad(/*IUnityInterfaces*/void*)
