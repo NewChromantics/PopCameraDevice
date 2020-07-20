@@ -415,7 +415,6 @@ public:
 		mColourMode		( ColourMode ),
 		mFrameRate		( FrameRate )
 	{
-		std::Debug << "TPixelReader constructor" << std::endl;
 		Start();
 	}
 	~TPixelReader();
@@ -808,7 +807,6 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 
 KinectAzure::TFrameReader::~TFrameReader()
 {
-	//std::Debug << __PRETTY_FUNCTION__ << std::endl;
 	try
 	{
 		this->Stop(true);
@@ -823,7 +821,6 @@ void KinectAzure::TFrameReader::Open()
 {
 	if (mDevice)
 		return;
-	std::Debug << __PRETTY_FUNCTION__ << std::endl;
 	
 	auto DepthMode = GetDepthMode();
 	auto ColourMode = GetColourMode();
@@ -837,8 +834,6 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 	//		5 secs is a good indication something has gone wrong I think...
 	try
 	{
-		std::Debug << __PRETTY_FUNCTION__ << std::endl;
-
 		Open();
 
 		int32_t Timeout = 5000;
