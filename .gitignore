@@ -1,33 +1,34 @@
+# unity temp files
 Unity/**/Library/
-
 Unity/**/obj/
-
 Unity/**/Temp/
-
 Unity/**/*.sln
-
 Unity/**/*.csproj
-xcuserdata/
-
-Unity/**/holobuild/
 Unity/**/UWP/
 Unity/**/holobuild/
+
+
+# xcode temp files
+xcuserdata/
+
+# visual studio temp files
 **/.vs/
 **/*.db
 **/*.opendb
 **/*.unitypackage
 PopEncodeJpeg.uwp/Release/
+PopCameraDevice\.visualstudio/x64/
+PopCameraDevice\.visualstudio/Master/
+*.pdb
+*.user
+PopCameraDevice.visualstudio/obj/ARM64/
+
+# linux temp files
+*.o
 
 # Build files
 Build/
 Unity/PopCameraDevice/Assets/PopCameraDevice/
 
-# Intermediates
-PopCameraDevice\.visualstudio/x64/
-PopCameraDevice\.visualstudio/Master/
-*.pdb
-*.user
-
+# external libs
 Source/Libs/Microsoft.Azure.Kinect.Sensor.1.4.1/
-
-PopCameraDevice.visualstudio/obj/ARM64/
