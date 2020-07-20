@@ -7,23 +7,31 @@ on:
       - '*Test*'
 
 jobs:
-  Build:
+  Test:
     env:
-      archTarget: arm64
-    runs-on: ubuntu-latest
-    # This container can be modified to pull in the compiler for different architectures
-    # https://hub.docker.com/_/gcc?tab=tags
-    container: gcc
+      project: PopCameraDevice
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-latest
+            type: linux
+            architecture: x86_64
+
+          - os: ARM64
+            type: linux
+            architecture: nvidia
+
+          - os: Pi4
+            type: linux
+            architecture: arm64
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v1
         with:
-          submodules: recursive
-      - name: Compile project
-        run: |
-          make lib -C $GITHUB_WORKSPACE/PopCameraDevice.Linux/
-      - name: Archive build
-        uses: actions/upload-artifact@v1
+          submodules: "recursive"
+      - name: Linux
+        uses: NewChromantics/PopAction_BuildLinux@v1
         with:
-          name: ${{ env.archTarget }}
-          path: PopCameraDevice.Linux/libs/${{ env.archTarget }}
+          architecture: ${{ matrix.config.architecture }}
+          project: ${{ env.project }}
