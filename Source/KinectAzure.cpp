@@ -415,6 +415,8 @@ public:
 		mColourMode		( ColourMode ),
 		mFrameRate		( FrameRate )
 	{
+		std::Debug << "TPixelReader constructor" << std::endl;
+		Start();
 	}
 	~TPixelReader();
 
@@ -441,7 +443,7 @@ void KinectAzure::LoadDll()
 
 	//	linux requres DISPLAY env var to be 0 for headless mode
 #if defined(TARGET_LINUX)
-	Platform::SetEnvVar("DISPLAY","0");
+	Platform::SetEnvVar("DISPLAY",":0");
 #endif
 
 #if defined(K4A_DLL)
@@ -798,7 +800,8 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 	if ( !mKeepAlive )
 		Open();
 
-	Start();
+	//	gr: calling this here, the thread runs faster than the constructor can finish, so virtuals aren't setup
+	//Start();
 }
 
 
@@ -834,6 +837,8 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 	//		5 secs is a good indication something has gone wrong I think...
 	try
 	{
+		std::Debug << __PRETTY_FUNCTION__ << std::endl;
+
 		Open();
 
 		int32_t Timeout = 5000;
