@@ -1,0 +1,27 @@
+{
+  "name": "@newchromantics/popcameradevice",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "version": "1.0.0",
+  "description": "Pop Camera Device",
+  "main": "index.js",
+  "files": [
+    "Build"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NewChromantics/PopCameraDevice.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NewChromantics/PopCameraDevice/issues"
+  },
+  "homepage": "https://github.com/NewChromantics/PopCameraDevice#readme"
+}

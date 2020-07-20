@@ -1,10 +1,11 @@
 Build Status
 ==========================
-![Build Windows](https://github.com/SoylentGraham/PopCameraDevice/workflows/Build%20Windows/badge.svg)
-![Build Windows_NoKinect](https://github.com/SoylentGraham/PopCameraDevice/workflows/Build%20Windows%20NoKinect/badge.svg)
-![Build Osx](https://github.com/SoylentGraham/PopCameraDevice/workflows/Build%20Osx/badge.svg)
-![Build Ios](https://github.com/SoylentGraham/PopCameraDevice/workflows/Build%20Ios/badge.svg)
-![Build Linux](https://github.com/SoylentGraham/PopH264/workflows/Build%20Linux/badge.svg)
+![Build Windows](https://github.com/NewChromantics/PopCameraDevice/workflows/Build%20Windows/badge.svg)
+![Build Windows_NoKinect](https://github.com/NewChromantics/PopCameraDevice/workflows/Build%20Windows%20NoKinect/badge.svg)
+![Build Osx](https://github.com/NewChromantics/PopCameraDevice/workflows/Build%20Osx/badge.svg)
+![Build Ios](https://github.com/NewChromantics/PopCameraDevice/workflows/Build%20Ios/badge.svg)
+![Build Linux](https://github.com/NewChromantics/PopH264/workflows/Build%20Linux/badge.svg)
+![Create Release](https://github.com/NewChromantics/PopCameraDevice/workflows/Create%20Release/badge.svg)
 
 Kinect Azure
 ============
