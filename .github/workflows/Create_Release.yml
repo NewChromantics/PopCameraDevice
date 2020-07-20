@@ -47,7 +47,7 @@ jobs:
           
           - os: macOS
             type: osx
-            buildScheme: PopCamera
+            buildScheme: PopCamera_Osx
 
     steps:
       - name: Checkout repo
