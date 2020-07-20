@@ -38,17 +38,13 @@ jobs:
             type: Debug
             BuildDirectory: Build\Debug_x6
 
-          - os: windows
-            type: Debug_NoKinect
-            BuildDirectory: PopCameraDevice.visualstudio\x64\Debug_NoKinect
-
           - os: macOS
             type: ios
             buildScheme: PopCameraDevice_Ios
-          
-          - os: macOS
-            type: osx
-            buildScheme: PopCameraDevice_Osx
+          # tsdk: Causes the release to fail
+          # - os: macOS
+          #   type: osx
+          #   buildScheme: PopCameraDevice_Osx
 
     steps:
       - name: Checkout repo
