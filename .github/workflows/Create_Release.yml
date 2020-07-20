@@ -21,17 +21,18 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-latest
-            type: linux
-            architecture: x86_64
+          # tsdk: Disabled as the kinect dependencies break the build
+          # - os: ubuntu-latest
+          #   type: linux
+          #   architecture: x86_64
 
           - os: ARM64
             type: linux
             architecture: nvidia
 
-          - os: Pi4
-            type: linux
-            architecture: arm64
+          # - os: Pi4
+          #   type: linux
+          #   architecture: arm64
 
           - os: windows
             type: Debug
@@ -43,11 +44,11 @@ jobs:
 
           - os: macOS
             type: ios
-            buildScheme: PopCamera_Ios
+            buildScheme: PopCameraDevice_Ios
           
           - os: macOS
             type: osx
-            buildScheme: PopCamera_Osx
+            buildScheme: PopCameraDevice_Osx
 
     steps:
       - name: Checkout repo
