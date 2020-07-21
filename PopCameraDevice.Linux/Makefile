@@ -46,7 +46,8 @@ $(SOY_PATH)/src/SoyMedia.cpp \
 $(SOY_PATH)/src/SoyMediaFormat.cpp \
 $(SOY_PATH)/src/SoyWave.cpp \
 $(SOY_PATH)/src/SoyRuntimeLibrary.cpp \
-$(SOY_PATH)/src/SoyThread.cpp
+$(SOY_PATH)/src/SoyThread.cpp \
+$(SOY_PATH)/src/SoyFilesystem.cpp \
 
 
 APP_SRC_FILES =	\

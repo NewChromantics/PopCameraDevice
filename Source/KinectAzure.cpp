@@ -5,6 +5,7 @@
 #include "SoyThread.h"
 #include "SoyMedia.h"
 #include <cmath>	//	fabsf
+#include <SoyFilesystem.h>
 
 //	these macros are missing on linux
 #if defined(TARGET_LINUX)
@@ -59,6 +60,9 @@ namespace KinectAzure
 	k4a_color_resolution_t	GetLargestColourResolution(SoyPixelsFormat::Type Format);
 
 	constexpr auto	SerialPrefix = "KinectAzure_";
+
+	//	default to best format
+	auto const static K4A_DEPTH_MODE_DEFAULT = K4A_DEPTH_MODE_NFOV_UNBINNED;
 }
 
 
@@ -203,33 +207,38 @@ k4a_depth_mode_t KinectAzure::GetDepthMode(SoyPixelsMeta Format, size_t& FrameRa
 		K4A_DEPTH_MODE_WFOV_2X2BINNED,
 		K4A_DEPTH_MODE_WFOV_UNBINNED 
 	};
-	for (auto DepthFormat : DepthFormats)
-	{
-		//	require format to be right?
-		size_t DummyFrameRate = FrameRate;
-		auto PixelFormat = GetPixelMeta(DepthFormat, DummyFrameRate);
-		if (SameDim(Format, PixelFormat))
-		{
-			FrameRate = DummyFrameRate;
-			return DepthFormat;
-		}
-	}
 
 	//	allow a way to get the no-depth mode
 	if (Format == SoyPixelsMeta())
 		return K4A_DEPTH_MODE_OFF;
 
-	//	todo: how do we pick res?
-	//	note: res will/should match colour, not dept
-	switch (Format.GetFormat())
+	//	look for size matches
+	//	gr: should also do framerate if !=0
+	for (auto DepthFormat : DepthFormats)
 	{
-	case SoyPixelsFormat::Yuv_8_88_Depth16:	return K4A_DEPTH_MODE_NFOV_UNBINNED;
-	case SoyPixelsFormat::Yuv_844_Depth16:		return K4A_DEPTH_MODE_NFOV_UNBINNED;
-	case SoyPixelsFormat::BGRA_Depth16:				return K4A_DEPTH_MODE_NFOV_UNBINNED;
+		size_t DummyFrameRate = FrameRate;
+		auto PixelFormat = GetPixelMeta(DepthFormat, DummyFrameRate);
+		if (SameDim(Format, PixelFormat))
+		{
+			//	output framerate for this configuration
+			FrameRate = DummyFrameRate;
+			return DepthFormat;
+		}
 	}
 
-	//	todo: if pixel format is right, return best res
-	//	todo: get depth for mixed pixel format
+	//	no size matches, so return something if they requested a depth
+	switch (Format.GetFormat())
+	{
+	case SoyPixelsFormat::Depth16mm:
+	{
+		//	get framerate
+		auto DepthFormat = K4A_DEPTH_MODE_DEFAULT;
+		GetPixelMeta(DepthFormat, FrameRate);
+		return DepthFormat;
+	}
+	default:break;
+	}
+
 	std::stringstream Error;
 	Error << "Couldn't convert pixel meta to a depth format; " << Format;
 	throw Soy::AssertException(Error);
@@ -406,6 +415,7 @@ public:
 		mColourMode		( ColourMode ),
 		mFrameRate		( FrameRate )
 	{
+		Start();
 	}
 	~TPixelReader();
 
@@ -429,6 +439,11 @@ void KinectAzure::LoadDll()
 	//	load the lazy-load libraries
 	if (DllLoaded)
 		return;
+
+	//	linux requres DISPLAY env var to be 0 for headless mode
+#if defined(TARGET_LINUX)
+	Platform::SetEnvVar("DISPLAY",":0");
+#endif
 
 #if defined(K4A_DLL)
 	//	we should just try, because if the parent process has loaded it, this
@@ -496,11 +511,6 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 		Formats.PushBack(FormatString);
 	};
 
-	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::Yuv_8_88_Depth16);
-	PushColourFormat(K4A_COLOR_RESOLUTION_720P, SoyPixelsFormat::BGRA_Depth16);
-	PushColourFormat(K4A_COLOR_RESOLUTION_1080P, SoyPixelsFormat::BGRA_Depth16);
-	PushColourFormat(K4A_COLOR_RESOLUTION_1440P, SoyPixelsFormat::BGRA_Depth16);
-	PushColourFormat(K4A_COLOR_RESOLUTION_1536P, SoyPixelsFormat::BGRA_Depth16);
 	//	DO NOT WORK - all 844's dont work
 	//Yuv_8_88_Ntsc_Depth16 ^ 1920x1080
 	//Yuv_8_88_Ntsc_Depth16 ^ 2560x1440
@@ -586,6 +596,10 @@ KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4
 		if (ColourMode.resolution != K4A_COLOR_RESOLUTION_OFF )
 			DeviceConfig.color_format = ColourMode.format;
 		DeviceConfig.camera_fps = FrameRate;
+
+		//	gr: if this fails when using depth on linux with error 204, may need to set headless display mode before running
+		//export DISPLAY:=0
+
 		Error = k4a_device_start_cameras(mDevice, &DeviceConfig);
 		IsOkay(Error, "k4a_device_start_cameras");
 		
@@ -785,14 +799,14 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 	if ( !mKeepAlive )
 		Open();
 
-	Start();
+	//	gr: calling this here, the thread runs faster than the constructor can finish, so virtuals aren't setup
+	//Start();
 }
 
 
 
 KinectAzure::TFrameReader::~TFrameReader()
 {
-	//std::Debug << __PRETTY_FUNCTION__ << std::endl;
 	try
 	{
 		this->Stop(true);
@@ -807,7 +821,6 @@ void KinectAzure::TFrameReader::Open()
 {
 	if (mDevice)
 		return;
-	std::Debug << __PRETTY_FUNCTION__ << std::endl;
 	
 	auto DepthMode = GetDepthMode();
 	auto ColourMode = GetColourMode();
@@ -830,7 +843,7 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 	{
 		auto SleepMs = 1000;
 		//	gr: if we get this, we should restart the capture/acquire device
-		std::Debug << "Exception in TKinectAzureSkeletonReader loop: " << e.what() << " (Pausing for "<< SleepMs << "ms)" << std::endl;
+		std::Debug << "Exception in " << __PRETTY_FUNCTION__ << " loop: " << e.what() << " (Pausing for "<< SleepMs << "ms)" << std::endl;
 
 		//	gr: for now at least send this in KeepAlive mode, 
 		//		as the caller might send different params in the API (eg. GPU index)
