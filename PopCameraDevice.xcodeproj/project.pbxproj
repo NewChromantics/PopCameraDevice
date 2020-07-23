@@ -280,8 +280,6 @@
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice.cs; sourceTree = "<group>"; };
 		BF67C8552437364600D7492E /* PopOutputDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PopOutputDevice.cpp; path = Source/PopOutputDevice.cpp; sourceTree = "<group>"; };
-		BF67C8582437367F00D7492E /* TOutputDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TOutputDevice.cpp; path = Source/TOutputDevice.cpp; sourceTree = "<group>"; };
-		BF67C8592437367F00D7492E /* TOutputDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TOutputDevice.h; path = Source/TOutputDevice.h; sourceTree = "<group>"; };
 		BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CoreMediaOutputDevice.mm; path = Source/CoreMediaOutputDevice.mm; sourceTree = "<group>"; };
 		BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreMediaOutputDevice.h; path = Source/CoreMediaOutputDevice.h; sourceTree = "<group>"; };
 		BF67C86424373BD600D7492E /* CoreMediaIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMediaIO.framework; path = System/Library/Frameworks/CoreMediaIO.framework; sourceTree = SDKROOT; };
@@ -626,8 +624,6 @@
 				BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */,
 				BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */,
 				BF012AB12268DBF8003AEB55 /* TestDevice.h */,
-				BF67C8582437367F00D7492E /* TOutputDevice.cpp */,
-				BF67C8592437367F00D7492E /* TOutputDevice.h */,
 				BFD607731EA16EFC0035C814 /* Unity */,
 			);
 			name = Source;
