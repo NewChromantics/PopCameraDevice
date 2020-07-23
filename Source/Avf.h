@@ -8,10 +8,19 @@
 #include "SoyFourcc.h"
 
 #include <CoreVideo/CVPixelBuffer.h>
+
+//	forward declare some classes that aren't in every sdk version,
+//	plus for use in c++
 #if defined(__OBJC__)
 @class AVDepthData;
+@class ARFrame;
+@class ARSession;
+@class ARDepthData;
 #else
 class AVDepthData;
+class ARFrame;
+class ARSession;
+class ARDepthData;
 #endif
 
 

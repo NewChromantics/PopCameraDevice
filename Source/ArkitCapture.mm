@@ -2,7 +2,7 @@
 #include "AvfVideoCapture.h"
 #include "SoyAvf.h"
 #import <ARKit/ARKit.h>
-
+#include "Json11/json11.hpp"
 
 
 @interface ARSessionProxy : NSObject <ARSessionDelegate>
@@ -181,28 +181,162 @@ void Arkit::TFrameProxyDevice::EnableFeature(PopCameraDevice::TFeature::Type Fea
 }
 
 
+
+namespace Avf
+{
+	void	GetMeta(ARFrame* Frame,json1::Json& Meta);
+	void	GetMeta(AVDepthData* Depth,json1::Json& Meta);
+	void	GetMeta(ARCamera* Camera,json11::Json& Meta);
+}
+
+
+json11::Json::array GetJsonArray()
+{
+	
+}
+
+
+void Avf::GetMeta(ARCamera* Camera,json11::Json& Meta)
+{
+	//	"rotation and translation in world space"
+	//	so camera to world?
+	auto LocalToWorld = GetJsonArray(Camera.transform);
+	auto LocalEulerRadians = GetJsonArray( Camera.eulerAngles );
+	auto Tracking = magic_enum::enum_name(Camera.trackingState);
+	auto TrackingStateReason = magic_enum::enum_name(Camera.trackingStateReason);
+	auto Intrinsics = GetJsonArray(Camera.intrinsics);
+	auto CameraResolution = GetJsonArray(Camera.imageResolution);
+	
+	Meta["LocalToWorld"] = LocalToWorld;
+	Meta["LocalEulerRadians"] = LocalEulerRadians;
+	Meta["Tracking"] = Tracking;
+	Meta["TrackingStateReason"] = TrackingStateReason;
+	Meta["Intrinsics"] = Intrinsics;
+}
+	
+void Avf::GetMeta(ARFrame* Frame,json11::Json& Meta)
+{
+	if ( !Frame )
+		return;
+	
+	if ( Frame.camera )
+	{
+		json11::Json::object CameraMeta;
+		GetMeta(Frame.camera,CameraMeta);
+		Meta["Camera"] = CameraMeta;
+	}
+	
+	//	get anchors
+	auto EnumAnchor = [&](ARAnchor* Anchor)
+	{
+		
+	};
+	Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);
+	
+	if ( Frame.lightEstimate )
+	{
+		
+	}
+	
+	if ( Frame.rawFeaturePoints )
+	{
+		
+	}
+	
+	if ( Frame.detectedBody )
+	{
+		
+	}
+	
+	if ( Frame.geoTrackingStatus )
+	{
+		
+	}
+	
+	auto WorldMappingStatus = magic_enum::enum_name(Frame.worldMappingStatus);
+	Meta["WorldMappingStatus"] = WorldMappingStatus;
+}
+
+
+void Avf::GetMeta(AVDepthData* Depth,json11::Json& Meta)
+{
+	
+	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
+	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
+	auto IsFiltered = DepthData.depthDataFiltered;
+	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
+	
+	Meta["Quality"] = Quality;
+	Meta["Accuracy"] = Accuracy;
+	Meta["IsFiltered"] = IsFiltered;
+	
+	//	gr: rename to Projection & CameraToWorld
+	auto IntrinsicMatrix = GetJsonArray(CameraCalibration.intrinsicMatrix);
+	auto IntrinsicPixelToMm = CameraCalibration.pixelSize;
+	auto IntrinsicSize = GetJsonArray(CameraCalibration.intrinsicMatrixReferenceDimensions);
+	auto ExtrinsicMatrix = GetJsonArray(CameraCalibration.extrinsicMatrix);
+	
+	json11::Json CameraJson = json11::Json::object{
+		{ "IntrinsicMatrix",IntrinsicMatrix },
+		{ "IntrinsicPixelToMm",IntrinsicPixelToMm },
+		{ "IntrinsicSize",IntrinsicSize },
+		{ "ExtrinsicMatrix",ExtrinsicMatrix }
+	};
+	Meta["CameraCalibration"] = CameraJson;
+}
+
 void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 {
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
 	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
-	
+
+	//	get meta out of the ARFrame
+	json11::Json Meta;
+	GetMeta( Frame, Meta );
+
 	//	read specific pixels
 	switch( Source )
 	{
 		case ArFrameSource::capturedImage:
-			PushFrame( Frame.capturedImage, FrameTime );
+			PushFrame( Frame.capturedImage, FrameTime, Meta );
 			return;
 			
 		case ArFrameSource::capturedDepthData:
-			PushFrame( Frame.capturedDepthData, CapDepthTime );
+			PushFrame( Frame.capturedDepthData, CapDepthTime, Meta );
 			return;
-			/*
-			 case ArFrameSource::sceneDepth:
-			 PushFrame( Frame.sceneDepth, FrameTime );
-			 return;
-			 */
 			
+#pragma warning ARKit sdk __IPHONE_OS_VERSION_MIN_REQUIRED
+
+		case ArFrameSource::segmentationBuffer:
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 130000
+			PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta );
+#else
+			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
+#pragma warning Compiling without ARFrame segmentationBuffer __IPHONE_OS_VERSION_MIN_REQUIRED
+#endif
+			return;
+			
+		case ArFrameSource::sceneDepth:
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 140000
+			GetMeta( Frame.sceneDepth, Meta );
+			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta );
+#else
+#pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
+			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
+#endif
+			return;
+
+		case ArFrameSource::sceneDepthConfidence:
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 140000
+			GetMeta( Frame.sceneDepth, Meta );
+			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta );
+#else
+#pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
+			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
+#endif
+			return;
+
 		default:break;
 	}
 	
@@ -211,24 +345,18 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	throw Soy::AssertException(Debug);
 }
 
-void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp)
+void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json& Meta)
 {
 	Soy::TScopeTimerPrint Timer("PushFrame(AVDepthData",5);
 	auto DepthPixels = Avf::GetDepthPixelBuffer(DepthData);
 	
-	//	convert format
-	//SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
-	//Soy::TFourcc DepthFormat(DepthData.depthDataType);
-	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
-	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
-	auto IsFiltered = DepthData.depthDataFiltered;
-	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
-	
-	PushFrame(DepthPixels,Timestamp);
+	GetMeta( DepthData, Meta );
+	PushFrame( DepthPixels, Timestamp, Meta );
 }
 
 
-void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp)
+
+void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json& Meta)
 {
 	Soy::TScopeTimerPrint Timer("PushFrame(CVPixelBufferRef",5);
 	float3x3 Transform;

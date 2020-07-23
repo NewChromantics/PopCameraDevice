@@ -7,13 +7,10 @@
 #include "AvfPixelBuffer.h"
 
 
-#if defined(__OBJC__)
-@class ARFrame;
-@class ARSession;
-#else
-class ARFrame;
-class ARSession;
-#endif
+namespace json11
+{
+	class Json;
+}
 
 namespace Arkit
 {
@@ -30,10 +27,14 @@ namespace Arkit
 			capturedImage,
 			capturedDepthData,
 			sceneDepth,
+			sceneDepthConfidence,
+			segmentationBuffer,
 			
-			FrontColour,	//	capturedImage
-			FrontDepth,		//	capturedDepthData
-			RearDepth,		//	sceneDepth
+			FrontColour,		//	capturedImage
+			FrontDepth,			//	capturedDepthData
+			RearDepth,			//	sceneDepth
+			RearDepthConfidence,	//	sceneDepth
+			Segmentation,		//	segmentationBuffer
 			
 			Depth,			//	default
 		};
@@ -53,8 +54,9 @@ namespace Arkit
 class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 {
 public:
-	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp);
-	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp);
+	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json& Meta);
+	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json& Meta);
+	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json& Meta);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
 };
 
