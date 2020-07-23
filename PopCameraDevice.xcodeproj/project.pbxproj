@@ -117,6 +117,8 @@
 		BF15205123855D8300A70EBF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205023855D8200A70EBF /* CoreGraphics.framework */; };
 		BF15205323855F1F00A70EBF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205223855F1F00A70EBF /* UIKit.framework */; };
 		BF216E9C24C99989003FD00B /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF216E9B24C99989003FD00B /* ARKit.framework */; };
+		BF216EA024CA1B81003FD00B /* json11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF216E9E24CA1B7D003FD00B /* json11.cpp */; };
+		BF216EA124CA1B82003FD00B /* json11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF216E9E24CA1B7D003FD00B /* json11.cpp */; };
 		BF39C0CC2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
@@ -272,6 +274,8 @@
 		BF15205023855D8200A70EBF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		BF15205223855F1F00A70EBF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		BF216E9B24C99989003FD00B /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
+		BF216E9E24CA1B7D003FD00B /* json11.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = json11.cpp; path = Source/Json11/json11.cpp; sourceTree = SOURCE_ROOT; };
+		BF216E9F24CA1B7D003FD00B /* json11.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = json11.hpp; path = Source/Json11/json11.hpp; sourceTree = SOURCE_ROOT; };
 		BF2E7CAF22E4EB26008B905F /* TestAppInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = TestAppInfo.plist; path = Source/TestAppInfo.plist; sourceTree = "<group>"; };
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice.cs; sourceTree = "<group>"; };
@@ -511,6 +515,15 @@
 			path = PopCameraDevice_Ios;
 			sourceTree = "<group>";
 		};
+		BF216E9D24CA1B5F003FD00B /* Json11 */ = {
+			isa = PBXGroup;
+			children = (
+				BF216E9E24CA1B7D003FD00B /* json11.cpp */,
+				BF216E9F24CA1B7D003FD00B /* json11.hpp */,
+			);
+			path = Json11;
+			sourceTree = "<group>";
+		};
 		BF4A6A0B1EA16D7C00613A64 = {
 			isa = PBXGroup;
 			children = (
@@ -574,6 +587,7 @@
 		BFD6076D1EA16ED20035C814 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				BF216E9D24CA1B5F003FD00B /* Json11 */,
 				BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */,
 				BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */,
 				BF012B01226A03C5003AEB55 /* Avf.h */,
@@ -884,6 +898,7 @@
 				BF012AD42269FAE2003AEB55 /* TestDevice.cpp in Sources */,
 				BF8534DA22B3FE370049C01B /* usb_libusb10.c in Sources */,
 				BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */,
+				BF216EA024CA1B81003FD00B /* json11.cpp in Sources */,
 				BF8534D222B3FE370049C01B /* audio.c in Sources */,
 				BF152043238559F000A70EBF /* SoyFourcc.cpp in Sources */,
 				BF012AF12269FE13003AEB55 /* SoyDebug.mm in Sources */,
@@ -910,6 +925,7 @@
 				BF152035238559A200A70EBF /* SoyPixels.cpp in Sources */,
 				BF15202F238559A200A70EBF /* SoyH264.cpp in Sources */,
 				BF152032238559A200A70EBF /* SoyMediaFormat.cpp in Sources */,
+				BF216EA124CA1B82003FD00B /* json11.cpp in Sources */,
 				BF152037238559A200A70EBF /* SoyShader.cpp in Sources */,
 				BF15203C238559A200A70EBF /* SoyTime.mm in Sources */,
 				BF152030238559A200A70EBF /* SoyJson.cpp in Sources */,

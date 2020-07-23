@@ -184,19 +184,75 @@ void Arkit::TFrameProxyDevice::EnableFeature(PopCameraDevice::TFeature::Type Fea
 
 namespace Avf
 {
-	void	GetMeta(ARFrame* Frame,json1::Json& Meta);
-	void	GetMeta(AVDepthData* Depth,json1::Json& Meta);
-	void	GetMeta(ARCamera* Camera,json11::Json& Meta);
+	void	GetMeta(ARFrame* Frame,json11::Json::object& Meta);
+	void	GetMeta(AVDepthData* Depth,json11::Json::object& Meta);
+	void	GetMeta(ARCamera* Camera,json11::Json::object& Meta);
+	void	GetMeta(ARDepthData* Camera,json11::Json::object& Meta);
 }
 
 
-json11::Json::array GetJsonArray()
+json11::Json::array GetJsonArray(simd_float3 Values)
 {
-	
+	json11::Json::array Array;
+	Array.push_back( Values[0] );
+	Array.push_back( Values[1] );
+	Array.push_back( Values[2] );
+	return Array;
+}
+
+json11::Json::array GetJsonArray(simd_float4 Values)
+{
+	json11::Json::array Array;
+	Array.push_back( Values[0] );
+	Array.push_back( Values[1] );
+	Array.push_back( Values[2] );
+	Array.push_back( Values[3] );
+	return Array;
+}
+
+json11::Json::array GetJsonArray(simd_float4x4 Values)
+{
+	json11::Json::array Array;
+	for ( auto r=0;	r<4;	r++ )
+		for ( auto c=0;	c<4;	c++ )
+			Array.push_back( Values.columns[c][r] );
+	return Array;
+}
+
+json11::Json::array GetJsonArrayAs4x4(simd_float4x3 Values)
+{
+	json11::Json::array Array;
+	for ( auto r=0;	r<3;	r++ )
+		for ( auto c=0;	c<4;	c++ )
+			Array.push_back( Values.columns[c][r] );
+	Array.push_back(0);
+	Array.push_back(0);
+	Array.push_back(0);
+	Array.push_back(1);
+	return Array;
+}
+
+json11::Json::array GetJsonArray(simd_float3x3 Values)
+{
+	json11::Json::array Array;
+	for ( auto r=0;	r<3;	r++ )
+		for ( auto c=0;	c<3;	c++ )
+			Array.push_back( Values.columns[c][r] );
+	return Array;
+}
+
+json11::Json::array GetJsonArray(CGSize Values)
+{
+	//	gr: should this return a object with Width/Height?
+	json11::Json::array Array;
+	Array.push_back( Values.width );
+	Array.push_back( Values.height );
+	return Array;
 }
 
 
-void Avf::GetMeta(ARCamera* Camera,json11::Json& Meta)
+
+void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 {
 	//	"rotation and translation in world space"
 	//	so camera to world?
@@ -214,7 +270,7 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json& Meta)
 	Meta["Intrinsics"] = Intrinsics;
 }
 	
-void Avf::GetMeta(ARFrame* Frame,json11::Json& Meta)
+void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 {
 	if ( !Frame )
 		return;
@@ -258,31 +314,36 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json& Meta)
 }
 
 
-void Avf::GetMeta(AVDepthData* Depth,json11::Json& Meta)
+void Avf::GetMeta(AVDepthData* Depth,json11::Json::object& Meta)
 {
-	
-	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
-	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
-	auto IsFiltered = DepthData.depthDataFiltered;
-	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
+	auto Quality = magic_enum::enum_name(Depth.depthDataQuality);
+	auto Accuracy = magic_enum::enum_name(Depth.depthDataAccuracy);
+	auto IsFiltered = Depth.depthDataFiltered;
+	AVCameraCalibrationData* CameraCalibration = Depth.cameraCalibrationData;
 	
 	Meta["Quality"] = Quality;
 	Meta["Accuracy"] = Accuracy;
 	Meta["IsFiltered"] = IsFiltered;
-	
 	//	gr: rename to Projection & CameraToWorld
 	auto IntrinsicMatrix = GetJsonArray(CameraCalibration.intrinsicMatrix);
 	auto IntrinsicPixelToMm = CameraCalibration.pixelSize;
 	auto IntrinsicSize = GetJsonArray(CameraCalibration.intrinsicMatrixReferenceDimensions);
-	auto ExtrinsicMatrix = GetJsonArray(CameraCalibration.extrinsicMatrix);
+	auto ExtrinsicMatrix = GetJsonArrayAs4x4(CameraCalibration.extrinsicMatrix);
 	
-	json11::Json CameraJson = json11::Json::object{
+	json11::Json CameraJson = json11::Json::object
+	{
 		{ "IntrinsicMatrix",IntrinsicMatrix },
 		{ "IntrinsicPixelToMm",IntrinsicPixelToMm },
 		{ "IntrinsicSize",IntrinsicSize },
 		{ "ExtrinsicMatrix",ExtrinsicMatrix }
 	};
 	Meta["CameraCalibration"] = CameraJson;
+}
+
+
+void Avf::GetMeta(ARDepthData* Depth,json11::Json::object& Meta)
+{
+	//	no meta here!
 }
 
 void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
@@ -292,8 +353,8 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
 
 	//	get meta out of the ARFrame
-	json11::Json Meta;
-	GetMeta( Frame, Meta );
+	json11::Json::object Meta;
+	Avf::GetMeta( Frame, Meta );
 
 	//	read specific pixels
 	switch( Source )
@@ -319,7 +380,7 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 			
 		case ArFrameSource::sceneDepth:
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 140000
-			GetMeta( Frame.sceneDepth, Meta );
+			Avf::GetMeta( Frame.sceneDepth, Meta );
 			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta );
 #else
 #pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
@@ -329,7 +390,7 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 
 		case ArFrameSource::sceneDepthConfidence:
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= 140000
-			GetMeta( Frame.sceneDepth, Meta );
+			Avf::GetMeta( Frame.sceneDepth, Meta );
 			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta );
 #else
 #pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
@@ -345,18 +406,18 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	throw Soy::AssertException(Debug);
 }
 
-void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json& Meta)
+void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta)
 {
 	Soy::TScopeTimerPrint Timer("PushFrame(AVDepthData",5);
 	auto DepthPixels = Avf::GetDepthPixelBuffer(DepthData);
 	
-	GetMeta( DepthData, Meta );
+	Avf::GetMeta( DepthData, Meta );
 	PushFrame( DepthPixels, Timestamp, Meta );
 }
 
 
 
-void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json& Meta)
+void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta)
 {
 	Soy::TScopeTimerPrint Timer("PushFrame(CVPixelBufferRef",5);
 	float3x3 Transform;

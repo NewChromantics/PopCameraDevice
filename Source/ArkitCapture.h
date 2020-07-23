@@ -6,11 +6,8 @@
 #include "SoyEnum.h"
 #include "AvfPixelBuffer.h"
 
-
-namespace json11
-{
-	class Json;
-}
+//	can't really forward declare json11::Json::object
+#include "Json11/json11.hpp"
 
 namespace Arkit
 {
@@ -54,9 +51,9 @@ namespace Arkit
 class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 {
 public:
-	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json& Meta);
-	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json& Meta);
-	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json& Meta);
+	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta);
+	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
+	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
 };
 
