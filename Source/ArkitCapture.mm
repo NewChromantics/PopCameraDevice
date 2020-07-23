@@ -188,8 +188,18 @@ namespace Avf
 	void	GetMeta(AVDepthData* Depth,json11::Json::object& Meta);
 	void	GetMeta(ARCamera* Camera,json11::Json::object& Meta);
 	void	GetMeta(ARDepthData* Camera,json11::Json::object& Meta);
+
+	json11::Json::object	GetSkeleton(ARSkeleton2D* Skeleton);
 }
 
+
+json11::Json::array GetJsonArray(simd_float2 Values)
+{
+	json11::Json::array Array;
+	Array.push_back( Values[0] );
+	Array.push_back( Values[1] );
+	return Array;
+}
 
 json11::Json::array GetJsonArray(simd_float3 Values)
 {
@@ -250,6 +260,51 @@ json11::Json::array GetJsonArray(CGSize Values)
 	return Array;
 }
 
+namespace Avf
+{
+	namespace GeoTrackingState
+	{
+		enum Type
+		{
+			Invalid,
+			NotAvailable = ARGeoTrackingStateNotAvailable,
+			Initializing = ARGeoTrackingStateInitializing,
+			Localizing = ARGeoTrackingStateLocalizing,
+			Localized = ARGeoTrackingStateLocalized
+		};
+		DECLARE_SOYENUM(GeoTrackingState);
+	}
+
+	namespace GeoTrackingAccuracy
+	{
+		enum Type
+		{
+			Invalid,
+			Undetermined = ARGeoTrackingAccuracyUndetermined,
+			Low = ARGeoTrackingAccuracyLow,
+			Medium = ARGeoTrackingAccuracyMedium,
+			High = ARGeoTrackingAccuracyHigh
+		};
+		DECLARE_SOYENUM(GeoTrackingAccuracy);
+	}
+
+	namespace GeoTrackingStateReason
+	{
+		enum Type
+		{
+			Invalid,
+			None = ARGeoTrackingStateReasonNone,
+			NotAvailableAtLocation = ARGeoTrackingStateReasonNotAvailableAtLocation,
+			NeedLocationPermissions = ARGeoTrackingStateReasonNeedLocationPermissions,
+			WorldTrackingUnstable = ARGeoTrackingStateReasonWorldTrackingUnstable,
+			WaitingForLocation = ARGeoTrackingStateReasonWaitingForLocation,
+			GeoDataNotLoaded = ARGeoTrackingStateReasonGeoDataNotLoaded,
+			DevicePointedTooLow = ARGeoTrackingStateReasonDevicePointedTooLow,
+			VisualLocalizationFailed = ARGeoTrackingStateReasonVisualLocalizationFailed,
+		};
+		DECLARE_SOYENUM(GeoTrackingStateReason);
+	}
+}
 
 
 void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
@@ -269,6 +324,28 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	Meta["TrackingStateReason"] = TrackingStateReason;
 	Meta["Intrinsics"] = Intrinsics;
 }
+
+//ARSkeletonJointNameHead
+json11::Json::object Avf::GetSkeleton(ARSkeleton2D* Skeleton)
+{
+	//	gr: cache this as the definition doesn't change
+	//		then copy it and replace values
+	json11::Json::object SkeletonJson;
+	
+	auto EnumJoint = [&](NSString* Name)
+	{
+		auto Position2 = [Skeleton landmarkForJointNamed:Name];
+		auto PositionArray = GetJsonArray(Position2);
+		auto Key = Soy::NSStringToString(Name);
+		SkeletonJson[Key] = PositionArray;
+	};
+	
+	auto Definition = Skeleton.definition;
+	auto JointNames = Definition.jointNames;
+	Platform::NSArray_ForEach<NSString*>(JointNames,EnumJoint);
+
+	return SkeletonJson;
+}
 	
 void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 {
@@ -283,30 +360,73 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 	}
 	
 	//	get anchors
-	auto EnumAnchor = [&](ARAnchor* Anchor)
 	{
-		
-	};
-	Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);
+		json11::Json::array Anchors;
+		auto EnumAnchor = [&](ARAnchor* Anchor)
+		{
+			auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
+			auto Name = Soy::NSStringToString(Anchor.name);
+			auto SessionUuid = Soy::NSStringToString(Anchor.sessionIdentifier.UUIDString);
+			auto LocalToWorld = GetJsonArray(Anchor.transform);
+			json11::Json::object AnchorObject =
+			{
+				{"Uuid",Uuid},
+				{"Name",Name},
+				{"SessionUuid",SessionUuid},
+				{"LocalToWorld",LocalToWorld},
+			};
+			Anchors.push_back(AnchorObject);
+		};
+		Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);
+		if ( Anchors.size() )
+			Meta["Anchors"] = Anchors;
+	}
 	
 	if ( Frame.lightEstimate )
 	{
-		
+		Meta["LightIntensity"] = Frame.lightEstimate.ambientIntensity;
+		Meta["LightTemperature"] = Frame.lightEstimate.ambientColorTemperature;
 	}
 	
 	if ( Frame.rawFeaturePoints )
 	{
-		
+		//	write all positions and their 64 bit id's (as string)
+		auto* PointCloud = Frame.rawFeaturePoints;
+		json11::Json::array PositionArray;
+		json11::Json::array UidArray;
+		for ( auto i=0;	i<PointCloud.count;	i++ )
+		{
+			auto& Uid64 = PointCloud.identifiers[i];
+			auto& Pos3 = PointCloud.points[i];
+			auto UidString = std::to_string(Uid64);
+			PositionArray.push_back(Pos3[0]);
+			PositionArray.push_back(Pos3[1]);
+			PositionArray.push_back(Pos3[2]);
+			UidArray.push_back(UidString);
+		}
+		json11::Json::object Features =
+		{
+			{"Positions",PositionArray},
+			{"Uids",UidArray}
+		};
+		Meta["Features"] = Features;
 	}
 	
-	if ( Frame.detectedBody )
+	if ( Frame.detectedBody && Frame.detectedBody.skeleton )
 	{
-		
+		auto Skeleton = GetSkeleton( Frame.detectedBody.skeleton );
+		Meta["Skeleton"] = Skeleton;
 	}
 	
 	if ( Frame.geoTrackingStatus )
 	{
+		auto State = Avf::GeoTrackingState::ToString(static_cast<Avf::GeoTrackingState::Type>(Frame.geoTrackingStatus.state));
+		auto Accuracy = Avf::GeoTrackingAccuracy::ToString(static_cast<Avf::GeoTrackingAccuracy::Type>(Frame.geoTrackingStatus.accuracy));
+		auto StateReason = Avf::GeoTrackingStateReason::ToString(static_cast<Avf::GeoTrackingStateReason::Type>(Frame.geoTrackingStatus.stateReason));
 		
+		Meta["GeoTrackingState"] = State;
+		Meta["GeoTrackingStateReason"] = StateReason;
+		Meta["GeoTrackingAccuracy"] = Accuracy;
 	}
 	
 	auto WorldMappingStatus = magic_enum::enum_name(Frame.worldMappingStatus);
