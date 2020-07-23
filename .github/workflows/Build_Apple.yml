@@ -20,7 +20,7 @@ jobs:
             type: Ios
 
           - os: macOS
-            type: Os
+            type: Osx
 
     steps:
       - uses: actions/checkout@v2
