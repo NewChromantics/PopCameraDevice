@@ -1,7 +1,7 @@
 {
   "name": "@newchromantics/popcameradevice",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/newchromatics"
+    "registry": "https://npm.pkg.github.com/newchromantics"
   },
   "version": "0.0.1",
   "description": "Pop Camera Device",
