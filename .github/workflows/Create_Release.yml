@@ -41,16 +41,13 @@ jobs:
           #   BuildDirectory: Build
 
           - os: windows
-            type: Debug
-            BuildDirectory: Build
+            type: x64
 
           - os: macOS
             type: Ios
-            BuildDirectory: build/Release-iphoneos
 
           - os: macOS
             type: Osx
-            BuildDirectory: build/Release
 
     steps:
       - name: Checkout repo
