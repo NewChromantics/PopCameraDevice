@@ -1,15 +1,11 @@
 {
   "name": "@newchromantics/popcameradevice",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
-  "version": "1.0.0",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "version": "0.0.3",
   "description": "Pop Camera Device",
   "main": "index.js",
-  "files": [
-    "Build"
-  ],
-  "dependencies": {
-  },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -41,18 +41,13 @@ jobs:
           #   BuildDirectory: Build
 
           - os: windows
-            type: Debug
-            BuildDirectory: Build
+            type: x64
 
           - os: macOS
-            type: ios
-            buildScheme: PopCameraDevice_Ios
-            BuildDirectory: build/Release-iphoneos
+            type: Ios
 
           - os: macOS
-            type: osx
-            buildScheme: PopCameraDevice_Osx
-            BuildDirectory: build/Release
+            type: Osx
 
     steps:
       - name: Checkout repo
@@ -75,19 +70,13 @@ jobs:
           project: ${{ env.project }}
 
       - name: Apple
+        id: Apple
         if: matrix.config.os == 'macOS'
         uses: NewChromantics/PopAction_BuildApple@v1
         with:
-          BuildScheme: ${{ matrix.config.buildScheme }}
+          BuildScheme: ${{ env.project }}_${{ matrix.config.type }}
           project: ${{ env.project }}
-
-      - name: GetTargetBuildDir
-        if: matrix.config.os == 'macOS'
-        id: GetTargetBuildDir
-        run: |
-          echo "Setting target build dir"
-          echo "##[set-output name=TargetBuildDir;]$(xcodebuild -workspace $BuildProject/project.xcworkspace -scheme $BuildScheme -showBuildSettings | grep TARGET_BUILD_DIR | sed -e 's/.*TARGET_BUILD_DIR = //')"
-
+          
       - name: Linux
         if: matrix.config.type == 'linux'
         uses: NewChromantics/PopAction_BuildLinux@v1
@@ -98,17 +87,18 @@ jobs:
 
       - name: Upload Windows And Linux
         uses: actions/upload-artifact@v2
-        if: matrix.config.type != 'macOS'
+        if: matrix.config.os != 'macOS'
         with:
           name: ${{ matrix.config.os }}-${{ matrix.config.type }}
-          path: ${{ matrix.config.BuildDirectory }}
+          path: Build
 
-      - name: Upload macOS
-        uses: actions/upload-artifact@v2
-        if: matrix.config.type == 'macOS'
+      - name: Upload MacOs
+# tsdk: v2 of this action fails with osx https://github.com/actions/upload-artifact/issues/76
+        uses: actions/upload-artifact@v1
+        if: matrix.config.os == 'macOS'
         with:
           name: ${{ matrix.config.os }}-${{ matrix.config.type }}
-          path: ${{steps.GetTargetBuildDir.outputs.TargetBuildDir}}
+          path: ${{ steps.Apple.outputs.buildDirectory }}
 
   publish-gpr:
     needs: Build
@@ -131,16 +121,6 @@ jobs:
         env:
           PACKAGE_DIR: ${{ env.project }}.Package/
 
-      # make a release
-      - name: Make github release
-        # only try and make a release if this is a release (to help testing npm packaging)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: fnkr/github-action-ghr@v1   
-        env:
-         GHR_COMPRESS: xz
-         GHR_PATH: ${{ env.project }}.Package/
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # setup node for npm packaging
       - name: Make github package
         uses: actions/setup-node@v1
@@ -155,9 +135,22 @@ jobs:
 
       # copy files we want to
       # download github-publish dependencies (ci), then publish from package dir
-      - run: |
-         npm ci
-         npm publish $NPM_PACKAGE_DRY_RUN
+      - name: Publish
         working-directory: ${{ env.project }}.Package/
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: |
+          ls
+          pwd
+          npm ci
+          npm publish $NPM_PACKAGE_DRY_RUN
+          
+      # make a release
+      - name: Make github release
+        # only try and make a release if this is a release (to help testing npm packaging)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: fnkr/github-action-ghr@v1   
+        env:
+         GHR_COMPRESS: xz
+         GHR_PATH: ${{ env.project }}.Package/
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
