@@ -19,13 +19,11 @@ LIB_INCLUDES = \
 -I$(SRC_PATH)	\
 -I$(SOY_PATH)/src	\
 -I$(SRC_PATH)/MagicEnum/include \
--I$(SRC_PATH)/Libs/KinectAzure/build/native/include
 
 
 LIB_SRC_FILES  = \
 $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
-$(SRC_PATH)/KinectAzure.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
 
 # soy lib files
@@ -57,7 +55,32 @@ $(SRC_PATH)/PopCameraDevice_TestApp.cpp
 
 LIB_DEFINES = \
 -DTARGET_LINUX	\
--DENABLE_KINECTAZURE	\
+
+ifeq ($(osTarget),nvidia)
+	LIB_INCLUDES += \
+	-I$(SRC_PATH)/Libs/KinectAzure/build/native/include
+
+	LIB_SRC_FILES  += \
+	$(SRC_PATH)/KinectAzure.cpp \
+
+	LIB_LINK_LIBS = \
+	-lk4a	\
+	-ldepthengine	\
+	-L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
+	-L/usr/lib/aarch64-linux-gnu/
+
+	LIB_DEFINES = \
+	-DENABLE_KINECTAZURE	\
+
+	# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
+
+	# gr: these are now installed in the OS
+	K4A_LIB = \
+	$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
+
+	DEPTHENGINE_LIB = \
+	$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
+endif
 
 # -g stops symbol stripping
 # -f[lag] PIC position independent code (for dyanmically loaded code)
@@ -67,25 +90,8 @@ LDFLAGS = -pthread
 LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
 
-
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
 APP_LINK_FLAGS = $(LDFLAGS)
-
-LIB_LINK_LIBS = \
--lk4a	\
--ldepthengine	\
--L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
--L/usr/lib/aarch64-linux-gnu/	
-
-# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
-
-# gr: these are now installed in the OS
-K4A_LIB = \
-$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
-
-DEPTHENGINE_LIB = \
-$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
-
 
 LIB_OBJECTS=$(LIB_SRC_FILES:.cpp=.o)
 APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
