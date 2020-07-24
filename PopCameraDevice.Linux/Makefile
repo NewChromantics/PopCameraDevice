@@ -5,10 +5,10 @@ APP_NAME = PopCameraDeviceTestApp
 compiler ?= g++
 CC = ${compiler}
 
-# archTarget is the target architecture
+# osTarget is the target os eg. Nvidia / Pi4
 # tsdk: the naming of the build folders are handled by the github actions
-# archTarget could still be used for an if statements in the make file
-archTarget ?= Linux
+# osTarget is still used for if statements in the make file
+osTarget ?= Linux
 BUILD_DIR = ../Build
 
 PROJECT_PATH = ..
