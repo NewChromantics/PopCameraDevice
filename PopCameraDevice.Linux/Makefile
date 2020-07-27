@@ -69,7 +69,7 @@ ifeq ($(osTarget),Nvidia)
 	-L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
 	-L/usr/lib/aarch64-linux-gnu/
 
-	LIB_DEFINES = \
+	LIB_DEFINES += \
 	-DENABLE_KINECTAZURE	\
 
 	# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
