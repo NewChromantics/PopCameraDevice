@@ -80,6 +80,8 @@ ifeq ($(osTarget),nvidia)
 
 	DEPTHENGINE_LIB = \
 	$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
+else
+	NON_KINECT_LIBS = -ldl
 endif
 
 # -g stops symbol stripping
@@ -91,7 +93,7 @@ LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
 
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
-APP_LINK_FLAGS = $(LDFLAGS)
+APP_LINK_FLAGS = $(LDFLAGS) $(NON_KINECT_LIBS)
 
 LIB_OBJECTS=$(LIB_SRC_FILES:.cpp=.o)
 APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
@@ -110,7 +112,6 @@ OUT_FILES = $(addprefix ${BUILD_DIR}/,$(notdir ${OUT_FILE_SOURCES}))
 
 
 GithubWorkflow: $(OUT_APP) $(OUT_LIB)
-	# gr: this prints out the word echo " should it be $(info ::set-output) ?
 	$(info ::set-output name=executable:$(OUT_APP))
 	$(info ::set-output name=library:$(OUT_LIB))
 .PHONY: GithubWorkflow
