@@ -56,7 +56,7 @@ $(SRC_PATH)/PopCameraDevice_TestApp.cpp
 LIB_DEFINES = \
 -DTARGET_LINUX	\
 
-ifeq ($(osTarget),nvidia)
+ifeq ($(osTarget),Nvidia)
 	LIB_INCLUDES += \
 	-I$(SRC_PATH)/Libs/KinectAzure/build/native/include
 
