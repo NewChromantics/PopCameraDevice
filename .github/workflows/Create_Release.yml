@@ -27,17 +27,16 @@ jobs:
           - os: ubuntu-latest
             type: linux
             architecture: x86_64
-            BuildDirectory: Build
 
           - os: Nvidia
             type: linux
             architecture: arm64
-            BuildDirectory: Build
 
-          - os: Pi4
-            type: linux
-            architecture: arm64
-            BuildDirectory: Build
+          # tsdk: not compiling for the pi 
+          # - os: Pi4
+          #   type: linux
+          #   architecture: arm64
+
 
           - os: windows
             type: x64
