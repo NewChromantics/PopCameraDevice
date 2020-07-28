@@ -17,8 +17,8 @@ SOY_PATH = $(PROJECT_PATH)/Source/SoyLib
 
 LIB_INCLUDES = \
 -I$(SRC_PATH)	\
--I$(SOY_PATH)/src	\
 -I$(SRC_PATH)/MagicEnum/include \
+-I$(SOY_PATH)/src	\
 
 
 LIB_SRC_FILES  = \
