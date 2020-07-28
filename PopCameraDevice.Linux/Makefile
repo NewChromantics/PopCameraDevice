@@ -81,7 +81,7 @@ ifeq ($(osTarget),Nvidia)
 	DEPTHENGINE_LIB = \
 	$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
 else
-	NON_KINECT_LIBS = -ldl
+	NON_KINECT_LINK_LIBS = -ldl
 endif
 
 # -g stops symbol stripping
@@ -93,7 +93,7 @@ LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
 
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
-APP_LINK_FLAGS = $(LDFLAGS) $(NON_KINECT_LIBS)
+APP_LINK_FLAGS = $(LDFLAGS) 
 
 LIB_OBJECTS=$(LIB_SRC_FILES:.cpp=.o)
 APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
@@ -131,7 +131,7 @@ $(OUT_FILES): $(OUT_FILE_SOURCES)
 $(OUT_APP): $(APP_OBJECTS) $(OUT_LIB)
 	$(info Building app $(OUT_APP))
 	mkdir -p $(BUILD_DIR)
-	$(CC) $(APP_LINK_FLAGS) $(APP_OBJECTS) -o $@ -L$(BUILD_DIR) -l$(LIB_NAME)
+	$(CC) $(APP_LINK_FLAGS) $(APP_OBJECTS) -o $@ -L$(BUILD_DIR) -l$(LIB_NAME) $(NON_KINECT_LINK_LIBS)
 
 # $(K4A_LIB)
 $(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
