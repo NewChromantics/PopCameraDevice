@@ -35,10 +35,10 @@ jobs:
             architecture: arm64
             BuildDirectory: Build
 
-          # - os: Pi4
-          #   type: linux
-          #   architecture: arm64
-          #   BuildDirectory: Build
+          - os: Pi4
+            type: linux
+            architecture: arm64
+            BuildDirectory: Build
 
           - os: windows
             type: x64
