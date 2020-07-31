@@ -7,37 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BF012ACF2268DE24003AEB55 /* AvfCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012ACD2268DE24003AEB55 /* AvfCapture.h */; };
 		BF012AD12268DE24003AEB55 /* AvfCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.mm */; };
 		BF012AD22269FAE2003AEB55 /* PopCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */; };
 		BF012AD32269FAE2003AEB55 /* TCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */; };
 		BF012AD42269FAE2003AEB55 /* TestDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */; };
-		BF012ADA2269FC83003AEB55 /* SoyPixels.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AD62269FC83003AEB55 /* SoyPixels.h */; };
-		BF012ADB2269FC83003AEB55 /* SoyAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AD72269FC83003AEB55 /* SoyAssert.h */; };
 		BF012ADD2269FC83003AEB55 /* SoyPixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AD82269FC83003AEB55 /* SoyPixels.cpp */; };
 		BF012ADF2269FC83003AEB55 /* SoyAssert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AD92269FC83003AEB55 /* SoyAssert.cpp */; };
 		BF012AE42269FCA4003AEB55 /* SoyString.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012AE02269FCA4003AEB55 /* SoyString.mm */; };
 		BF012AE62269FCA4003AEB55 /* SoyString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AE12269FCA4003AEB55 /* SoyString.cpp */; };
-		BF012AE72269FCA4003AEB55 /* SoyString.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AE22269FCA4003AEB55 /* SoyString.h */; };
-		BF012AEA2269FCBF003AEB55 /* MemHeap.hpp in Headers */ = {isa = PBXBuildFile; fileRef = BF012AE82269FCBF003AEB55 /* MemHeap.hpp */; };
 		BF012AEC2269FCBF003AEB55 /* memheap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AE92269FCBF003AEB55 /* memheap.cpp */; };
 		BF012AF12269FE13003AEB55 /* SoyDebug.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012AED2269FE12003AEB55 /* SoyDebug.mm */; };
-		BF012AF22269FE13003AEB55 /* SoyDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AEE2269FE13003AEB55 /* SoyDebug.h */; };
 		BF012AF42269FE13003AEB55 /* SoyDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AEF2269FE13003AEB55 /* SoyDebug.cpp */; };
-		BF012AF82269FE3F003AEB55 /* SoyTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AF52269FE3F003AEB55 /* SoyTypes.h */; };
 		BF012AFA2269FE3F003AEB55 /* SoyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AF62269FE3F003AEB55 /* SoyTypes.cpp */; };
-		BF012AFB2269FE3F003AEB55 /* SoyTypes_CoreFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AF72269FE3F003AEB55 /* SoyTypes_CoreFoundation.h */; };
 		BF012AFF226A0108003AEB55 /* SoyTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AFC226A0108003AEB55 /* SoyTime.cpp */; };
-		BF012B00226A0108003AEB55 /* SoyTime.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AFD226A0108003AEB55 /* SoyTime.h */; };
 		BF012B04226A047F003AEB55 /* Avf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B02226A047F003AEB55 /* Avf.mm */; };
 		BF012B07226A09EC003AEB55 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B06226A09EC003AEB55 /* AVFoundation.framework */; };
 		BF012B0A226A0B05003AEB55 /* PopCameraDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AB22268DBF8003AEB55 /* PopCameraDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF012B17226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */; };
-		BF012B18226A1D7F003AEB55 /* AvfVideoCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */; };
 		BF012B1E226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B1B226A1FD3003AEB55 /* AvfPixelBuffer.mm */; };
 		BF012B22226A218F003AEB55 /* SoyScope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B1F226A218F003AEB55 /* SoyScope.cpp */; };
-		BF012B23226A218F003AEB55 /* SoyScope.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B20226A218F003AEB55 /* SoyScope.h */; };
-		BF012B27226A21C0003AEB55 /* SoyAvf.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B25226A21C0003AEB55 /* SoyAvf.h */; };
 		BF012B29226A21C0003AEB55 /* SoyAvf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B26226A21C0003AEB55 /* SoyAvf.mm */; };
 		BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B2B226A2232003AEB55 /* SoyOpenglContext.cpp */; };
 		BF012B2F226A263E003AEB55 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B2E226A263E003AEB55 /* CoreMedia.framework */; };
@@ -46,31 +34,20 @@
 		BF012B35226A2696003AEB55 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B34226A2696003AEB55 /* CoreGraphics.framework */; };
 		BF012B37226A26B0003AEB55 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B36226A26AF003AEB55 /* CoreVideo.framework */; };
 		BF012B3B226A26E9003AEB55 /* SoyOpengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B38226A26E9003AEB55 /* SoyOpengl.cpp */; };
-		BF012B3C226A26E9003AEB55 /* SoyOpengl.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B39226A26E9003AEB55 /* SoyOpengl.h */; };
 		BF012B40226A26F1003AEB55 /* SoyH264.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B3D226A26F0003AEB55 /* SoyH264.cpp */; };
-		BF012B41226A26F1003AEB55 /* SoyH264.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B3E226A26F0003AEB55 /* SoyH264.h */; };
 		BF012B45226A26FB003AEB55 /* SoyThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B42226A26FB003AEB55 /* SoyThread.cpp */; };
-		BF012B46226A26FB003AEB55 /* SoyThread.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B43226A26FB003AEB55 /* SoyThread.h */; };
 		BF012B4A226A270A003AEB55 /* SoyMedia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B47226A270A003AEB55 /* SoyMedia.cpp */; };
-		BF012B4B226A270A003AEB55 /* SoyMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B48226A270A003AEB55 /* SoyMedia.h */; };
 		BF012B4F226A2726003AEB55 /* SoyGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B4C226A2726003AEB55 /* SoyGraphics.cpp */; };
-		BF012B50226A2726003AEB55 /* SoyGraphics.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B4D226A2726003AEB55 /* SoyGraphics.h */; };
-		BF012B53226A2FCF003AEB55 /* SoyMediaFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B51226A2FCF003AEB55 /* SoyMediaFormat.h */; };
 		BF012B55226A2FCF003AEB55 /* SoyMediaFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B52226A2FCF003AEB55 /* SoyMediaFormat.cpp */; };
 		BF012B59226A2FE0003AEB55 /* SoyWave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B56226A2FE0003AEB55 /* SoyWave.cpp */; };
-		BF012B5A226A2FE0003AEB55 /* SoyWave.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B57226A2FE0003AEB55 /* SoyWave.h */; };
 		BF012B5E226A30A6003AEB55 /* SoyVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B5B226A30A6003AEB55 /* SoyVector.cpp */; };
-		BF012B5F226A30A6003AEB55 /* SoyVector.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B5C226A30A6003AEB55 /* SoyVector.h */; };
-		BF012B62226A30C7003AEB55 /* SoyShader.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B60226A30C7003AEB55 /* SoyShader.h */; };
 		BF012B64226A30C7003AEB55 /* SoyShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B61226A30C7003AEB55 /* SoyShader.cpp */; };
 		BF012B69226A3176003AEB55 /* SoyFilesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B65226A3176003AEB55 /* SoyFilesystem.cpp */; };
-		BF012B6A226A3176003AEB55 /* SoyFilesystem.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B66226A3176003AEB55 /* SoyFilesystem.h */; };
 		BF012B6C226A3176003AEB55 /* SoyFilesystem.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B67226A3176003AEB55 /* SoyFilesystem.mm */; };
 		BF012B6E226A31F3003AEB55 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B6D226A31F2003AEB55 /* CoreServices.framework */; };
 		BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B74226A3296003AEB55 /* SoyTime.mm */; };
 		BF012B78226A3303003AEB55 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B77226A3303003AEB55 /* AppKit.framework */; };
 		BF108A9922970C92003DDC5F /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
-		BF108AB322971762003DDC5F /* AvfPixelBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012B1A226A1FD3003AEB55 /* AvfPixelBuffer.h */; };
 		BF108AE5229726CF003DDC5F /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = BF108AD8229726CE003DDC5F /* Readme.md */; };
 		BF108AF022972F29003DDC5F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AEE22972F23003DDC5F /* IOKit.framework */; };
 		BF1520182384863900A70EBF /* Avf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B02226A047F003AEB55 /* Avf.mm */; };
@@ -119,6 +96,9 @@
 		BF216E9C24C99989003FD00B /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF216E9B24C99989003FD00B /* ARKit.framework */; };
 		BF216EA024CA1B81003FD00B /* json11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF216E9E24CA1B7D003FD00B /* json11.cpp */; };
 		BF216EA124CA1B82003FD00B /* json11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF216E9E24CA1B7D003FD00B /* json11.cpp */; };
+		BF21AEA524D4831E0046A434 /* PopCameraDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AB22268DBF8003AEB55 /* PopCameraDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BF21AEA624D483240046A434 /* PopCameraDeviceFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AB62268DBF8003AEB55 /* PopCameraDeviceFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BF21AEA724D483250046A434 /* PopCameraDeviceFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AB62268DBF8003AEB55 /* PopCameraDeviceFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BF39C0CC2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
@@ -133,11 +113,9 @@
 		BF8534E322B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
 		BF8534EA22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BFBD322124B7B1A50029951F /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFBD322024B7B1A40029951F /* ARKit.framework */; };
-		BFDBAB8424B9C64F00E8BCE1 /* ArkitCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */; };
 		BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
-		BFEE8DFD22B125AA00F89A39 /* SoyJson.h in Headers */ = {isa = PBXBuildFile; fileRef = BFEE8DFB22B125AA00F89A39 /* SoyJson.h */; };
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 /* End PBXBuildFile section */
 
@@ -519,7 +497,8 @@
 				BF216E9E24CA1B7D003FD00B /* json11.cpp */,
 				BF216E9F24CA1B7D003FD00B /* json11.hpp */,
 			);
-			path = Json11;
+			name = Json11;
+			path = Source/Json11;
 			sourceTree = "<group>";
 		};
 		BF4A6A0B1EA16D7C00613A64 = {
@@ -649,31 +628,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF012AF22269FE13003AEB55 /* SoyDebug.h in Headers */,
-				BF012B53226A2FCF003AEB55 /* SoyMediaFormat.h in Headers */,
-				BF012B3C226A26E9003AEB55 /* SoyOpengl.h in Headers */,
-				BF012B62226A30C7003AEB55 /* SoyShader.h in Headers */,
-				BFEE8DFD22B125AA00F89A39 /* SoyJson.h in Headers */,
-				BF012B5A226A2FE0003AEB55 /* SoyWave.h in Headers */,
-				BF012B6A226A3176003AEB55 /* SoyFilesystem.h in Headers */,
-				BF108AB322971762003DDC5F /* AvfPixelBuffer.h in Headers */,
-				BF012AEA2269FCBF003AEB55 /* MemHeap.hpp in Headers */,
-				BF012ACF2268DE24003AEB55 /* AvfCapture.h in Headers */,
-				BF012B41226A26F1003AEB55 /* SoyH264.h in Headers */,
-				BF012B23226A218F003AEB55 /* SoyScope.h in Headers */,
-				BF012B46226A26FB003AEB55 /* SoyThread.h in Headers */,
-				BF012ADA2269FC83003AEB55 /* SoyPixels.h in Headers */,
-				BF012B27226A21C0003AEB55 /* SoyAvf.h in Headers */,
-				BF012ADB2269FC83003AEB55 /* SoyAssert.h in Headers */,
-				BF012AE72269FCA4003AEB55 /* SoyString.h in Headers */,
-				BF012B50226A2726003AEB55 /* SoyGraphics.h in Headers */,
-				BF012AFB2269FE3F003AEB55 /* SoyTypes_CoreFoundation.h in Headers */,
-				BF012B18226A1D7F003AEB55 /* AvfVideoCapture.h in Headers */,
 				BF012B0A226A0B05003AEB55 /* PopCameraDevice.h in Headers */,
-				BF012B5F226A30A6003AEB55 /* SoyVector.h in Headers */,
-				BF012AF82269FE3F003AEB55 /* SoyTypes.h in Headers */,
-				BF012B00226A0108003AEB55 /* SoyTime.h in Headers */,
-				BF012B4B226A270A003AEB55 /* SoyMedia.h in Headers */,
+				BF21AEA624D483240046A434 /* PopCameraDeviceFramework.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -681,7 +637,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFDBAB8424B9C64F00E8BCE1 /* ArkitCapture.h in Headers */,
+				BF21AEA724D483250046A434 /* PopCameraDeviceFramework.h in Headers */,
+				BF21AEA524D4831E0046A434 /* PopCameraDevice.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
