@@ -19,26 +19,23 @@ on:
 
 jobs:
   Build:
-    name: ${{ matrix.config.os }}-${{ matrix.config.type }}
+    name: ${{ matrix.config.os }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       matrix:
         config:
-          # tsdk: Disabled as the kinect dependencies break the build
-          # - os: ubuntu-latest
-          #   type: linux
-          #   architecture: x86_64
-          #   BuildDirectory: Build
+          - os: ubuntu-latest
+            type: linux
+            architecture: x86_64
 
           - os: Nvidia
             type: linux
             architecture: arm64
-            BuildDirectory: Build
 
+          # tsdk: not compiling for the pi 
           # - os: Pi4
           #   type: linux
           #   architecture: arm64
-          #   BuildDirectory: Build
 
           - os: windows
             type: x64
@@ -81,24 +78,15 @@ jobs:
         if: matrix.config.type == 'linux'
         uses: NewChromantics/PopAction_BuildLinux@v1
         with:
-          machine: ${{ matrix.config.os }}
-          architecture: ${{ matrix.config.architecture }}
+          os: ${{ matrix.config.os }}
           project: ${{ env.project }}
 
-      - name: Upload Windows And Linux
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
-        if: matrix.config.os != 'macOS'
         with:
-          name: ${{ matrix.config.os }}-${{ matrix.config.type }}
-          path: Build
-
-      - name: Upload MacOs
-# tsdk: v2 of this action fails with osx https://github.com/actions/upload-artifact/issues/76
-        uses: actions/upload-artifact@v1
-        if: matrix.config.os == 'macOS'
-        with:
-          name: ${{ matrix.config.os }}-${{ matrix.config.type }}
-          path: ${{ steps.Apple.outputs.buildDirectory }}
+          # tsdk: these env vars are set in each of the actions
+          name: ${{ env.UPLOAD_NAME }}
+          path: ${{ env.UPLOAD_DIR }}
 
   publish-gpr:
     needs: Build
@@ -141,8 +129,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           ls
-          pwd
-          npm ci
           npm publish $NPM_PACKAGE_DRY_RUN
           
       # make a release

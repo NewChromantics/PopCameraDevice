@@ -5,10 +5,10 @@ APP_NAME = PopCameraDeviceTestApp
 compiler ?= g++
 CC = ${compiler}
 
-# archTarget is the target architecture
+# osTarget is the target os eg. Nvidia / Pi4
 # tsdk: the naming of the build folders are handled by the github actions
-# archTarget could still be used for an if statements in the make file
-archTarget ?= Linux
+# osTarget is still used for if statements in the make file
+osTarget ?= Linux
 BUILD_DIR = ../Build
 
 PROJECT_PATH = ..
@@ -17,15 +17,13 @@ SOY_PATH = $(PROJECT_PATH)/Source/SoyLib
 
 LIB_INCLUDES = \
 -I$(SRC_PATH)	\
--I$(SOY_PATH)/src	\
 -I$(SRC_PATH)/MagicEnum/include \
--I$(SRC_PATH)/Libs/KinectAzure/build/native/include
+-I$(SOY_PATH)/src	\
 
 
 LIB_SRC_FILES  = \
 $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
-$(SRC_PATH)/KinectAzure.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
 
 # soy lib files
@@ -57,7 +55,34 @@ $(SRC_PATH)/PopCameraDevice_TestApp.cpp
 
 LIB_DEFINES = \
 -DTARGET_LINUX	\
--DENABLE_KINECTAZURE	\
+
+ifeq ($(osTarget),Nvidia)
+	LIB_INCLUDES += \
+	-I$(SRC_PATH)/Libs/KinectAzure/build/native/include
+
+	LIB_SRC_FILES  += \
+	$(SRC_PATH)/KinectAzure.cpp \
+
+	LIB_LINK_LIBS = \
+	-lk4a	\
+	-ldepthengine	\
+	-L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
+	-L/usr/lib/aarch64-linux-gnu/
+
+	LIB_DEFINES += \
+	-DENABLE_KINECTAZURE	\
+
+	# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
+
+	# gr: these are now installed in the OS
+	K4A_LIB = \
+	$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
+
+	DEPTHENGINE_LIB = \
+	$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
+else
+	NON_KINECT_LINK_LIBS = -ldl
+endif
 
 # -g stops symbol stripping
 # -f[lag] PIC position independent code (for dyanmically loaded code)
@@ -67,25 +92,8 @@ LDFLAGS = -pthread
 LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
 
-
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
-APP_LINK_FLAGS = $(LDFLAGS)
-
-LIB_LINK_LIBS = \
--lk4a	\
--ldepthengine	\
--L/usr/lib/aarch64-linux-gnu/libk4a1.4	\
--L/usr/lib/aarch64-linux-gnu/	
-
-# -L$(SRC)/Source/Libs/KinectAzure/linux/lib/native/arm64/release
-
-# gr: these are now installed in the OS
-K4A_LIB = \
-$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so
-
-DEPTHENGINE_LIB = \
-$(SRC_PATH)/Libs/KinectAzure/linux/lib/native/arm64/release/libdepthengine.so
-
+APP_LINK_FLAGS = $(LDFLAGS) 
 
 LIB_OBJECTS=$(LIB_SRC_FILES:.cpp=.o)
 APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
@@ -104,7 +112,6 @@ OUT_FILES = $(addprefix ${BUILD_DIR}/,$(notdir ${OUT_FILE_SOURCES}))
 
 
 GithubWorkflow: $(OUT_APP) $(OUT_LIB)
-	# gr: this prints out the word echo " should it be $(info ::set-output) ?
 	$(info ::set-output name=executable:$(OUT_APP))
 	$(info ::set-output name=library:$(OUT_LIB))
 .PHONY: GithubWorkflow
@@ -124,7 +131,7 @@ $(OUT_FILES): $(OUT_FILE_SOURCES)
 $(OUT_APP): $(APP_OBJECTS) $(OUT_LIB)
 	$(info Building app $(OUT_APP))
 	mkdir -p $(BUILD_DIR)
-	$(CC) $(APP_LINK_FLAGS) $(APP_OBJECTS) -o $@ -L$(BUILD_DIR) -l$(LIB_NAME)
+	$(CC) $(APP_LINK_FLAGS) $(APP_OBJECTS) -o $@ -L$(BUILD_DIR) -l$(LIB_NAME) $(NON_KINECT_LINK_LIBS)
 
 # $(K4A_LIB)
 $(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
