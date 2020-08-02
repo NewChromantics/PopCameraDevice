@@ -465,8 +465,8 @@ void KinectAzure::InitDebugHandler()
 	};
 
 	void* Context = nullptr;
-	//auto DebugLevel = K4A_LOG_LEVEL_TRACE;
-	auto DebugLevel = K4A_LOG_LEVEL_WARNING;
+	auto DebugLevel = K4A_LOG_LEVEL_TRACE;
+	//auto DebugLevel = K4A_LOG_LEVEL_WARNING;
 	auto Result = k4a_set_debug_message_handler(OnDebug, Context, DebugLevel);
 	IsOkay(Result, "k4a_set_debug_message_handler");
 
