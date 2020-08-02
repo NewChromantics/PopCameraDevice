@@ -68,7 +68,7 @@ void TestDeviceInstance(const std::string& Name,const std::string& Format,size_t
 		*/
 	
 		std::stringstream Debug;
-		Debug << "Got frame " << FrameTime << "(first=" << FirstFrameTime << ")";
+		Debug << "Got frame " << FrameTime << "(" << static_cast<uint32_t>(FrameTime) << ") (first=" << FirstFrameTime << ")";
 		//	todo: verify pixels
 		DebugPrint(Debug.str());
 	}
