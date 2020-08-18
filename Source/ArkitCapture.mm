@@ -4,6 +4,8 @@
 #import <ARKit/ARKit.h>
 #include "Json11/json11.hpp"
 
+//  gr: make this a proper check, quickly disabling for build here
+#define ENABLE_IOS14    (__IPHONE_OS_VERSION_MIN_REQUIRED >= 140000)
 
 @interface ARSessionProxy : NSObject <ARSessionDelegate>
 {
@@ -267,11 +269,13 @@ namespace Avf
 		enum Type
 		{
 			Invalid,
+#if ENABLE_IOS14
 			NotAvailable = ARGeoTrackingStateNotAvailable,
 			Initializing = ARGeoTrackingStateInitializing,
 			Localizing = ARGeoTrackingStateLocalizing,
 			Localized = ARGeoTrackingStateLocalized
-		};
+#endif
+        };
 		DECLARE_SOYENUM(GeoTrackingState);
 	}
 
@@ -280,10 +284,12 @@ namespace Avf
 		enum Type
 		{
 			Invalid,
+#if ENABLE_IOS14
 			Undetermined = ARGeoTrackingAccuracyUndetermined,
 			Low = ARGeoTrackingAccuracyLow,
 			Medium = ARGeoTrackingAccuracyMedium,
 			High = ARGeoTrackingAccuracyHigh
+#endif
 		};
 		DECLARE_SOYENUM(GeoTrackingAccuracy);
 	}
@@ -293,6 +299,7 @@ namespace Avf
 		enum Type
 		{
 			Invalid,
+#if ENABLE_IOS14
 			None = ARGeoTrackingStateReasonNone,
 			NotAvailableAtLocation = ARGeoTrackingStateReasonNotAvailableAtLocation,
 			NeedLocationPermissions = ARGeoTrackingStateReasonNeedLocationPermissions,
@@ -301,7 +308,8 @@ namespace Avf
 			GeoDataNotLoaded = ARGeoTrackingStateReasonGeoDataNotLoaded,
 			DevicePointedTooLow = ARGeoTrackingStateReasonDevicePointedTooLow,
 			VisualLocalizationFailed = ARGeoTrackingStateReasonVisualLocalizationFailed,
-		};
+#endif
+        };
 		DECLARE_SOYENUM(GeoTrackingStateReason);
 	}
 }
@@ -418,6 +426,7 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 		Meta["Skeleton"] = Skeleton;
 	}
 	
+#if ENABLE_IOS14
 	if ( Frame.geoTrackingStatus )
 	{
 		auto State = Avf::GeoTrackingState::ToString(static_cast<Avf::GeoTrackingState::Type>(Frame.geoTrackingStatus.state));
@@ -428,6 +437,7 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 		Meta["GeoTrackingStateReason"] = StateReason;
 		Meta["GeoTrackingAccuracy"] = Accuracy;
 	}
+#endif
 	
 	auto WorldMappingStatus = magic_enum::enum_name(Frame.worldMappingStatus);
 	Meta["WorldMappingStatus"] = WorldMappingStatus;
@@ -499,22 +509,22 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 			return;
 			
 		case ArFrameSource::sceneDepth:
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 140000
+#if ENABLE_IOS14
 			Avf::GetMeta( Frame.sceneDepth, Meta );
 			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta );
 #else
 #pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
-			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
+			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::to_string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
 #endif
 			return;
 
 		case ArFrameSource::sceneDepthConfidence:
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 140000
+#if ENABLE_IOS14
 			Avf::GetMeta( Frame.sceneDepth, Meta );
 			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta );
 #else
 #pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
-			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
+			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::to_string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
 #endif
 			return;
 
