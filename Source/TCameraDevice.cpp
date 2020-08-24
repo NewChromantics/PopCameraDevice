@@ -62,14 +62,15 @@ void PopCameraDevice::DecodeFormatString_UnitTests()
 }
 
 
-void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,const std::string& FrameMeta)
+void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,json11::Json::object FrameMeta)
 {
+	//	currently we're only storing last frame...
 	{
 		Soy::TScopeTimerPrint Timer("PopCameraDevice::TDevice::PushFrame Lock",5);
 		std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
 		mLastPixelBuffer = FramePixelBuffer;
 		mLastPixelsMeta = PixelMeta;
-		mLastFrameMeta = FrameMeta;
+		mLastFrameMeta = json11::Json(FrameMeta).dump();
 		mLastFrameTime = FrameTime;
 	}
 
@@ -103,7 +104,6 @@ std::shared_ptr<TPixelBuffer> PopCameraDevice::TDevice::GetNextFrame(SoyPixelsMe
 		mLastFrameMeta.clear();
 		mLastPixelBuffer.reset();
 		mLastFrameTime = SoyTime();
-		FrameMeta = std::string();
 	}
 
 	return PixelBuffer;

@@ -67,7 +67,11 @@ void TestDevice::GenerateFrame()
 		Plane.SetPixels(GetArrayBridge(Components));
 	}
 
-	this->PushFrame(pPixelBuffer, Pixels.mMeta, FrameTime, std::string() );
+	json11::Json::object Meta;
+	Meta["Hello"] = "World";
+	Meta["GeneratedFrameNumer"] = static_cast<int>(mFrameNumber);
+
+	this->PushFrame(pPixelBuffer, Pixels.mMeta, FrameTime, Meta);
 	mFrameNumber++;
 }
 

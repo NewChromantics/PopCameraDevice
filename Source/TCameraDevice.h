@@ -1,7 +1,8 @@
 #pragma once
 
 #include <mutex>
-#include "SoyLib/src/SoyPixels.h"
+#include <SoyPixels.h>
+#include "Json11/json11.hpp"
 
 class TPixelBuffer;
 
@@ -57,7 +58,7 @@ public:
 	virtual void					ReadNativeHandle(void* Handle);
 
 protected:
-	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,const std::string& FrameMeta);
+	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,json11::Json::object FrameMeta);
 
 public:
 	Array<std::function<void()>>	mOnNewFrameCallbacks;

@@ -18,6 +18,7 @@
     <ClCompile Include="..\Source\Freenect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Source\Json11\json11.cpp" />
     <ClCompile Include="..\Source\Kinect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
@@ -97,6 +98,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Source\Freenect.h" />
+    <ClInclude Include="..\Source\Json11\json11.hpp" />
     <ClInclude Include="..\Source\Kinect.h" />
     <ClInclude Include="..\Source\Freenect2.h" />
     <ClInclude Include="..\Source\Kinect2.h" />

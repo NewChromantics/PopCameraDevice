@@ -53,7 +53,8 @@ void TestDeviceInstance(const std::string& Name,const std::string& Format,size_t
 	{
 		//DebugPrint("Pop Frame:");
 		uint8_t Plane0[100 * 100 * 4];
-		auto FrameTime = PopCameraDevice_PopNextFrame(Instance, nullptr, 0, Plane0, std::size(Plane0), nullptr, 0, nullptr, 0);
+		char MetaJson[1024];
+		auto FrameTime = PopCameraDevice_PopNextFrame(Instance, MetaJson, std::size(MetaJson), Plane0, std::size(Plane0), nullptr, 0, nullptr, 0);
 		if (FrameTime == -1)
 		{
 			//DebugPrint("No frame, waiting...");
@@ -68,7 +69,7 @@ void TestDeviceInstance(const std::string& Name,const std::string& Format,size_t
 		*/
 	
 		std::stringstream Debug;
-		Debug << "Got frame " << FrameTime << "(" << static_cast<uint32_t>(FrameTime) << ") (first=" << FirstFrameTime << ")";
+		Debug << "Got frame " << FrameTime << "(" << static_cast<uint32_t>(FrameTime) << ") (first=" << FirstFrameTime << ") Meta=" << MetaJson << std::endl;
 		//	todo: verify pixels
 		DebugPrint(Debug.str());
 	}

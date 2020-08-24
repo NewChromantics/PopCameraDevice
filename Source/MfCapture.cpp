@@ -559,7 +559,8 @@ void MediaFoundation::TCamera::PushLatestFrame(size_t StreamIndex)
 	if ( !LatestPacket )
 		return;
 
-	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, LatestPacket->mTimecode, std::string() );
+	json11::Json::object Meta;
+	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, LatestPacket->mTimecode, Meta );
 }
 
 void MediaFoundation::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)

@@ -25,6 +25,9 @@
     <Filter Include="PopCameraDevice.Linux">
       <UniqueIdentifier>{78d892bd-989c-4f4c-95cc-c9d559e8d044}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\json11">
+      <UniqueIdentifier>{37d91a3b-5028-4c8d-821b-bc09032d1626}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp">
@@ -140,6 +143,9 @@
     </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\SoyFilesystem.cpp">
       <Filter>SoyLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Json11\json11.cpp">
+      <Filter>Source\json11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,6 +286,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\string.hpp">
       <Filter>SoyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Json11\json11.hpp">
+      <Filter>Source\json11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include "SoyMedia.h"
 #include <cmath>	//	fabsf
 #include <SoyFilesystem.h>
+#include "Json11/json11.hpp"
 
 //	these macros are missing on linux
 #if defined(TARGET_LINUX)
@@ -54,6 +55,7 @@ namespace KinectAzure
 	SoyPixelsRemote			GetPixels(k4a_image_t Image);
 	SoyPixelsFormat::Type	GetFormat(k4a_image_format_t Format);
 	k4a_image_format_t		GetFormat(SoyPixelsFormat::Type Format);
+	k4a_image_format_t		GetColourFormat(SoyPixelsFormat::Type Format);
 	k4a_colour_mode_t		GetColourMode(SoyPixelsMeta Format,size_t& FrameRate);
 	k4a_depth_mode_t		GetDepthMode(SoyPixelsMeta Format, size_t& FrameRate);
 	k4a_fps_t				GetFrameRate(size_t FrameRate);
@@ -262,20 +264,22 @@ k4a_color_resolution_t KinectAzure::GetLargestColourResolution(SoyPixelsFormat::
 {
 	switch (Format)
 	{
-		//	this doesn't work at all
-	case SoyPixelsFormat::Yuv_844_Depth16:
+		//	Yuv_844 + Depth doesn't work
+	case SoyPixelsFormat::Yuv_844:
 		return K4A_COLOR_RESOLUTION_OFF;
 
-	case SoyPixelsFormat::Yuv_8_88_Depth16:
+		//	nv12 + depth	maxes out at 720P
+	case SoyPixelsFormat::Depth16mm:
 		return K4A_COLOR_RESOLUTION_720P;
 
-	case SoyPixelsFormat::BGRA_Depth16:
+		//	bgra+depth max 1536P
+	case SoyPixelsFormat::BGRA:
 		return K4A_COLOR_RESOLUTION_1536P;
 
-	case SoyPixelsFormat::Nv12:
+	case SoyPixelsFormat::Yuv_8_88:
 		return K4A_COLOR_RESOLUTION_3072P;
 	}
-	//	needs to throw?
+
 	return K4A_COLOR_RESOLUTION_OFF;
 }
 
@@ -296,7 +300,7 @@ k4a_colour_mode_t KinectAzure::GetColourMode(SoyPixelsMeta Format, size_t& Frame
 	if (Format.GetFormat() == SoyPixelsFormat::Invalid)
 		ColorMode.format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
 	else
-		ColorMode.format = GetFormat(Format.GetFormat());
+		ColorMode.format = GetColourFormat(Format.GetFormat());
 
 
 	auto ColourResolutions =
@@ -383,15 +387,12 @@ k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
 
 	case SoyPixelsFormat::RGBA:
 	case SoyPixelsFormat::BGRA:
-	case SoyPixelsFormat::BGRA_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
-	case SoyPixelsFormat::Yuv_8_88_Depth16:
 	case SoyPixelsFormat::Nv12:
 		return K4A_IMAGE_FORMAT_COLOR_NV12;
 
 	case SoyPixelsFormat::YUY2:
-	case SoyPixelsFormat::Yuv_844_Depth16:
 		return K4A_IMAGE_FORMAT_COLOR_YUY2;
 
 		//	return YUV for luma?
@@ -405,10 +406,34 @@ k4a_image_format_t KinectAzure::GetFormat(SoyPixelsFormat::Type Format)
 }
 
 
+k4a_image_format_t KinectAzure::GetColourFormat(SoyPixelsFormat::Type Format)
+{
+	switch (Format)
+	{
+	case SoyPixelsFormat::RGBA:
+	case SoyPixelsFormat::BGRA:
+		return K4A_IMAGE_FORMAT_COLOR_BGRA32;
+
+	case SoyPixelsFormat::Nv12:
+		return K4A_IMAGE_FORMAT_COLOR_NV12;
+
+	case SoyPixelsFormat::YUY2:
+		return K4A_IMAGE_FORMAT_COLOR_YUY2;
+
+		//	return YUV for luma?
+	case SoyPixelsFormat::Greyscale:
+		return K4A_IMAGE_FORMAT_CUSTOM8;
+	}
+
+	std::stringstream Error;
+	Error << "Unhandled pixel format " << magic_enum::enum_name(Format);
+	throw Soy::AssertException(Error);
+}
+
 class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta, SoyTime)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta, SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
 		TFrameReader	(DeviceIndex, KeepAlive),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
@@ -425,10 +450,10 @@ private:
 	virtual k4a_colour_mode_t	GetColourMode() override { return mColourMode; }
 	virtual k4a_fps_t			GetFrameRate() override { return mFrameRate; }
 
-	std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta,SoyTime)>	mOnNewFrame;
+	std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta,SoyTime,json11::Json::object&)>	mOnNewFrame;
 	k4a_depth_mode_t		mDepthMode = K4A_DEPTH_MODE_OFF;
 	k4a_colour_mode_t		mColourMode;
-	k4a_fps_t				mFrameRate;
+	k4a_fps_t				mFrameRate = K4A_FRAMES_PER_SECOND_30;
 };
 
 
@@ -702,8 +727,6 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::
 	//	todo: remove keep alive when PopEngine/CAPI is fixed
 	auto KeepAlive = true;	//	keep reopening the device in the reader
 
-	auto OnNewFrame = std::bind(&TCameraDevice::OnFrame, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
 	//	work out which reader we need to create
 	//	gr: what default should we use, default to both?
 	//	gr: this default should be first from EnumDeviceNameAndFormats()!
@@ -736,17 +759,16 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::
 
 	auto Fps = GetFrameRate(FrameRate);
 
+	auto OnNewFrame = [this](std::shared_ptr<TPixelBuffer> FramePixelBuffer, SoyPixelsMeta PixelMeta, SoyTime FrameTime, json11::Json::object FrameMeta)
+	{
+		PushFrame(FramePixelBuffer, PixelMeta, FrameTime, FrameMeta);
+	};
+
 	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode, Fps) );
 }
 
 KinectAzure::TCameraDevice::~TCameraDevice()
 {
-}
-
-void KinectAzure::TCameraDevice::OnFrame(std::shared_ptr<TPixelBuffer>& PixelBuffer,SoyPixelsMeta PixelMeta,SoyTime Time)
-{
-	std::string Meta;
-	PushFrame(PixelBuffer, PixelMeta, Time, Meta);
 }
 
 
@@ -1028,19 +1050,84 @@ KinectAzure::TPixelReader::~TPixelReader()
 	}
 }
 
+std::vector<float> GetTransform4x4(k4a_calibration_extrinsics_t Extrinsics)
+{
+	auto& r = Extrinsics.rotation;
+	auto& t = Extrinsics.translation;
+	std::vector<float> Matrix =
+	{
+		r[0], r[1], r[2],	0,
+		r[3], r[4], r[5],	0,
+		r[6], r[7], r[8],	0,
+		t[0], t[1], t[2],	1,
+	};
+	return Matrix;
+}
+
+void GetMeta(k4a_calibration_camera_t Calibration, json11::Json::object& Json)
+{
+	//	might be a bit useless
+	Json["MaxFov"] = Calibration.metric_radius;
+
+	//	turn lens rotation & translation (from middle of camera I think)
+	auto Transform = GetTransform4x4(Calibration.extrinsics);
+	std::vector<float> mtx;
+	Json["LocalToLensTransform"] = mtx;
+
+	if (Calibration.intrinsics.type != K4A_CALIBRATION_LENS_DISTORTION_MODEL_BROWN_CONRADY)
+	{
+		//	just print all the values
+		Json["IntrinsicsMode"] = magic_enum::enum_name(Calibration.intrinsics.type);
+		std::vector<float> Intrinsics;
+		for (auto i = 0; i < Calibration.intrinsics.parameter_count; i++)
+			Intrinsics.push_back(Calibration.intrinsics.parameters.v[i]);
+		Json["Intrinsics"] = Intrinsics;
+	}
+	else
+	{
+		//	gr: todo: turn this into a projection matrix, but get it right :)
+		Json["cx"] = Calibration.intrinsics.parameters.param.cx;
+		Json["cy"] = Calibration.intrinsics.parameters.param.cy;
+		Json["fx"] = Calibration.intrinsics.parameters.param.fx;
+		Json["fy"] = Calibration.intrinsics.parameters.param.fy;
+		Json["k1"] = Calibration.intrinsics.parameters.param.k1;
+		Json["k2"] = Calibration.intrinsics.parameters.param.k2;
+		Json["k3"] = Calibration.intrinsics.parameters.param.k3;
+		Json["k4"] = Calibration.intrinsics.parameters.param.k4;
+		Json["k5"] = Calibration.intrinsics.parameters.param.k5;
+		Json["k6"] = Calibration.intrinsics.parameters.param.k6;
+		Json["codx"] = Calibration.intrinsics.parameters.param.codx;
+		Json["cody"] = Calibration.intrinsics.parameters.param.cody;
+		Json["p1"] = Calibration.intrinsics.parameters.param.p1;
+		Json["p2"] = Calibration.intrinsics.parameters.param.p2;
+		Json["metric_radius"] = Calibration.intrinsics.parameters.param.metric_radius;
+	}
+}
 
 void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
 {
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
 	auto ColourImage = k4a_capture_get_color_image(Frame);
+	bool DepthIsAlignedToColour = false;
 
-	auto OnOneImage = [&](k4a_image_t Image)
+	//	extract general meta
+	json11::Json::object FrameMeta;
+	FrameMeta["Temperature"] = Imu.temperature;
+	FrameMeta["Accelerometer"] = json11::Json::array{ Imu.acc_sample.xyz.x, Imu.acc_sample.xyz.y, Imu.acc_sample.xyz.z };
+	FrameMeta["Gyro"] = json11::Json::array{ Imu.gyro_sample.xyz.x, Imu.gyro_sample.xyz.y, Imu.gyro_sample.xyz.z };
+
+	auto PushImage = [&](k4a_image_t Image, k4a_calibration_camera_t Calibration)
 	{
 		auto Pixels = GetPixels(Image);
 		float3x3 Transform;
-		auto Meta = Pixels.GetMeta();
+		auto PixelMeta = Pixels.GetMeta();
+		
+		//	add calibration meta here
+		auto Meta = FrameMeta;
+		GetMeta(Calibration, Meta);
+		
 		std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels,Transform));
-		this->mOnNewFrame(PixelBuffer, Meta, CaptureTime);
+		this->mOnNewFrame(PixelBuffer, PixelMeta, CaptureTime, Meta);
 	};
 
 	//	if colour & depth, realign so depth matches colour
@@ -1062,6 +1149,7 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 		//	swap depth for new depth
 		k4a_image_release(DepthImage);
 		DepthImage = TransformedDepthImage;
+		DepthIsAlignedToColour = true;
 	}
 
 	auto Cleanup = [&]()
@@ -1086,36 +1174,15 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 			//	gr: throw?
 			std::Debug << __PRETTY_FUNCTION__ << " Frame had no depth or colour" << std::endl;
 		}
-		else if (DepthImage && !ColourImage)
-		{
-			OnOneImage(DepthImage);
-		}
-		else if (ColourImage && !DepthImage)
-		{
-			OnOneImage(ColourImage);
-		}
-		else
-		{
-			auto ColourPixels = GetPixels(ColourImage);
-			auto DepthPixels = GetPixels(DepthImage);
-			
-			//	still need a format, but providing two buffers is simpler
-			auto MergedFormat = SoyPixelsFormat::GetMergedFormat(ColourPixels.GetFormat(), DepthPixels.GetFormat());
-			SoyPixelsMeta MergedMeta(ColourPixels.GetWidth(), ColourPixels.GetHeight(), MergedFormat);
 
-			std::shared_ptr<SoyPixelsImpl> ColourPixelsCopy(new SoyPixels(ColourPixels));
-			std::shared_ptr<SoyPixelsImpl> DepthPixelsCopy(new SoyPixels(DepthPixels));
-			std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbSharedPixelBuffer(ColourPixelsCopy, DepthPixelsCopy));
-			this->mOnNewFrame(PixelBuffer, MergedMeta, CaptureTime);
-			/*
-			SoyPixels MergedPixels(SoyPixelsMeta(ColourPixels.GetWidth(), ColourPixels.GetHeight(), MergedFormat));
-			BufferArray<std::shared_ptr<SoyPixelsImpl>,4> MergedPlanes;
-			MergedPixels.SplitPlanes(GetArrayBridge(MergedPlanes));
-			MergedPlanes[0]->Copy(ColourPixels);
-			MergedPlanes[1]->Copy(DepthPixels);
-			OnFrame(MergedPixels, CaptureTime);
-			*/
-		}
+		//	gr: GetDepthToImageTransform do we want this? if we have calibration for each, maybe it's not needed
+		auto Calibration = this->GetCalibration();
+		
+		if (DepthImage)
+			PushImage(DepthImage, Calibration.depth_camera_calibration);
+		if ( ColourImage )
+			PushImage(ColourImage, Calibration.color_camera_calibration);
+		
 		Cleanup();
 	}
 	catch (...)

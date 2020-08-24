@@ -1,5 +1,4 @@
 #include "Freenect.h"
-#include "SoyJson.h"
 #include "libusb.h"
 #include "libfreenect.h"
 
@@ -1631,8 +1630,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	float3x3 Transform;
 	std::shared_ptr<TPixelBuffer> PixelBuffer( new TDumbPixelBuffer( Frame, Transform ) );
 	
-	TJsonWriter Meta;
-	Meta.Push("Time", Timestamp.GetMilliSeconds().count() );
+	json11::Json::object Meta;
 	
 	//	would like a more official source from libfreenect, but there isn't one :)
 	//	http://smeenk.com/kinect-field-of-view-comparison/
@@ -1643,27 +1641,25 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	float ColourVertFov = 48.6f;
 	if ( Frame.GetFormat() == SoyPixelsFormat::Depth16mm)
 	{
-		Meta.Push("DepthMax",FREENECT_DEPTH_MM_MAX_VALUE);
-		Meta.Push("DepthInvalid",FREENECT_DEPTH_MM_NO_VALUE);
-		Meta.Push("HorizontalFov",DepthHorzFov);
-		Meta.Push("VerticalFov",DepthVertFov);
+		Meta["DepthMax"] = FREENECT_DEPTH_MM_MAX_VALUE;
+		Meta["DepthInvalid"] = FREENECT_DEPTH_MM_NO_VALUE;
+		Meta["HorizontalFov"] = DepthHorzFov;
+		Meta["VerticalFov"] = DepthVertFov;
 	}
 	else if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepth10bit || Frame.GetFormat() == SoyPixelsFormat::FreenectDepth11bit )
 	{
-		Meta.Push("DepthMax",FREENECT_DEPTH_RAW_MAX_VALUE);
-		Meta.Push("DepthInvalid",FREENECT_DEPTH_RAW_NO_VALUE);
-		Meta.Push("HorizontalFov",DepthHorzFov);
-		Meta.Push("VerticalFov",DepthVertFov);
+		Meta["DepthMax"] = FREENECT_DEPTH_RAW_MAX_VALUE;
+		Meta["DepthInvalid"] = FREENECT_DEPTH_RAW_NO_VALUE;
+		Meta["HorizontalFov"] = DepthHorzFov;
+		Meta["VerticalFov"] = DepthVertFov;
 	}
 	else
 	{
-		Meta.Push("HorizontalFov",ColourHorzFov);
-		Meta.Push("VerticalFov",ColourVertFov);
+		Meta["HorizontalFov"] = ColourHorzFov;
+		Meta["VerticalFov"] = ColourVertFov;
 	}
 	
-	auto MetaString = Meta.GetString();
-	
-	this->PushFrame( PixelBuffer, Frame.GetMeta(), Timestamp, MetaString );
+	this->PushFrame( PixelBuffer, Frame.GetMeta(), Timestamp, Meta );
 }
 
 
