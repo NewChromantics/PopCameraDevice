@@ -15,7 +15,7 @@ namespace KinectAzure
 class KinectAzure::TCameraDevice : public PopCameraDevice::TDevice
 {
 public:
-	TCameraDevice(const std::string& Serial, const std::string& FormatString);
+	TCameraDevice(PopCameraDevice::TParams& Params);
 	~TCameraDevice();
 
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature, bool Enable) override;

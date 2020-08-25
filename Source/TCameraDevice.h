@@ -12,7 +12,7 @@ namespace PopCameraDevice
 	class TDevice;
 	class TStreamMeta;
 	class TInvalidNameException;
-
+	class TParams;
 	
 	std::string	GetFormatString(SoyPixelsMeta Meta, size_t FrameRate = 0);
 	void		DecodeFormatString(std::string FormatString, SoyPixelsMeta& Meta, size_t& FrameRate);
@@ -48,6 +48,14 @@ public:
 };
 
 
+//	move towards params with json. like Poph264
+class PopCameraDevice::TParams
+{
+public:
+	std::string		mSerial;
+	std::string		mFormat;
+	bool			mVerboseDebug = true;
+};
 
 class PopCameraDevice::TDevice
 {

@@ -48,7 +48,7 @@ namespace KinectAzure
 	void		IsOkay(k4a_result_t Error, const char* Context);
 	void		IsOkay(k4a_wait_result_t Error, const char* Context);
 	void		IsOkay(k4a_buffer_result_t Error, const char* Context);
-	void		InitDebugHandler();
+	void		InitDebugHandler(bool Verbose);
 	void		LoadDll();
 	size_t		GetDeviceIndex(const std::string& Serial);
 
@@ -480,7 +480,7 @@ void KinectAzure::LoadDll()
 	DllLoaded = true;
 }
 
-void KinectAzure::InitDebugHandler()
+void KinectAzure::InitDebugHandler(bool Verbose)
 {
 	LoadDll();
 
@@ -490,8 +490,7 @@ void KinectAzure::InitDebugHandler()
 	};
 
 	void* Context = nullptr;
-	auto DebugLevel = K4A_LOG_LEVEL_TRACE;
-	//auto DebugLevel = K4A_LOG_LEVEL_WARNING;
+	auto DebugLevel = Verbose ? K4A_LOG_LEVEL_TRACE : K4A_LOG_LEVEL_WARNING;
 	auto Result = k4a_set_debug_message_handler(OnDebug, Context, DebugLevel);
 	IsOkay(Result, "k4a_set_debug_message_handler");
 
@@ -715,13 +714,16 @@ k4a_transformation_t KinectAzure::TDevice::GetDepthToImageTransform()
 	return mTransformation;
 }
 
-KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial, const std::string& FormatString)
+KinectAzure::TCameraDevice::TCameraDevice(PopCameraDevice::TParams& Params)
 {
+	auto& Serial = Params.mSerial;
+	auto& FormatString = Params.mFormat;
+
 	if (!Soy::StringBeginsWith(Serial, KinectAzure::SerialPrefix, true))
 		throw PopCameraDevice::TInvalidNameException();
 
 	LoadDll();
-	InitDebugHandler();
+	InitDebugHandler( Params.mVerboseDebug );
 
 	auto DeviceIndex = GetDeviceIndex(Serial);
 	//	todo: remove keep alive when PopEngine/CAPI is fixed

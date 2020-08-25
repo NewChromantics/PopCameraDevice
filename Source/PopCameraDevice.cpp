@@ -69,7 +69,7 @@ namespace PopCameraDevice
 	int32_t			GetNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize, ArrayBridge<ArrayBridge<uint8_t>*>&& Planes, bool DeleteFrame);
 	void			AddOnNewFrameCallback(int32_t Instance,std::function<void()> Callback);
 
-	uint32_t		CreateCameraDevice(const std::string& Name,const std::string& Format);
+	uint32_t		CreateCameraDevice(PopCameraDevice::TParams& Params);
 
 	//	to deal with windows exiting a process but silently destroying/detaching threads	
 	//	we do a hail mary shutdown
@@ -341,8 +341,12 @@ __export void PopCameraDevice_EnumCameraDevicesJson(char* StringBuffer,int32_t S
 
 
 
-uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::string& Format)
+uint32_t PopCameraDevice::CreateCameraDevice(PopCameraDevice::TParams& Params)
 {
+	//	todo: move constructors to params
+	auto& Name = Params.mSerial;
+	auto& Format = Params.mFormat;
+
 	//	alloc device
 	if (Name == TestDevice::DeviceName)
 	{
@@ -390,7 +394,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,const std::
 #if defined(ENABLE_KINECTAZURE)
 	try
 	{
-		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Name,Format));
+		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Params));
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}
@@ -465,8 +469,12 @@ __export int32_t PopCameraDevice_CreateCameraDeviceWithFormat(const char* Name,c
 {
 	try
 	{
-		Format = Format ? Format : "";
-		auto InstanceId = PopCameraDevice::CreateCameraDevice( Name, Format );
+		PopCameraDevice::TParams Params;
+		Params.mSerial = Name;
+		Params.mFormat = Format;
+		Params.mVerboseDebug = false;
+
+		auto InstanceId = PopCameraDevice::CreateCameraDevice(Params);
 		return InstanceId;
 	}
 	catch(std::exception& e)
