@@ -58,7 +58,7 @@ void Avf::TCamera::PushLatestFrame(size_t StreamIndex)
 		return;
 	
 	//	todo: get all the frame meta
-	std::string Meta;
+	json11::Json::object Meta;
 	SoyTime FrameTime = LatestPacket->GetStartTime();
 	this->PushFrame( LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, FrameTime, Meta );
 }
