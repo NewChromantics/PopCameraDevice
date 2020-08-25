@@ -13,7 +13,8 @@
 
 namespace PopCameraDevice
 {
-	const Soy::TVersion	Version(2, 1, 1);
+	//	2.1.4	Added KinectAzure meta, now propogating properly out
+	const Soy::TVersion	Version(2, 1, 4);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
