@@ -290,6 +290,9 @@
     <ClInclude Include="..\Source\Json11\json11.hpp">
       <Filter>Source\json11</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\ArkitCapture.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\AvfCapture.mm">
@@ -309,6 +312,9 @@
     </None>
     <None Include="..\PopCameraDevice.Linux\Makefile">
       <Filter>PopCameraDevice.Linux</Filter>
+    </None>
+    <None Include="..\Source\ArkitCapture.mm">
+      <Filter>Source</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
