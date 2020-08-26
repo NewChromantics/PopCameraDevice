@@ -552,11 +552,10 @@ void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timesta
 	Soy::TScopeTimerPrint Timer("PushFrame(CVPixelBufferRef",5);
 	float3x3 Transform;
 	auto DoRetain = true;
-	auto PixelMeta = Avf::GetPixelMeta(PixelBuffer);
 	std::shared_ptr<AvfDecoderRenderer> Renderer;
 	
 	std::shared_ptr<TPixelBuffer> Buffer( new CVPixelBuffer( PixelBuffer, DoRetain, Renderer, Transform ) );
-	PopCameraDevice::TDevice::PushFrame( Buffer, PixelMeta, Timestamp, Meta );
+	PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, Meta );
 }
 
 

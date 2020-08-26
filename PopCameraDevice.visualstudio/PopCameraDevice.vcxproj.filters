@@ -293,6 +293,12 @@
     <ClInclude Include="..\Source\ArkitCapture.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\AvfPixelBuffer.h">
+      <Filter>SoyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\SoyAvf.h">
+      <Filter>SoyLib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Source\AvfCapture.mm">
@@ -315,6 +321,12 @@
     </None>
     <None Include="..\Source\ArkitCapture.mm">
       <Filter>Source</Filter>
+    </None>
+    <None Include="..\Source\SoyLib\src\AvfPixelBuffer.mm">
+      <Filter>SoyLib</Filter>
+    </None>
+    <None Include="..\Source\SoyLib\src\SoyAvf.mm">
+      <Filter>SoyLib</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

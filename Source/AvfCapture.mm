@@ -60,7 +60,7 @@ void Avf::TCamera::PushLatestFrame(size_t StreamIndex)
 	//	todo: get all the frame meta
 	json11::Json::object Meta;
 	SoyTime FrameTime = LatestPacket->GetStartTime();
-	this->PushFrame( LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, FrameTime, Meta );
+	this->PushFrame( LatestPacket->mPixelBuffer, FrameTime, Meta );
 }
 
 void Avf::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
