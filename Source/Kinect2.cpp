@@ -237,7 +237,7 @@ void Kinect2::TDevice::GetNextFrame()
 
 	float3x3 Transform;
 	std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels,Transform));
-	PushFrame( PixelBuffer, Pixels.GetMeta(), FrameTime, Json );
+	PushFrame( PixelBuffer, FrameTime, Json );
 }
 
 

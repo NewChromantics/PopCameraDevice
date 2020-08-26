@@ -13,8 +13,7 @@
 
 namespace PopCameraDevice
 {
-	//	2.1.4	Added KinectAzure meta, now propogating properly out
-	const Soy::TVersion	Version(2, 1, 4);
+	const Soy::TVersion	Version(2, 1, 5);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
@@ -249,17 +248,13 @@ void GetObjectJson(const TDeviceAndFormats& DeviceAndFormats, std::stringstream&
 }
 
 
-void GetObjectJson(const SoyPixelsMeta& PlaneMeta, std::stringstream& Json, int Tabs)
+void GetObjectJson(json11::Json::object& Json,const SoyPixelsMeta& PlaneMeta)
 {
-	Json << GetTabString(Tabs) << "{\n";
-
-	PushJson(Json, "Width", PlaneMeta.GetWidth(), Tabs, true);
-	PushJson(Json, "Height", PlaneMeta.GetHeight(), Tabs, true);
-	PushJson(Json, "Format", SoyPixelsFormat::ToString(PlaneMeta.GetFormat()), Tabs, true);
-	PushJson(Json, "DataSize", PlaneMeta.GetDataSize(), Tabs, true);
-	PushJson(Json, "Channels", PlaneMeta.GetChannels(), Tabs, false);
-
-	Json << GetTabString(Tabs) << "}";
+	Json["Width"] = static_cast<int>(PlaneMeta.GetWidth());
+	Json["Height"] = static_cast<int>(PlaneMeta.GetHeight());
+	Json["Format"] = SoyPixelsFormat::ToString(PlaneMeta.GetFormat());
+	Json["DataSize"] = static_cast<int>(PlaneMeta.GetDataSize());
+	Json["Channels"] = PlaneMeta.GetChannels();
 }
 
 void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndFormats)
@@ -555,48 +550,20 @@ void PopCameraDevice::ReadNativeHandle(int32_t Instance,void* Handle)
 
 
 
-void GetJson(std::stringstream& Json,SoyPixelsMeta PixelMeta,std::string FrameMeta,const ArrayBridge<SoyTime>&& BufferedFrames)
+void GetJson(json11::Json::object& Json,SoyPixelsMeta PixelMeta)
 {
+	//	output all plane info
 	BufferArray<SoyPixelsMeta, 3> PlaneMetas;
 	PixelMeta.GetPlanes(GetArrayBridge(PlaneMetas));
-	const auto PreTab = 1;
-	Json << "{\n";
+
+	json11::Json::object Planes;
+	for (auto p = 0; p < PlaneMetas.GetSize(); p++)
 	{
-		if (BufferedFrames.GetSize() > 0)
-		{
-			//	todo:
-			//PushJson(Json, "BufferedFrames", BufferedFrames, PreTab, true);
-		}
-
-		if (FrameMeta.length() >= 2 && FrameMeta[0] == '{')
-		{
-			//	meta is a json object
-			PushJsonKey(Json, "Meta", PreTab);
-			Json << FrameMeta << ",\n";
-		}
-		else if (FrameMeta.length() > 0)
-		{
-			PushJson(Json, "Meta", FrameMeta, PreTab, true);
-		}
-
-		PushJsonKey(Json, "Planes", PreTab);
-		Json << "[\n";
-
-		for (auto p = 0; p < PlaneMetas.GetSize(); p++)
-		{
-			auto Tabs = PreTab+1;
-			auto& PlaneMeta = PlaneMetas[p];
-			GetObjectJson(PlaneMeta, Json, Tabs);
-
-			if (p != PlaneMetas.GetSize() - 1)
-			{
-				Json << ",";
-			}
-			Json << "\n";			
-		}
-		Json << "\t]\n";
+		auto& PlaneMeta = PlaneMetas[p];
+		GetObjectJson(Planes, PlaneMeta);
 	}
-	Json << "}\n";
+
+	Json["Plane"] = Planes;
 }
 
 
@@ -658,26 +625,34 @@ int32_t PopCameraDevice::GetNextFrame(int32_t Instance, char* JsonBuffer, int32_
 	try
 	{
 		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
-		SoyPixelsMeta PixelMeta;
-		SoyTime FrameTime;
-		std::string FrameMeta;
-		auto NextFrameBuffer = Device.GetNextFrame(PixelMeta, FrameTime, FrameMeta,DeleteFrame);
-
-		if (!NextFrameBuffer)
+		TFrame Frame;
+		if ( !Device.GetNextFrame(Frame, DeleteFrame ) )
 			return PopCameraDevice::NoFrame;
 
-		//	get full meta
+		//	get additional meta (and copy to user's buffer)
 		if (JsonBuffer)
 		{
-			BufferArray<SoyTime, 1> BufferedFrames;
-			std::stringstream Json;
-			GetJson(Json, PixelMeta, FrameMeta, GetArrayBridge(BufferedFrames));
-			Soy::StringToBuffer(Json.str(), JsonBuffer, JsonBufferSize);
+			auto Meta = Frame.mMeta;
+			try
+			{
+				auto PixelMeta = Frame.mPixelBuffer->GetMeta();
+				GetJson(Meta, PixelMeta);
+			}
+			catch (std::exception& e)
+			{
+				Meta["Error_GetPixelMeta"] = e.what();
+			}
+
+			Device.GetDeviceMeta(Meta);
+
+			//	copy to output
+			auto JsonString = json11::Json(Meta).dump();
+			Soy::StringToBuffer(JsonString, JsonBuffer, JsonBufferSize);
 		}
 
-		CopyPlanes(*NextFrameBuffer, Planes);
+		CopyPlanes(*Frame.mPixelBuffer, Planes);
 
-		return FrameTime.GetTime();
+		return Frame.mFrameTime.GetTime();
 	}
 	catch (std::exception& e)
 	{

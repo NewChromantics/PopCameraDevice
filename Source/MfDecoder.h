@@ -137,6 +137,11 @@ public:
 	MfPixelBuffer(Soy::AutoReleasePtr<IMFSample>& Sample,const TStreamMeta& Meta,bool ApplyHeightPadding,bool ApplyWidthPadding,bool Win7Emulation);
 	~MfPixelBuffer();
 
+	virtual SoyPixelsMeta	GetMeta() override
+	{
+		return mMeta.mPixelMeta;
+	}
+
 	virtual void		Lock(ArrayBridge<Opengl::TTexture>&& Textures,Opengl::TContext& Context,float3x3& Transform) override	{}
 	virtual void		Lock(ArrayBridge<Directx::TTexture>&& Textures,Directx::TContext& Context,float3x3& Transform) override;
 	virtual void		Lock(ArrayBridge<Metal::TTexture>&& Textures,Metal::TContext& Context,float3x3& Transform) override		{}

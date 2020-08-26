@@ -10,9 +10,9 @@ class TPixelBuffer;
 namespace PopCameraDevice
 {
 	class TDevice;
-	class TStreamMeta;
 	class TInvalidNameException;
 	class TParams;
+	class TFrame;
 	
 	std::string	GetFormatString(SoyPixelsMeta Meta, size_t FrameRate = 0);
 	void		DecodeFormatString(std::string FormatString, SoyPixelsMeta& Meta, size_t& FrameRate);
@@ -38,15 +38,6 @@ public:
 	virtual const char* what() const __noexcept { return "Invalid device name"; }
 };
 
-//	used as desired params when creating camera devices
-//	todo: merge/cleanup soy TStreamMeta which has more info (eg. transform matrix)
-class PopCameraDevice::TStreamMeta
-{
-public:
-	SoyPixelsMeta	mPixelMeta;
-	size_t			mFrameRate = 0;
-};
-
 
 //	move towards params with json. like Poph264
 class PopCameraDevice::TParams
@@ -57,26 +48,35 @@ public:
 	bool			mVerboseDebug = true;
 };
 
+class PopCameraDevice::TFrame
+{
+public:
+	json11::Json::object			mMeta;
+	SoyTime							mFrameTime;
+	std::shared_ptr<TPixelBuffer>	mPixelBuffer;
+};
+
 class PopCameraDevice::TDevice
 {
 public:
-	std::shared_ptr<TPixelBuffer>	GetNextFrame(SoyPixelsMeta& PixelMeta, SoyTime& FrameTime, std::string& FrameMeta,bool DeleteFrame);
+	bool							GetNextFrame(TFrame& Frame,bool DeleteFrame);
 
 	virtual void					EnableFeature(TFeature::Type Feature,bool Enable)=0;	//	throws if unsupported
 	virtual void					ReadNativeHandle(void* Handle);
+	
+	//	get additional meta for output (debug mostly?)
+	virtual void					GetDeviceMeta(json11::Json::object& Meta);
 
 protected:
-	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,json11::Json::object FrameMeta);
+	virtual void					PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyTime FrameTime,json11::Json::object& FrameMeta);
 
 public:
 	Array<std::function<void()>>	mOnNewFrameCallbacks;
 
 private:
-	//	currently storing just last frame
-	std::mutex						mLastPixelBufferLock;
-	std::shared_ptr<TPixelBuffer>	mLastPixelBuffer;
-	std::string						mLastFrameMeta;		//	maybe some key system later, but currently device outputs anything (ideally json)
-	SoyPixelsMeta					mLastPixelsMeta;
-	SoyTime							mLastFrameTime;
+	size_t			mCulledFrames = 0;	//	debug - running total of culled frames
+	std::mutex		mFramesLock;
+	Array<TFrame>	mFrames;		//	might be expensive to copy atm
+	size_t			mMaxFrameBuffers = 10;
 };
 

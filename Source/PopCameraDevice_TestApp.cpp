@@ -92,7 +92,7 @@ int main()
 
 	//	test device currently only pumps out one frame
 	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
-	TestDeviceInstance("KinectAzure_000396300112", "Depth16mm", 4);
+	TestDeviceInstance("KinectAzure_000396300112", "Depth16mm", 50);
 	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
 	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
 	//TestDeviceInstance("KinectAzure_000396300112","BGRA_Depth16^2560x1440@30", 4);

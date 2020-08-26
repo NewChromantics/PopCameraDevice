@@ -19,7 +19,7 @@
 //	Version history (PopCameraDevice_GetVersion)
 //
 //	2.0.1	Added PopCameraDevice_ReadNativeHandle()
-//
+//	2.1.4	Added KinectAzure meta, now propogating properly out
 
 //	function pointer type for new frame callback
 typedef void PopCameraDevice_OnNewFrame(void* Meta);

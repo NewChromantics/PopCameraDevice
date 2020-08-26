@@ -1659,7 +1659,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 		Meta["VerticalFov"] = ColourVertFov;
 	}
 	
-	this->PushFrame( PixelBuffer, Frame.GetMeta(), Timestamp, Meta );
+	this->PushFrame( PixelBuffer, Timestamp, Meta );
 }
 
 

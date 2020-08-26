@@ -62,16 +62,25 @@ void PopCameraDevice::DecodeFormatString_UnitTests()
 }
 
 
-void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyPixelsMeta PixelMeta,SoyTime FrameTime,json11::Json::object FrameMeta)
+void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyTime FrameTime,json11::Json::object& FrameMeta)
 {
-	//	currently we're only storing last frame...
 	{
 		Soy::TScopeTimerPrint Timer("PopCameraDevice::TDevice::PushFrame Lock",5);
-		std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
-		mLastPixelBuffer = FramePixelBuffer;
-		mLastPixelsMeta = PixelMeta;
-		mLastFrameMeta = json11::Json(FrameMeta).dump();
-		mLastFrameTime = FrameTime;
+		std::lock_guard<std::mutex> Lock(mFramesLock);
+
+		TFrame NewFrame;
+		NewFrame.mPixelBuffer = FramePixelBuffer;
+		NewFrame.mMeta = FrameMeta;
+		NewFrame.mFrameTime = FrameTime;
+		mFrames.PushBack(NewFrame);
+		
+		if (mFrames.GetSize() > mMaxFrameBuffers)
+		{
+			auto CullCount = mFrames.GetSize() - mMaxFrameBuffers;
+			mCulledFrames += CullCount;
+			mFrames.RemoveBlock(0,CullCount);
+			std::Debug << __PRETTY_FUNCTION__ << "Culling " << CullCount << "/" << mFrames.GetSize() << " frames as over max " << mMaxFrameBuffers << " (total culled=" << mCulledFrames << ")" << std::endl;
+		}
 	}
 
 	for (auto i = 0; i < mOnNewFrameCallbacks.GetSize(); i++)
@@ -90,24 +99,25 @@ void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixe
 }
 
 
-
-std::shared_ptr<TPixelBuffer> PopCameraDevice::TDevice::GetNextFrame(SoyPixelsMeta& PixelMeta, SoyTime& FrameTime, std::string& FrameMeta, bool DeleteFrame)
+void PopCameraDevice::TDevice::GetDeviceMeta(json11::Json::object& Meta)
 {
-	std::lock_guard<std::mutex> Lock(mLastPixelBufferLock);
-	auto PixelBuffer = mLastPixelBuffer;
-	PixelMeta = mLastPixelsMeta;
-	FrameTime = mLastFrameTime;
-	FrameMeta = mLastFrameMeta;
+	if (mCulledFrames > 0)
+		Meta["CulledFrames"] = static_cast<int>(mCulledFrames);
+}
 
+
+bool PopCameraDevice::TDevice::GetNextFrame(TFrame& Frame,bool DeleteFrame)
+{
+	std::lock_guard<std::mutex> Lock(mFramesLock);
+	if (mFrames.IsEmpty())
+		return false;
+
+	Frame = mFrames[0];
 	if (DeleteFrame)
 	{
-		mLastFrameMeta.clear();
-		mLastPixelBuffer.reset();
-		mLastFrameTime = SoyTime();
+		mFrames.RemoveBlock(0, 1);
 	}
-
-	return PixelBuffer;
-
+	return true;
 }
 
 void PopCameraDevice::TDevice::ReadNativeHandle(void* Handle)

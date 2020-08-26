@@ -560,7 +560,7 @@ void MediaFoundation::TCamera::PushLatestFrame(size_t StreamIndex)
 		return;
 
 	json11::Json::object Meta;
-	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mMeta.mPixelMeta, LatestPacket->mTimecode, Meta );
+	this->PushFrame(LatestPacket->mPixelBuffer, LatestPacket->mTimecode, Meta );
 }
 
 void MediaFoundation::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)

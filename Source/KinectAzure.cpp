@@ -433,7 +433,7 @@ k4a_image_format_t KinectAzure::GetColourFormat(SoyPixelsFormat::Type Format)
 class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta, SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
 		TFrameReader	(DeviceIndex, KeepAlive),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
@@ -450,7 +450,7 @@ private:
 	virtual k4a_colour_mode_t	GetColourMode() override { return mColourMode; }
 	virtual k4a_fps_t			GetFrameRate() override { return mFrameRate; }
 
-	std::function<void(std::shared_ptr<TPixelBuffer>&,SoyPixelsMeta,SoyTime,json11::Json::object&)>	mOnNewFrame;
+	std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime,json11::Json::object&)>	mOnNewFrame;
 	k4a_depth_mode_t		mDepthMode = K4A_DEPTH_MODE_OFF;
 	k4a_colour_mode_t		mColourMode;
 	k4a_fps_t				mFrameRate = K4A_FRAMES_PER_SECOND_30;
@@ -761,9 +761,9 @@ KinectAzure::TCameraDevice::TCameraDevice(PopCameraDevice::TParams& Params)
 
 	auto Fps = GetFrameRate(FrameRate);
 
-	auto OnNewFrame = [this](std::shared_ptr<TPixelBuffer> FramePixelBuffer, SoyPixelsMeta PixelMeta, SoyTime FrameTime, json11::Json::object FrameMeta)
+	auto OnNewFrame = [this](std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyTime FrameTime,json11::Json::object& FrameMeta)
 	{
-		PushFrame(FramePixelBuffer, PixelMeta, FrameTime, FrameMeta);
+		PushFrame(FramePixelBuffer, FrameTime, FrameMeta);
 	};
 
 	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode, Fps) );
@@ -1122,14 +1122,13 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 	{
 		auto Pixels = GetPixels(Image);
 		float3x3 Transform;
-		auto PixelMeta = Pixels.GetMeta();
 		
 		//	add calibration meta here
 		auto Meta = FrameMeta;
 		GetMeta(Calibration, Meta);
 		
 		std::shared_ptr<TPixelBuffer> PixelBuffer(new TDumbPixelBuffer(Pixels,Transform));
-		this->mOnNewFrame(PixelBuffer, PixelMeta, CaptureTime, Meta);
+		this->mOnNewFrame(PixelBuffer, CaptureTime, Meta);
 	};
 
 	//	if colour & depth, realign so depth matches colour
