@@ -563,7 +563,7 @@ void GetJson(json11::Json::object& Json,SoyPixelsMeta PixelMeta)
 		GetObjectJson(Planes, PlaneMeta);
 	}
 
-	Json["Plane"] = Planes;
+	Json["Planes"] = Planes;
 }
 
 
