@@ -729,36 +729,14 @@ KinectAzure::TCameraDevice::TCameraDevice(PopCameraDevice::TParams& Params)
 	//	todo: remove keep alive when PopEngine/CAPI is fixed
 	auto KeepAlive = true;	//	keep reopening the device in the reader
 
-	//	work out which reader we need to create
-	//	gr: what default should we use, default to both?
-	//	gr: this default should be first from EnumDeviceNameAndFormats()!
-	size_t FrameRate = 0;
-	SoyPixelsMeta Format;
-	PopCameraDevice::DecodeFormatString(FormatString, Format, FrameRate);
-	if ( Format == SoyPixelsMeta() )
-		Format = GetPixelMeta(K4A_DEPTH_MODE_NFOV_UNBINNED, FrameRate);
 
-	auto DepthMode = K4A_DEPTH_MODE_OFF;
+	//	gr: just hardcode these formats, then make it configurable when
+	//		we have JSON options
+	auto DepthMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
 	k4a_colour_mode_t ColourMode;
-
-	try
-	{
-		DepthMode = GetDepthMode(Format, FrameRate);
-	}
-	catch (std::exception& e)
-	{
-		std::Debug << e.what() << std::endl;
-	}
-
-	try
-	{
-		ColourMode = GetColourMode(Format, FrameRate );
-	}
-	catch (std::exception& e)
-	{
-		std::Debug << e.what() << std::endl;
-	}
-
+	ColourMode.resolution = GetLargestColourResolution(SoyPixelsFormat::Depth16mm);
+	ColourMode.format = GetFormat(SoyPixelsFormat::Nv12);
+	size_t FrameRate = 30;
 	auto Fps = GetFrameRate(FrameRate);
 
 	auto OnNewFrame = [this](std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyTime FrameTime,json11::Json::object& FrameMeta)
