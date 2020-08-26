@@ -556,11 +556,13 @@ void GetJson(json11::Json::object& Json,SoyPixelsMeta PixelMeta)
 	BufferArray<SoyPixelsMeta, 3> PlaneMetas;
 	PixelMeta.GetPlanes(GetArrayBridge(PlaneMetas));
 
-	json11::Json::object Planes;
+	json11::Json::array Planes;
 	for (auto p = 0; p < PlaneMetas.GetSize(); p++)
 	{
 		auto& PlaneMeta = PlaneMetas[p];
-		GetObjectJson(Planes, PlaneMeta);
+		json11::Json::object PlaneMetaObject;
+		GetObjectJson(PlaneMetaObject, PlaneMeta);
+		Planes.push_back(PlaneMetaObject);
 	}
 
 	Json["Planes"] = Planes;
