@@ -13,7 +13,7 @@
 
 namespace PopCameraDevice
 {
-	const Soy::TVersion	Version(2, 1, 5);
+	const Soy::TVersion	Version(2, 1, 6);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
