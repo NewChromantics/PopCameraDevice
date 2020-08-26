@@ -57,9 +57,3 @@ __export void				PopCameraDevice_UnitTests();
 //	for ARFrameProxy, you can pass in an ARFrame pointer, to read depth images immediately for queuing up
 __export void				PopCameraDevice_ReadNativeHandle(int32_t Instance,void* Handle);
 
-
-
-//	create an output device, a virtual camera device
-__export int32_t			PopOutputDevice_CreateDevice(const char* Name,const char* Format,char* ErrorBuffer, int32_t ErrorBufferLength);
-__export void				PopOutputDevice_FreeDevice(int32_t Instance);
-__export void				PopOutputDevice_PushFrame(int32_t Instance,uint8_t* PixelBuffer,int32_t PixelBufferSize,const char* MetaJson,char* ErrorBuffer, int32_t ErrorBufferLength);
