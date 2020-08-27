@@ -22,16 +22,16 @@ void DebugPrint(const std::string& Message)
 }
 
 
-void TestDeviceInstance(const std::string& Name,const std::string& Format,size_t GrabFrameCount)
+void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,size_t GrabFrameCount)
 {
 	//	create the test device
 	//	and grab a frame to test
 	DebugPrint("Creating test device");
 	DebugPrint(Name);
-	DebugPrint(Format);
+	DebugPrint(OptionsJson);
 	
 	char ErrorBuffer[1024];
-	auto Instance = PopCameraDevice_CreateCameraDeviceWithFormat(Name.c_str(), Format.c_str(), ErrorBuffer, std::size(ErrorBuffer));
+	auto Instance = PopCameraDevice_CreateCameraDevice(Name.c_str(), OptionsJson.c_str(), ErrorBuffer, std::size(ErrorBuffer));
 	if (Instance <= 0)
 		throw std::runtime_error(std::string("Device failed to be created; ") + ErrorBuffer);
 
@@ -92,7 +92,9 @@ int main()
 
 	//	test device currently only pumps out one frame
 	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
-	TestDeviceInstance("KinectAzure_000396300112", "Depth16mm", 50);
+	
+	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"Yuv_8_88\"}", 50);
+	TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Depth16mm\"}", 50);
 	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
 	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
 	//TestDeviceInstance("KinectAzure_000396300112","BGRA_Depth16^2560x1440@30", 4);

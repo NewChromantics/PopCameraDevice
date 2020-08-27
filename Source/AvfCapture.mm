@@ -9,7 +9,7 @@
 
 
 
-Avf::TCamera::TCamera(const std::string& DeviceName,const std::string& Format)
+Avf::TCamera::TCamera(const std::string& DeviceName,json11::Json& Options)
 {
 	//	for AVF, name has to be serial
 	std::string Serial;
@@ -31,9 +31,7 @@ Avf::TCamera::TCamera(const std::string& DeviceName,const std::string& Format)
 	}
 	
 	
-	Avf::TCaptureParams Params;
-
-	PopCameraDevice::DecodeFormatString( Format, Params.mPixelFormat, Params.mFrameRate );
+	Avf::TCaptureParams Params(Options);
 	
 	std::shared_ptr<Opengl::TContext> OpenglContext;
 	

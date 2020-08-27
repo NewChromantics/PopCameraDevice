@@ -13,7 +13,7 @@
 
 namespace PopCameraDevice
 {
-	const Soy::TVersion	Version(2, 1, 6);
+	const Soy::TVersion	Version(2, 1, 7);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
@@ -69,7 +69,7 @@ namespace PopCameraDevice
 	int32_t			GetNextFrame(int32_t Instance, char* JsonBuffer, int32_t JsonBufferSize, ArrayBridge<ArrayBridge<uint8_t>*>&& Planes, bool DeleteFrame);
 	void			AddOnNewFrameCallback(int32_t Instance,std::function<void()> Callback);
 
-	uint32_t		CreateCameraDevice(PopCameraDevice::TParams& Params);
+	uint32_t		CreateCameraDevice(const std::string& Name,json11::Json& Options);
 
 	//	to deal with windows exiting a process but silently destroying/detaching threads	
 	//	we do a hail mary shutdown
@@ -337,11 +337,10 @@ __export void PopCameraDevice_EnumCameraDevicesJson(char* StringBuffer,int32_t S
 
 
 
-uint32_t PopCameraDevice::CreateCameraDevice(PopCameraDevice::TParams& Params)
+uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,json11::Json& Options)
 {
-	//	todo: move constructors to params
-	auto& Name = Params.mSerial;
-	auto& Format = Params.mFormat;
+	//	legacy support
+	auto Format = Options["Format"].string_value();
 
 	//	alloc device
 	if (Name == TestDevice::DeviceName)
@@ -390,7 +389,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(PopCameraDevice::TParams& Params)
 #if defined(ENABLE_KINECTAZURE)
 	try
 	{
-		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Params));
+		std::shared_ptr<TDevice> Device(new KinectAzure::TCameraDevice(Name,Options));
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}
@@ -403,7 +402,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(PopCameraDevice::TParams& Params)
 #if defined(TARGET_IOS)
 	if ( Name == Arkit::TFrameProxyDevice::DeviceName )
 	{
-		std::shared_ptr<TDevice> Device(new Arkit::TFrameProxyDevice(Format));
+		std::shared_ptr<TDevice> Device(new Arkit::TFrameProxyDevice(Options));
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}
@@ -412,7 +411,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(PopCameraDevice::TParams& Params)
 #if defined(TARGET_IOS)
 	if ( Name == Arkit::TSessionCamera::DeviceName_SceneDepth || Name == Arkit::TSessionCamera::DeviceName_FrontDepth )
 	{
-		std::shared_ptr<TDevice> Device(new Arkit::TSessionCamera(Name,Format));
+		std::shared_ptr<TDevice> Device(new Arkit::TSessionCamera(Name,Options));
 		if (Device)
 			return PopCameraDevice::CreateInstance(Device);
 	}
@@ -424,7 +423,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(PopCameraDevice::TParams& Params)
 #if defined(TARGET_WINDOWS)
 		std::shared_ptr<TDevice> Device(new MediaFoundation::TCamera(Name));
 #elif defined(TARGET_OSX) || defined(TARGET_IOS)
-		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name,Format));
+		std::shared_ptr<TDevice> Device(new Avf::TCamera(Name,Options));
 #else
 		std::shared_ptr<TDevice> Device;
 #endif
@@ -463,14 +462,22 @@ RETURN SafeCall(FUNC Function,const char* FunctionName,RETURN ErrorReturn)
 
 __export int32_t PopCameraDevice_CreateCameraDeviceWithFormat(const char* Name,const char* Format, char* ErrorBuffer, int32_t ErrorBufferLength)
 {
+	Soy::StringToBuffer("PopCameraDevice_CreateCameraDeviceWithFormat deprecated; use PopCameraDevice_CreateCameraDevice with json options", ErrorBuffer, ErrorBufferLength);
+	return 0;
+}
+
+__export int32_t PopCameraDevice_CreateCameraDevice(const char* Name,const char* OptionsJson, char* ErrorBuffer, int32_t ErrorBufferLength)
+{
 	try
 	{
-		PopCameraDevice::TParams Params;
-		Params.mSerial = Name;
-		Params.mFormat = Format;
-		Params.mVerboseDebug = false;
-
-		auto InstanceId = PopCameraDevice::CreateCameraDevice(Params);
+		std::string ParseError;
+		json11::Json Options = json11::Json::parse( OptionsJson ? OptionsJson : "{}", ParseError );
+		if ( !ParseError.empty() )
+		{
+			ParseError = std::string("PopCameraDevice_CreateCameraDevice parse json error; ") + ParseError;
+			throw Soy::AssertException(ParseError);
+		}
+		auto InstanceId = PopCameraDevice::CreateCameraDevice( Name, Options );
 		return InstanceId;
 	}
 	catch(std::exception& e)

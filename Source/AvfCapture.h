@@ -43,7 +43,7 @@ namespace ArFrameSource
 class Avf::TCamera : public PopCameraDevice::TDevice
 {
 public:
-	TCamera(const std::string& DeviceName,const std::string& Format);
+	TCamera(const std::string& DeviceName,json11::Json& Options);
 
 	void			PushLatestFrame(size_t StreamIndex);
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;

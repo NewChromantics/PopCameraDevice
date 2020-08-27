@@ -7,7 +7,7 @@
 #include <map>
 
 #include "AvfPixelBuffer.h"
-
+#include "Json11/json11.hpp"
 
 #if defined(__OBJC__)
 @class VideoCaptureProxy;
@@ -33,9 +33,13 @@ namespace TVideoQuality
 class Avf::TCaptureParams
 {
 public:
-	bool			mDiscardOldFrames = true;
-	size_t			mFrameRate = 0;	//	0 = any
-	SoyPixelsMeta	mPixelFormat;	//	invalid = any
+	TCaptureParams(json11::Json& Options);
+
+	bool					mDiscardOldFrames = true;
+	size_t					mFrameRate = 0;	//	0 = dont set
+	std::string				mCodecFormat;
+	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
+	SoyPixelsFormat::Type	mDepthFormat = SoyPixelsFormat::Invalid;
 };
 
 

@@ -14,6 +14,7 @@
 #include "Avf.h"
 #include "SoyFourcc.h"
 #include <magic_enum/include/magic_enum.hpp>
+#include "PopCameraDevice.h"
 
 namespace Avf
 {
@@ -171,13 +172,86 @@ namespace Avf
 @end
 
 
+Avf::TCaptureParams::TCaptureParams(json11::Json& Options)
+{
+	auto SetInt = [&](const char* Name,size_t& ValueUnsigned)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_number() )
+		return false;
+		auto Value = Handle.int_value();
+		if ( Value < 0 )
+		{
+			std::stringstream Error;
+			Error << "Value for " << Name << " is " << Value << ", not expecting negative";
+			throw Soy::AssertException(Error);
+		}
+		ValueUnsigned = Value;
+		return true;
+	};
+	auto SetBool = [&](const char* Name,bool& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_bool() )
+		return false;
+		Value = Handle.bool_value();
+		return true;
+	};
+	auto SetString = [&](const char* Name,std::string& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_string() )
+			return false;
+		Value = Handle.string_value();
+		return true;
+	};
+
+	auto SetPixelFormat = [&](const char* Name,SoyPixelsFormat::Type& Value)
+	{
+		std::string EnumString;
+		if ( !SetString(Name,EnumString) )
+			return false;
+		
+		Value = SoyPixelsFormat::Validate(EnumString);
+		return true;
+	};
+
+	SetBool( POPCAMERADEVICE_KEY_SKIPFRAMES, mDiscardOldFrames );
+	SetInt( POPCAMERADEVICE_KEY_FRAMERATE, mFrameRate );
+	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
+
+	//	format could be string codec, or pixel format
+	try
+	{
+		SetPixelFormat( POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
+	}
+	catch(...)
+	{
+		SetString(POPCAMERADEVICE_KEY_FORMAT, mCodecFormat);
+	}
+}
+
+
 AvfVideoCapture::AvfVideoCapture(const std::string& Serial,const Avf::TCaptureParams& Params,std::shared_ptr<Opengl::TContext> OpenglContext) :
 	AvfMediaExtractor		( OpenglContext ),
 	mQueue					( nullptr )
 {
-	CreateDevice(Serial);
-	CreateStream(Params );
-	StartStream();
+	@try
+	{
+		CreateDevice(Serial);
+		CreateStream(Params);
+	
+		if ( Params.mFrameRate != 0 )
+		{
+			SetFrameRate(Params.mFrameRate);
+		}
+	
+		StartStream();
+	}
+	@catch(NSException* e)
+	{
+		throw Soy::AssertException( Soy::NSErrorToString(e) );
+	}
 }
 
 AvfVideoCapture::~AvfVideoCapture()
@@ -320,10 +394,8 @@ void AvfVideoCapture::CreateAndAddOutputDepth(AVCaptureSession* Session,const Av
 #endif
 }
 
-void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,const Avf::TCaptureParams& Params)
+void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type Format,const Avf::TCaptureParams& Params)
 {
-	auto Serial = "SomeCamera";
-
 	mOutputColour.Retain( [[AVCaptureVideoDataOutput alloc] init] );
 	if ( !mOutputColour )
 		throw Soy::AssertException("Failed to allocate AVCaptureVideoDataOutput");
@@ -334,17 +406,21 @@ void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,const A
 	//	gr: debug all these
 	Array<std::string> Codecs;
 	GetOutputCodecs(Output,GetArrayBridge(Codecs));
+	std::Debug << "Availible Codecs: " << Soy::StringJoin(GetArrayBridge(Codecs),",") << std::endl;
+	
 	Array<Soy::TFourcc> Formats;
 	GetOutputFormats(Output,GetArrayBridge(Formats));
+	std::Debug << "Availible Formats: " << Soy::StringJoin(GetArrayBridge(Formats),",") << std::endl;
 
-	NSArray<AVVideoCodecType>* AvailibleCodecs = [Output availableVideoCodecTypes];
 	
+	OSType AvfFormat = Avf::GetPlatformPixelFormat(Format);
+
+	/*
 	//	loop through formats for ones we can handle that are accepted
 	//	https://developer.apple.com/library/mac/documentation/AVFoundation/Reference/AVCaptureVideoDataOutput_Class/#//apple_ref/occ/instp/AVCaptureVideoDataOutput/availableVideoCVPixelFormatTypes
 	//	The first format in the returned list is the most efficient output format.
 	Array<OSType> TryPixelFormats;
 	{
-		NSArray* AvailibleFormats = [Output availableVideoCVPixelFormatTypes];
 		Soy::Assert( AvailibleFormats != nullptr, "availableVideoCVPixelFormatTypes returned null array" );
 		
 		//	filter pixel formats

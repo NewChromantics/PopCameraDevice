@@ -386,20 +386,6 @@ Freenect::TFreenect& Freenect::TContext::GetFreenect()
 	return *mFreenect;
 }
 
-bool IsDepthFormat(SoyPixelsFormat::Type Format)
-{
-	switch ( Format )
-	{
-		case SoyPixelsFormat::Depth16mm:
-		case SoyPixelsFormat::KinectDepth:
-		case SoyPixelsFormat::FreenectDepth10bit:
-		case SoyPixelsFormat::FreenectDepth11bit:
-			return true;
-			
-		default:
-			return false;
-	}
-}
 
 std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(const std::string& Serial,SoyPixelsMeta Format)
 {

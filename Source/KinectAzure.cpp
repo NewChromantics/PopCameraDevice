@@ -714,10 +714,9 @@ k4a_transformation_t KinectAzure::TDevice::GetDepthToImageTransform()
 	return mTransformation;
 }
 
-KinectAzure::TCameraDevice::TCameraDevice(PopCameraDevice::TParams& Params)
+KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json::options& Options)
 {
 	auto& Serial = Params.mSerial;
-	auto& FormatString = Params.mFormat;
 
 	if (!Soy::StringBeginsWith(Serial, KinectAzure::SerialPrefix, true))
 		throw PopCameraDevice::TInvalidNameException();
