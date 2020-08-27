@@ -6,6 +6,7 @@
 
 //  gr: make this a proper check, quickly disabling for build here
 #define ENABLE_IOS14    (__IPHONE_OS_VERSION_MIN_REQUIRED >= 140000)
+#define ENABLE_IOS13    (__IPHONE_OS_VERSION_MIN_REQUIRED >= 130000)
 
 @interface ARSessionProxy : NSObject <ARSessionDelegate>
 {
@@ -52,7 +53,6 @@ public:
 }
 
 @end
-
 
 
 
@@ -183,6 +183,12 @@ void Arkit::TFrameProxyDevice::EnableFeature(PopCameraDevice::TFeature::Type Fea
 }
 
 
+#if !ENABLE_IOS14
+class ARSkeleton2D
+{
+	
+};
+#endif
 
 namespace Avf
 {
@@ -333,6 +339,7 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	Meta["Intrinsics"] = Intrinsics;
 }
 
+
 //ARSkeletonJointNameHead
 json11::Json::object Avf::GetSkeleton(ARSkeleton2D* Skeleton)
 {
@@ -340,6 +347,8 @@ json11::Json::object Avf::GetSkeleton(ARSkeleton2D* Skeleton)
 	//		then copy it and replace values
 	json11::Json::object SkeletonJson;
 	
+	
+#if ENABLE_IOS14
 	auto EnumJoint = [&](NSString* Name)
 	{
 		auto Position2 = [Skeleton landmarkForJointNamed:Name];
@@ -351,6 +360,7 @@ json11::Json::object Avf::GetSkeleton(ARSkeleton2D* Skeleton)
 	auto Definition = Skeleton.definition;
 	auto JointNames = Definition.jointNames;
 	Platform::NSArray_ForEach<NSString*>(JointNames,EnumJoint);
+#endif
 
 	return SkeletonJson;
 }
@@ -374,13 +384,17 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 		{
 			auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
 			auto Name = Soy::NSStringToString(Anchor.name);
+#if ENABLE_IOS14
 			auto SessionUuid = Soy::NSStringToString(Anchor.sessionIdentifier.UUIDString);
+#endif
 			auto LocalToWorld = GetJsonArray(Anchor.transform);
 			json11::Json::object AnchorObject =
 			{
 				{"Uuid",Uuid},
 				{"Name",Name},
+#if ENABLE_IOS14
 				{"SessionUuid",SessionUuid},
+#endif
 				{"LocalToWorld",LocalToWorld},
 			};
 			Anchors.push_back(AnchorObject);
@@ -420,11 +434,14 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 		Meta["Features"] = Features;
 	}
 	
+
+#if ENABLE_IOS14
 	if ( Frame.detectedBody && Frame.detectedBody.skeleton )
 	{
 		auto Skeleton = GetSkeleton( Frame.detectedBody.skeleton );
 		Meta["Skeleton"] = Skeleton;
 	}
+#endif
 	
 #if ENABLE_IOS14
 	if ( Frame.geoTrackingStatus )
@@ -500,10 +517,10 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 #pragma warning ARKit sdk __IPHONE_OS_VERSION_MIN_REQUIRED
 
 		case ArFrameSource::segmentationBuffer:
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 130000
+#if ENABLE_IOS13
 			PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta );
 #else
-			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
+			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::to_string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
 #pragma warning Compiling without ARFrame segmentationBuffer __IPHONE_OS_VERSION_MIN_REQUIRED
 #endif
 			return;
