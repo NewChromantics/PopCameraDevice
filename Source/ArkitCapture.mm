@@ -186,7 +186,7 @@ void Arkit::TFrameProxyDevice::EnableFeature(PopCameraDevice::TFeature::Type Fea
 }
 
 
-#if !ENABLE_IOS14
+#if !ENABLE_IOS13
 class ARSkeleton2D
 {
 	
