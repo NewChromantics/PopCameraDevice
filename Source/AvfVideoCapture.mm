@@ -178,7 +178,7 @@ Avf::TCaptureParams::TCaptureParams(json11::Json& Options)
 	{
 		auto& Handle = Options[Name];
 		if ( !Handle.is_number() )
-		return false;
+			return false;
 		auto Value = Handle.int_value();
 		if ( Value < 0 )
 		{
@@ -193,7 +193,7 @@ Avf::TCaptureParams::TCaptureParams(json11::Json& Options)
 	{
 		auto& Handle = Options[Name];
 		if ( !Handle.is_bool() )
-		return false;
+			return false;
 		Value = Handle.bool_value();
 		return true;
 	};

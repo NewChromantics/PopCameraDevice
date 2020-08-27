@@ -66,7 +66,7 @@ public:
 	static inline const char* DeviceName_SceneDepth = "Arkit Rear Depth";
 	static inline const char* DeviceName_FrontDepth = "Arkit Front Depth";
 public:
-	TSessionCamera(const std::string& DeviceName,const std::string& Format);
+	TSessionCamera(const std::string& DeviceName,json11::Json& Options);
 
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
 
@@ -85,7 +85,7 @@ class Arkit::TFrameProxyDevice : public Arkit::TFrameDevice
 public:
 	static inline const char* DeviceName = "AVFrameProxy";
 public:
-	TFrameProxyDevice(const std::string& Format);
+	TFrameProxyDevice(json11::Json& Options);
 	
 	virtual void	ReadNativeHandle(void* ArFrameHandle) override;
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
