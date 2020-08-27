@@ -447,37 +447,28 @@ void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixe
 		}
 		std::Debug << Debug.str() << std::endl;
 	}
-	
+	*/
 	bool KeepOldFrames = !Params.mDiscardOldFrames;
-	bool AddedOutput = false;
-	for ( int i=0;	i<TryPixelFormats.GetSize();	i++ )
-	{
-		OSType Format = TryPixelFormats[i];
-		
-		auto PixelFormat = Avf::GetPixelFormat( Format );
-		
-		//	should have alreayd filtered this
-		if ( PixelFormat == SoyPixelsFormat::Invalid )
-			continue;
-		
-		Output.alwaysDiscardsLateVideoFrames = KeepOldFrames ? NO : YES;
-		Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
-								[NSNumber numberWithInt:Format], kCVPixelBufferPixelFormatTypeKey, nil];
-		if ( ![Session canAddOutput:Output] )
-		{
-			std::Debug << "Device " << Serial << " does not support pixel format " << PixelFormat << " (despite claiming it does)" << std::endl;
-			continue;
-		}
-		
-		//	compatible, add
-		[Session addOutput:Output];
-		std::Debug << "Device " << Serial << " added " << PixelFormat << " output" << std::endl;
-		AddedOutput = true;
-		break;
-	}
+	Output.alwaysDiscardsLateVideoFrames = KeepOldFrames ? NO : YES;
 	
-	if ( !AddedOutput )
-	throw Soy::AssertException("Could not find compatible pixel format");
+	//	gr: wrong format here didnt error, just gave me infinite dropped samples.
+	Output.videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+							[NSNumber numberWithInt:AvfFormat], kCVPixelBufferPixelFormatTypeKey, nil];
+	/*
+	Output.videoSettings = @{
+							   (NSString *)kCVPixelBufferPixelFormatTypeKey : [NSNumber numberWithInt:Format],
+								};
+	 */
+	if ( ![Session canAddOutput:Output] )
+	{
+		std::stringstream Error;
+		Error << "Device does not support pixel format " << Soy::TFourcc(AvfFormat) << "/" << Format << std::endl;
+		throw Soy::AssertException(Error);
+	}
+
+	//	compatible, add
+	[Session addOutput:Output];
+	std::Debug << "Device added " << Soy::TFourcc(AvfFormat) << "/" << Format << " output" << std::endl;
 	
 	auto& Proxy = mProxyColour.mObject;
 	[Output setSampleBufferDelegate:Proxy queue: mQueue];
@@ -492,6 +483,57 @@ void AvfVideoCapture::CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixe
 
 }
 
+
+void AvfVideoCapture::CreateAndAddOutputCodec(AVCaptureSession* Session,const std::string& Codec,const Avf::TCaptureParams& Params)
+{
+	mOutputColour.Retain( [[AVCaptureVideoDataOutput alloc] init] );
+	if ( !mOutputColour )
+		throw Soy::AssertException("Failed to allocate AVCaptureVideoDataOutput");
+	
+	auto& Output = mOutputColour.mObject;
+	
+	//	todo: get output codecs
+	//	gr: debug all these
+	Array<std::string> Codecs;
+	GetOutputCodecs(Output,GetArrayBridge(Codecs));
+	std::Debug << "Availible Codecs: " << Soy::StringJoin(GetArrayBridge(Codecs),",") << std::endl;
+	
+	Array<Soy::TFourcc> Formats;
+	GetOutputFormats(Output,GetArrayBridge(Formats));
+	std::Debug << "Availible Formats: " << Soy::StringJoin(GetArrayBridge(Formats),",") << std::endl;
+	
+	
+	bool KeepOldFrames = !Params.mDiscardOldFrames;
+	NSString* CodecNs = Soy::StringToNSString(Codec);
+	Output.alwaysDiscardsLateVideoFrames = KeepOldFrames ? NO : YES;
+	
+	Output.videoSettings = @{
+							 (NSString *)AVVideoCodecKey : CodecNs
+							 };
+
+	if ( ![Session canAddOutput:Output] )
+	{
+		std::stringstream Error;
+		Error << "Device does not support codec " << Codec << std::endl;
+		throw Soy::AssertException(Error);
+	}
+	
+	//	compatible, add
+	[Session addOutput:Output];
+	std::Debug << "Device added " << Codec << " output" << std::endl;
+	
+	auto& Proxy = mProxyColour.mObject;
+	[Output setSampleBufferDelegate:Proxy queue: mQueue];
+	
+	
+	//	register for notifications from errors
+	NSNotificationCenter *notify = [NSNotificationCenter defaultCenter];
+	[notify addObserver: Proxy
+			   selector: @selector(onVideoError:)
+				   name: AVCaptureSessionRuntimeErrorNotification
+				 object: Session];
+	
+}
 
 void AvfVideoCapture::CreateDevice(const std::string& Serial)
 {
@@ -558,39 +600,16 @@ void AvfVideoCapture::CreateStream(const Avf::TCaptureParams& Params)
 	if ( MarkBeginConfig )
 		[Session beginConfiguration];
 
-	
-	//	now; see if the user desires a format
-	//	make a list of all our formats, and whether its colour or depth
-	Array<SoyPixelsFormat::Type> ColourFormats;
-	Array<SoyPixelsFormat::Type> DepthFormats;
 
-	//	todo: if camera has depth support
-	DepthFormats.PushBack(SoyPixelsFormat::DepthFloatMetres);
-	DepthFormats.PushBack(SoyPixelsFormat::DepthHalfMetres);
-	DepthFormats.PushBack(SoyPixelsFormat::DepthDisparityFloat);
-	DepthFormats.PushBack(SoyPixelsFormat::DepthDisparityHalf);
-	//	filter these based Params.Desired formats
-	if ( Params.mPixelFormat.GetFormat() != SoyPixelsFormat::Invalid )
-	{
-		
-	}
+	//	try and make all the format outputs asked for
+	if ( Params.mColourFormat != SoyPixelsFormat::Invalid )
+		CreateAndAddOutputColour(Session,Params.mColourFormat,Params);
+	
+	if ( Params.mDepthFormat != SoyPixelsFormat::Invalid )
+		CreateAndAddOutputDepth(Session,Params);
 
-	//	create output streams
-	//	should be able to make both?
-	if ( !DepthFormats.IsEmpty() )
-	{
-		auto TryParams = Params;
-		TryParams.mPixelFormat.DumbSetFormat(DepthFormats[0]);
-		CreateAndAddOutputDepth(Session,TryParams);
-	}
-	
-	if ( !ColourFormats.IsEmpty() )
-	{
-		auto TryParams = Params;
-		TryParams.mPixelFormat.DumbSetFormat(ColourFormats[0]);
-		CreateAndAddOutputColour(Session,TryParams);
-	}
-	
+	if ( !Params.mCodecFormat.empty() )
+		CreateAndAddOutputCodec(Session,Params.mCodecFormat,Params);
 
 	/*
 	//	try all the qualitys
@@ -616,21 +635,15 @@ void AvfVideoCapture::CreateStream(const Avf::TCaptureParams& Params)
 	if ( !Session.sessionPreset )
 		throw Soy::AssertException("Failed to set session quality");
 	*/
-
-	
 /*
-	[Session beginConfiguration];
-	auto FrameRate = 60;
-	try
+	//auto QualityString = AVCaptureSessionPreset1280x720;
+	auto QualityString = AVCaptureSessionPresetHigh;
+
+	if ( [mSession canSetSessionPreset:QualityString] )
 	{
-		SetFrameRate( FrameRate );
+		Session.sessionPreset = QualityString;
 	}
-	catch (std::exception& e)
-	{
-		std::Debug << "Failed to set frame rate to " << FrameRate << ": " << e.what() << std::endl;
-	}
-	[Session commitConfiguration];
-*/
+	*/
 	
 	if ( MarkBeginConfig )
 		[Session commitConfiguration];
@@ -912,6 +925,8 @@ void AvfVideoCapture::SetFrameRate(size_t FramesPerSec)
 	if ( NO == [Device lockForConfiguration:NULL] )
 		throw Soy::AssertException("Could not lock device for configuration");
 
+	//[Session beginConfiguration];
+	
 	@try
 	{
 		auto Scalar = 10;
@@ -926,6 +941,7 @@ void AvfVideoCapture::SetFrameRate(size_t FramesPerSec)
 		throw Soy::AssertException( Soy::NSErrorToString(e) );
 	}
 
+	//[Session commitConfiguration];
 }
 
 /*

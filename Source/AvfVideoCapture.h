@@ -85,16 +85,17 @@ public:
 
 	
 protected:
-	void					StartStream();
-	void					StopStream();
+	void		StartStream();
+	void		StopStream();
 	
 private:
 	void		Shutdown();
 	void		CreateDevice(const std::string& Serial);
 	void		CreateStream(const Avf::TCaptureParams& Params);
 	
-	void	CreateAndAddOutputDepth(AVCaptureSession* Session,const Avf::TCaptureParams& Params);
-	void	CreateAndAddOutputColour(AVCaptureSession* Session,const Avf::TCaptureParams& Params);
+	void		CreateAndAddOutputDepth(AVCaptureSession* Session,const Avf::TCaptureParams& Params);
+	void		CreateAndAddOutputColour(AVCaptureSession* Session,SoyPixelsFormat::Type Format,const Avf::TCaptureParams& Params);
+	void		CreateAndAddOutputCodec(AVCaptureSession* Session,const std::string& Codec,const Avf::TCaptureParams& Params);
 
 	
 public:
