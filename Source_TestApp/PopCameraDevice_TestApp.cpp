@@ -30,7 +30,7 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 	DebugPrint(Name);
 	DebugPrint(OptionsJson);
 	
-	char ErrorBuffer[1024];
+	char ErrorBuffer[1024] = {};
 	auto Instance = PopCameraDevice_CreateCameraDevice(Name.c_str(), OptionsJson.c_str(), ErrorBuffer, std::size(ErrorBuffer));
 	if (Instance <= 0)
 		throw std::runtime_error(std::string("Device failed to be created; ") + ErrorBuffer);

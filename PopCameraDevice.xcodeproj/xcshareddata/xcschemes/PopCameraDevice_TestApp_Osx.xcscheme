@@ -14,23 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BF09A5DD24FA73EB002F56DB"
-               BuildableName = "PopCameraDevice_TestApp_Ios.app"
-               BlueprintName = "PopCameraDevice_TestApp_Ios"
-               ReferencedContainer = "container:PopCameraDevice.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BF15200F2384861D00A70EBF"
-               BuildableName = "PopCameraDevice_Ios.framework"
-               BlueprintName = "PopCameraDevice_Ios"
+               BlueprintIdentifier = "BF108A9522970C92003DDC5F"
+               BuildableName = "TestApp"
+               BlueprintName = "TestApp"
                ReferencedContainer = "container:PopCameraDevice.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF09A5DD24FA73EB002F56DB"
-            BuildableName = "PopCameraDevice_TestApp_Ios.app"
-            BlueprintName = "PopCameraDevice_TestApp_Ios"
+            BlueprintIdentifier = "BF108A9522970C92003DDC5F"
+            BuildableName = "TestApp"
+            BlueprintName = "TestApp"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -59,7 +45,6 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      disableMainThreadChecker = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -70,9 +55,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF09A5DD24FA73EB002F56DB"
-            BuildableName = "PopCameraDevice_TestApp_Ios.app"
-            BlueprintName = "PopCameraDevice_TestApp_Ios"
+            BlueprintIdentifier = "BF108A9522970C92003DDC5F"
+            BuildableName = "TestApp"
+            BlueprintName = "TestApp"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -89,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BF09A5DD24FA73EB002F56DB"
-            BuildableName = "PopCameraDevice_TestApp_Ios.app"
-            BlueprintName = "PopCameraDevice_TestApp_Ios"
+            BlueprintIdentifier = "BF108A9522970C92003DDC5F"
+            BuildableName = "TestApp"
+            BlueprintName = "TestApp"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

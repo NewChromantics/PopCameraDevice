@@ -21,6 +21,7 @@
 //	2.0.1	Added PopCameraDevice_ReadNativeHandle()
 //	2.1.4	Added KinectAzure meta, now propogating properly out
 //	2.1.7	PopCameraDevice_CreateCameraDevice is now the prefered instantiator with JSON options
+//	2.2.0	Removed PopCameraDevice_CreateCameraDeviceWithFormat
 
 #define POPCAMERADEVICE_KEY_SKIPFRAMES	"SkipFrames"
 #define POPCAMERADEVICE_KEY_FRAMERATE	"FrameRate"
@@ -35,8 +36,8 @@ typedef void PopCameraDevice_OnNewFrame(void* Meta);
 //	enum every availible device and their availible formats as Json
 __export void				PopCameraDevice_EnumCameraDevicesJson(char* StringBuffer,int32_t StringBufferLength);
 
-//	create a new device. Format is optional. Returns instance ID (0 on error)
-__export int32_t			PopCameraDevice_CreateCameraDeviceWithFormat(const char* Name,const char* Format, char* ErrorBuffer, int32_t ErrorBufferLength);
+//	create a new device. Options are optional.
+//	Returns instance ID (0 on error)
 __export int32_t			PopCameraDevice_CreateCameraDevice(const char* Name,const char* OptionsJson, char* ErrorBuffer, int32_t ErrorBufferLength);
 
 __export void				PopCameraDevice_FreeCameraDevice(int32_t Instance);

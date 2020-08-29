@@ -28,7 +28,7 @@ public static class PopCameraDevice
 	
 	//	returns instance id
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
-	private static extern Int32 PopCameraDevice_CreateCameraDeviceWithFormat(byte[] Name, byte[] Format,[In, Out] byte[] ErrorBuffer, Int32 ErrorBufferLength);
+	private static extern Int32 PopCameraDevice_CreateCameraDevice(byte[] Name, byte[] OptionsJson,[In, Out] byte[] ErrorBuffer, Int32 ErrorBufferLength);
 
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern void PopCameraDevice_FreeCameraDevice(Int32 Instance);

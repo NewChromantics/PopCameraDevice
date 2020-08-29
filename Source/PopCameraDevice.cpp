@@ -13,7 +13,7 @@
 
 namespace PopCameraDevice
 {
-	const Soy::TVersion	Version(2, 1, 7);
+	const Soy::TVersion	Version(2, 2, 0);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
@@ -460,11 +460,6 @@ RETURN SafeCall(FUNC Function,const char* FunctionName,RETURN ErrorReturn)
 	}
 }
 
-__export int32_t PopCameraDevice_CreateCameraDeviceWithFormat(const char* Name,const char* Format, char* ErrorBuffer, int32_t ErrorBufferLength)
-{
-	Soy::StringToBuffer("PopCameraDevice_CreateCameraDeviceWithFormat deprecated; use PopCameraDevice_CreateCameraDevice with json options", ErrorBuffer, ErrorBufferLength);
-	return 0;
-}
 
 __export int32_t PopCameraDevice_CreateCameraDevice(const char* Name,const char* OptionsJson, char* ErrorBuffer, int32_t ErrorBufferLength)
 {
