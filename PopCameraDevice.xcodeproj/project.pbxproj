@@ -482,18 +482,11 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		BF09A5DF24FA73EB002F56DB /* Source_TestApp_Ios */ = {
+		BF09A5F424FA742B002F56DB /* Source_TestApp */ = {
 			isa = PBXGroup;
 			children = (
 				BF09A5E924FA73F3002F56DB /* Assets.xcassets */,
 				BF09A5EE24FA73F3002F56DB /* PopCameraDevice_TestAppIos_Info.plist */,
-			);
-			path = Source_TestApp_Ios;
-			sourceTree = "<group>";
-		};
-		BF09A5F424FA742B002F56DB /* Source_TestApp */ = {
-			isa = PBXGroup;
-			children = (
 				BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */,
 				BF2E7CAF22E4EB26008B905F /* PopCameraDevice_TestAppOsx_Info.plist */,
 			);
@@ -576,7 +569,6 @@
 				BF0A19C21EA428F4007EBC95 /* Unity */,
 				BFD6076D1EA16ED20035C814 /* Source */,
 				BF1520112384861D00A70EBF /* Source_Ios */,
-				BF09A5DF24FA73EB002F56DB /* Source_TestApp_Ios */,
 				BF4A6A151EA16D7D00613A64 /* Products */,
 				BF012B05226A09EC003AEB55 /* Frameworks */,
 			);
@@ -1144,7 +1136,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = X52DR36JY2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "$(SRCROOT)/Source_TestApp_Ios/PopCameraDevice_TestAppIos_Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Source_TestApp/PopCameraDevice_TestAppIos_Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -1179,7 +1171,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X52DR36JY2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = "$(SRCROOT)/Source_TestApp_Ios/PopCameraDevice_TestAppIos_Info.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/Source_TestApp/PopCameraDevice_TestAppIos_Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
