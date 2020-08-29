@@ -714,10 +714,50 @@ k4a_transformation_t KinectAzure::TDevice::GetDepthToImageTransform()
 	return mTransformation;
 }
 
-KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json::options& Options)
+KinectAzure::TCaptureParams::TCaptureParams(json11::Json& Options)
 {
-	auto& Serial = Params.mSerial;
+	auto SetInt = [&](const char* Name,size_t& ValueUnsigned)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_number() )
+			return false;
+		auto Value = Handle.int_value();
+		if ( Value < 0 )
+		{
+			std::stringstream Error;
+			Error << "Value for " << Name << " is " << Value << ", not expecting negative";
+			throw Soy::AssertException(Error);
+		}
+		ValueUnsigned = Value;
+		return true;
+	};
+	auto SetBool = [&](const char* Name,bool& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_bool() )
+			return false;
+		Value = Handle.bool_value();
+		return true;
+	};
+	auto SetPixelFormat = [&](const char* Name,SoyPixelsFormat::Type& Value)
+	{
+		std::string EnumString;
+		if ( !SetString(Name,EnumString) )
+			return false;
+		
+		Value = SoyPixelsFormat::Validate(EnumString);
+		return true;
+	};
 
+	SetInt( POPCAMERADEVICE_KEY_FRAMERATE, mFrameRate );
+	SetPixelFormat( POPCAMERADEVICE_KEY_COLOURFORMAT, mColourFormat );
+	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
+	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
+}
+
+KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json& Options)
+{
+	TCaptureParams Params(Options);
 	if (!Soy::StringBeginsWith(Serial, KinectAzure::SerialPrefix, true))
 		throw PopCameraDevice::TInvalidNameException();
 
@@ -729,14 +769,12 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json
 	auto KeepAlive = true;	//	keep reopening the device in the reader
 
 
-	//	gr: just hardcode these formats, then make it configurable when
-	//		we have JSON options
-	auto DepthMode = K4A_DEPTH_MODE_NFOV_UNBINNED;
+	size_t FrameRate = Params.mFrameRate;
+	auto DepthMode = GetDepthMode( Params.mDepthFormat, FrameRate );//K4A_DEPTH_MODE_NFOV_UNBINNED;
 	k4a_colour_mode_t ColourMode;
-	ColourMode.resolution = GetLargestColourResolution(SoyPixelsFormat::Depth16mm);
-	ColourMode.format = GetFormat(SoyPixelsFormat::Nv12);
-	size_t FrameRate = 30;
-	auto Fps = GetFrameRate(FrameRate);
+	ColourMode.resolution = GetLargestColourResolution( Params.mDepthFormat );
+	ColourMode.format = GetFormat( Params.mColourFormat );
+	auto Fps = GetFrameRate( FrameRate );
 
 	auto OnNewFrame = [this](std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyTime FrameTime,json11::Json::object& FrameMeta)
 	{
