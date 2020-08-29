@@ -20,7 +20,7 @@
 //
 //	2.0.1	Added PopCameraDevice_ReadNativeHandle()
 //	2.1.4	Added KinectAzure meta, now propogating properly out
-//	2.1.7	Json parameters now
+//	2.1.7	PopCameraDevice_CreateCameraDevice is now the prefered instantiator with JSON options
 
 #define POPCAMERADEVICE_KEY_SKIPFRAMES	"SkipFrames"
 #define POPCAMERADEVICE_KEY_FRAMERATE	"FrameRate"

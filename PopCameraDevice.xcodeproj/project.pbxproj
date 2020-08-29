@@ -280,6 +280,7 @@
 		BF216E9B24C99989003FD00B /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		BF216E9E24CA1B7D003FD00B /* json11.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = json11.cpp; path = Source/Json11/json11.cpp; sourceTree = SOURCE_ROOT; };
 		BF216E9F24CA1B7D003FD00B /* json11.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = json11.hpp; path = Source/Json11/json11.hpp; sourceTree = SOURCE_ROOT; };
+		BF22BD2424FA840B002B9AC0 /* PopCameraDevice.Package */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PopCameraDevice.Package; sourceTree = "<group>"; };
 		BF2E7CAF22E4EB26008B905F /* PopCameraDevice_TestAppOsx_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_TestAppOsx_Info.plist; sourceTree = "<group>"; };
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice.cs; sourceTree = "<group>"; };
@@ -560,6 +561,7 @@
 		BF4A6A0B1EA16D7C00613A64 = {
 			isa = PBXGroup;
 			children = (
+				BF22BD2424FA840B002B9AC0 /* PopCameraDevice.Package */,
 				BF22BD2324FA7DFD002B9AC0 /* Source_Osx */,
 				BF09A5F424FA742B002F56DB /* Source_TestApp */,
 				BFE462C024B3C99D00D04A4C /* PopCameraDevice.Linux */,
