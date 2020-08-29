@@ -5,9 +5,9 @@
 #include "Json11/json11.hpp"
 
 //  gr: make this a proper check, quickly disabling for build here
-#define ENABLE_IOS14    (__IPHONE_OS_VERSION_MIN_REQUIRED >= 140000)
-#define ENABLE_IOS13    (__IPHONE_OS_VERSION_MIN_REQUIRED >= 130000)
-#define ENABLE_IOS12   (__IPHONE_OS_VERSION_MIN_REQUIRED >= 120000)
+#define ENABLE_IOS14    (__IPHONE_OS_VERSION_MAX_ALLOWED >= 140000)
+#define ENABLE_IOS13    (__IPHONE_OS_VERSION_MAX_ALLOWED >= 130000)
+#define ENABLE_IOS12   (__IPHONE_OS_VERSION_MAX_ALLOWED >= 120000)
 
 #if ENABLE_IOS12
 #pragma message("IOS 12")
