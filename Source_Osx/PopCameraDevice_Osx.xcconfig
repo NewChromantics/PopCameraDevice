@@ -1,7 +1,7 @@
 //	config for OSX bundle apps
 //#include "PopApp.xcconfig"
 
-#include "Version.xcconfig"
+#include "../Source/Version.xcconfig"
 
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) TARGET_OSX ENABLE_FREENECT ENABLE_FREENECT2 //ENABLE_KINECTAZURE
 INFOPLIST_FILE = $(SRCROOT)/Info.plist
