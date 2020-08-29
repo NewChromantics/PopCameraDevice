@@ -6,7 +6,7 @@
 #include "SoyMedia.h"
 #include <cmath>	//	fabsf
 #include <SoyFilesystem.h>
-#include "Json11/json11.hpp"
+#include "PopCameraDevice.h"
 
 //	these macros are missing on linux
 #if defined(TARGET_LINUX)
@@ -739,6 +739,14 @@ KinectAzure::TCaptureParams::TCaptureParams(json11::Json& Options)
 		Value = Handle.bool_value();
 		return true;
 	};
+	auto SetString = [&](const char* Name, std::string& Value)
+	{
+		auto& Handle = Options[Name];
+		if (!Handle.is_string())
+			return false;
+		Value = Handle.string_value();
+		return true;
+	};
 	auto SetPixelFormat = [&](const char* Name,SoyPixelsFormat::Type& Value)
 	{
 		std::string EnumString;
@@ -750,9 +758,20 @@ KinectAzure::TCaptureParams::TCaptureParams(json11::Json& Options)
 	};
 
 	SetInt( POPCAMERADEVICE_KEY_FRAMERATE, mFrameRate );
-	SetPixelFormat( POPCAMERADEVICE_KEY_COLOURFORMAT, mColourFormat );
+	SetPixelFormat(POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
 	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
+
+	//	Allow our default of Depth, but if provided "depth" as format, let this happen
+	if (mDepthFormat == mColourFormat)
+		mDepthFormat = SoyPixelsFormat::Invalid;
+
+	//	allow Format to be depth
+	if (mDepthFormat == SoyPixelsFormat::Invalid && SoyPixelsFormat::IsDepthFormat(mColourFormat))
+	{
+		mDepthFormat = mColourFormat;
+		mColourFormat = SoyPixelsFormat::Invalid;
+	}
 }
 
 KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json& Options)
@@ -769,11 +788,21 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json
 	auto KeepAlive = true;	//	keep reopening the device in the reader
 
 
+	//	this all needs some giant case list mixing user-desired w/h/fps/colour/depth vs default
+	//	and fill in the gaps
 	size_t FrameRate = Params.mFrameRate;
-	auto DepthMode = GetDepthMode( Params.mDepthFormat, FrameRate );//K4A_DEPTH_MODE_NFOV_UNBINNED;
+	auto DepthMode = GetDepthMode( SoyPixelsMeta(0,0,Params.mDepthFormat), FrameRate );//K4A_DEPTH_MODE_NFOV_UNBINNED;
+	//	colour defaults off
 	k4a_colour_mode_t ColourMode;
-	ColourMode.resolution = GetLargestColourResolution( Params.mDepthFormat );
-	ColourMode.format = GetFormat( Params.mColourFormat );
+	if (Params.mColourFormat != SoyPixelsFormat::Invalid)
+	{
+		//	if there's depth too, let that dictate max colour res
+		if (Params.mDepthFormat != SoyPixelsFormat::Invalid )
+			ColourMode.resolution = GetLargestColourResolution(Params.mDepthFormat);
+		else
+			ColourMode.resolution = GetLargestColourResolution(Params.mColourFormat);
+		ColourMode.format = GetFormat(Params.mColourFormat);
+	}
 	auto Fps = GetFrameRate( FrameRate );
 
 	auto OnNewFrame = [this](std::shared_ptr<TPixelBuffer> FramePixelBuffer,SoyTime FrameTime,json11::Json::object& FrameMeta)

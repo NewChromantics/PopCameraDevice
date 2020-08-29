@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <sstream>
-#include "PopCameraDevice.h"
+#include "../Source/PopCameraDevice.h"
 #pragma comment(lib, "PopCameraDevice.lib")
 
 #if defined(_MSC_VER)
@@ -94,13 +94,18 @@ int main()
 	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
 	
 	auto TestFrameCount = 10;
+	/*
 	TestDeviceInstance("Back Camera", "{\"Format\":\"avc1\"}", TestFrameCount);
 	TestDeviceInstance("Back Camera", "{\"Format\":\"Yuv_8_88\"}", TestFrameCount);
 	TestDeviceInstance("Front TrueDepth Camera", "{\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"avc1\"}", TestFrameCount);
 	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"Uvy_8_88\"}", TestFrameCount);
 	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"Yuv_8_8_8\"}", TestFrameCount);
+	*/
 	TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("KinectAzure_000396300112", "{\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Yuv_8_88\"}", TestFrameCount);
+	TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
 	//TestDeviceInstance("KinectAzure_000396300112", "BGRA_Depth16^2560x1440@30", 4);
 	//TestDeviceInstance("KinectAzure_000396300112","BGRA_Depth16^2560x1440@30", 4);
