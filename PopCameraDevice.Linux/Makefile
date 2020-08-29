@@ -13,6 +13,7 @@ BUILD_DIR = ../Build
 
 PROJECT_PATH = ..
 SRC_PATH = $(PROJECT_PATH)/Source
+SRCTESTAPP_PATH = $(PROJECT_PATH)/Source_TestApp
 SOY_PATH = $(PROJECT_PATH)/Source/SoyLib
 
 LIB_INCLUDES = \
@@ -51,7 +52,7 @@ $(SOY_PATH)/src/SoyFilesystem.cpp \
 
 
 APP_SRC_FILES =	\
-$(SRC_PATH)/PopCameraDevice_TestApp.cpp 
+$(SRCTESTAPP_PATH)/PopCameraDevice_TestApp.cpp 
 
 
 LIB_DEFINES = \
