@@ -28,9 +28,11 @@ jobs:
             architecture: arm64
 
     steps:
+      # gr: fetch-depth:0 to override tags. To get rid of "existing tag will be clobbered" when we move a tag. This only seems to happen on the pi self runner (git version?)
       - uses: actions/checkout@v1
         with:
           submodules: "recursive"
+          fetch-depth: 0
       - name: Linux
         uses: NewChromantics/PopAction_BuildLinux@v1
         with:
