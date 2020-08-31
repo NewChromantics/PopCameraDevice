@@ -1,7 +1,7 @@
 #include "TCameraDevice.h"
 #include <SoyMedia.h>
 #include <magic_enum/include/magic_enum.hpp>
-
+#include "PopCameraDevice.h"
 
 std::string PopCameraDevice::GetFormatString(SoyPixelsMeta Meta, size_t FrameRate)
 {
@@ -59,6 +59,12 @@ void PopCameraDevice::DecodeFormatString_UnitTests()
 		DecodeFormatString(Format, Meta, FrameRate);
 		Test(Format, Meta, FrameRate, SoyPixelsMeta(123, 456, SoyPixelsFormat::RGBA), 789);
 	}
+}
+
+PopCameraDevice::TDevice::TDevice(json11::Json& Params)
+{
+	if ( Params[POPCAMERADEVICE_KEY_SPLITPLANES].is_bool() )
+		mSplitPlanes = Params[POPCAMERADEVICE_KEY_SPLITPLANES].bool_value();
 }
 
 

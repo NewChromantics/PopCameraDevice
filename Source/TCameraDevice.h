@@ -59,6 +59,9 @@ public:
 class PopCameraDevice::TDevice
 {
 public:
+	TDevice(json11::Json& Params);
+	TDevice()	{};
+	
 	bool							GetNextFrame(TFrame& Frame,bool DeleteFrame);
 
 	virtual void					EnableFeature(TFeature::Type Feature,bool Enable)=0;	//	throws if unsupported
@@ -72,6 +75,10 @@ protected:
 
 public:
 	Array<std::function<void()>>	mOnNewFrameCallbacks;
+
+public:
+	//	some generic properties from params
+	bool			mSplitPlanes = true;
 
 private:
 	size_t			mCulledFrames = 0;	//	debug - running total of culled frames

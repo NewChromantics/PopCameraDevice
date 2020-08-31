@@ -571,7 +571,38 @@ void GetJson(json11::Json::object& Json,SoyPixelsMeta PixelMeta)
 }
 
 
-void CopyPlanes(TPixelBuffer& PixelBuffer,ArrayBridge<ArrayBridge<uint8_t>*>& PlaneBuffers)
+void CopyPlanes(ArrayBridge<SoyPixelsImpl*>&& PlaneSrcs,ArrayBridge<ArrayBridge<uint8_t>*>& PlaneDsts,json11::Json::object& JsonMeta)
+{
+	json11::Json::array PlaneMetas;
+	
+	for (auto p = 0; p <PlaneSrcs.GetSize(); p++)
+	{
+		//	is there a buffer for this plane?
+		if (p >= PlaneDsts.GetSize())
+			continue;
+		auto* pPlaneDstArray = PlaneDsts[p];
+		if (!pPlaneDstArray)
+			continue;
+		
+		auto& PlaneSrc = *PlaneSrcs[p];
+		auto& PlaneSrcArray = PlaneSrc.GetPixelsArray();
+		auto& PlaneDstArray = *pPlaneDstArray;
+		
+		auto MaxSize = std::min(PlaneDstArray.GetDataSize(), PlaneSrcArray.GetDataSize());
+		//	copy as much as possible
+		auto PlaneSrcPixelsMin = GetRemoteArray(PlaneSrcArray.GetArray(), MaxSize);
+		PlaneDstArray.Copy(PlaneSrcPixelsMin);
+		
+		//	push meta
+		auto PlaneMeta = PlaneSrc.GetMeta();
+		json11::Json::object PlaneMetaObject;
+		GetObjectJson(PlaneMetaObject, PlaneMeta);
+		PlaneMetas.push_back(PlaneMetaObject);
+	}
+	JsonMeta["Planes"] = PlaneMetas;
+}
+
+void CopyPlanes(TPixelBuffer& PixelBuffer,ArrayBridge<ArrayBridge<uint8_t>*>& PlaneBuffers,json11::Json::object& JsonMeta,bool SplitPlanes)
 {
 	//	gr: we're losing this transform. go back through PixelBuffer implementations
 	//		to see if we explicitly sometimes reveal this transform ONLY on locking the 
@@ -583,30 +614,28 @@ void CopyPlanes(TPixelBuffer& PixelBuffer,ArrayBridge<ArrayBridge<uint8_t>*>& Pl
 	{
 		//	split planes of planes
 		BufferArray<std::shared_ptr<SoyPixelsImpl>, 10> Planes;
-		for (auto t = 0; t < Textures.GetSize(); t++)
+		BufferArray<SoyPixelsImpl*,10> PlanePtrs;
+		if ( SplitPlanes )
 		{
-			auto& Texture = *Textures[t];
-			Texture.SplitPlanes(GetArrayBridge(Planes));
+			for (auto t = 0; t < Textures.GetSize(); t++)
+			{
+				auto& Texture = *Textures[t];
+				Texture.SplitPlanes(GetArrayBridge(Planes));
+			}
+			for ( auto p=0;	p<Planes.GetSize();	p++ )
+				PlanePtrs.PushBack( Planes[p].get() );
+		}
+		else
+		{
+			//	just store originals (assuming theyre not split)
+			for (auto t = 0; t < Textures.GetSize(); t++)
+			{
+				auto& Texture = *Textures[t];
+				PlanePtrs.PushBack(&Texture);
+			}
 		}
 
-		for (auto p = 0; p < Planes.GetSize(); p++)
-		{
-			//	is there a buffer for this plane?
-			if (p >= PlaneBuffers.GetSize())
-				continue;
-			auto* pPlaneDstArray = PlaneBuffers[p];
-			if (!pPlaneDstArray)
-				continue;
-
-			auto& PlaneSrc = *Planes[p];
-			auto& PlaneSrcArray = PlaneSrc.GetPixelsArray();
-			auto& PlaneDstArray = *pPlaneDstArray;
-
-			auto MaxSize = std::min(PlaneDstArray.GetDataSize(), PlaneSrcArray.GetDataSize());
-			//	copy as much as possible
-			auto PlaneSrcPixelsMin = GetRemoteArray(PlaneSrcArray.GetArray(), MaxSize);
-			PlaneDstArray.Copy(PlaneSrcPixelsMin);
-		}
+		CopyPlanes( GetArrayBridge(PlanePtrs), PlaneBuffers, JsonMeta );
 		PixelBuffer.Unlock();
 	}
 	catch (...)
@@ -633,28 +662,20 @@ int32_t PopCameraDevice::GetNextFrame(int32_t Instance, char* JsonBuffer, int32_
 		if ( !Device.GetNextFrame(Frame, DeleteFrame ) )
 			return PopCameraDevice::NoFrame;
 
-		//	get additional meta (and copy to user's buffer)
+		auto Meta = Frame.mMeta;
+
+		//	get extra meta
+		Device.GetDeviceMeta(Meta);
+
+		CopyPlanes( *Frame.mPixelBuffer, Planes, Meta, Device.mSplitPlanes );
+
+		//	copy meta out
 		if (JsonBuffer)
 		{
-			auto Meta = Frame.mMeta;
-			try
-			{
-				auto PixelMeta = Frame.mPixelBuffer->GetMeta();
-				GetJson(Meta, PixelMeta);
-			}
-			catch (std::exception& e)
-			{
-				Meta["Error_GetPixelMeta"] = e.what();
-			}
-
-			Device.GetDeviceMeta(Meta);
-
 			//	copy to output
 			auto JsonString = json11::Json(Meta).dump();
 			Soy::StringToBuffer(JsonString, JsonBuffer, JsonBufferSize);
 		}
-
-		CopyPlanes(*Frame.mPixelBuffer, Planes);
 
 		return Frame.mFrameTime.GetTime();
 	}

@@ -28,7 +28,8 @@
 //	todo: change this format to allow an array instead of explicit "depth"
 #define POPCAMERADEVICE_KEY_FORMAT		"Format"
 #define POPCAMERADEVICE_KEY_DEPTHFORMAT	"DepthFormat"
-#define POPCAMERADEVICE_KEY_DEBUG		"Debug"		//	extra verbose debug output
+#define POPCAMERADEVICE_KEY_DEBUG		"Debug"			//	extra verbose debug output
+#define POPCAMERADEVICE_KEY_SPLITPLANES	"SplitPlanes"	//	by default we split YUV formats into multiple planes
 
 //	function pointer type for new frame callback
 typedef void PopCameraDevice_OnNewFrame(void* Meta);

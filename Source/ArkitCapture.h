@@ -51,6 +51,8 @@ namespace Arkit
 class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 {
 public:
+	TFrameDevice(json11::Json& Options) : TDevice	( Options )	{}
+	
 	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta);
 	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
 	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);

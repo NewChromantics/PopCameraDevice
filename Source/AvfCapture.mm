@@ -9,7 +9,8 @@
 
 
 
-Avf::TCamera::TCamera(const std::string& DeviceName,json11::Json& Options)
+Avf::TCamera::TCamera(const std::string& DeviceName,json11::Json& Options) :
+	TDevice	( Options )
 {
 	//	for AVF, name has to be serial
 	std::string Serial;

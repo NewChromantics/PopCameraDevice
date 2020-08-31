@@ -142,7 +142,8 @@ void Arkit::TSession::OnFrame(ARFrame* Frame)
 
 
 
-Arkit::TFrameProxyDevice::TFrameProxyDevice(json11::Json& Options)
+Arkit::TFrameProxyDevice::TFrameProxyDevice(json11::Json& Options) :
+	TFrameDevice	( Options )
 {
 	if ( Options["Source"].is_string() )
 	{
@@ -594,7 +595,8 @@ void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timesta
 
 
 
-Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json& Options)
+Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json& Options) :
+	TFrameDevice	( Options )
 {
 	if ( DeviceName == DeviceName_SceneDepth )
 		mSource = ArFrameSource::sceneDepth;

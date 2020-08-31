@@ -93,15 +93,19 @@ int main()
 	//	test device currently only pumps out one frame
 	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
 	
-	auto TestFrameCount = 10;
-	/*
+	auto TestFrameCount = 100;
+	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
+	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"SplitPlanes\":false,\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	return 0;
 	TestDeviceInstance("Back Camera", "{\"Format\":\"avc1\"}", TestFrameCount);
 	TestDeviceInstance("Back Camera", "{\"Format\":\"Yuv_8_88\"}", TestFrameCount);
 	TestDeviceInstance("Front TrueDepth Camera", "{\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"avc1\"}", TestFrameCount);
 	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"Uvy_8_88\"}", TestFrameCount);
 	TestDeviceInstance("FaceTime HD Camera (Built-in)", "{\"Format\":\"Yuv_8_8_8\"}", TestFrameCount);
-	*/
+	
 	TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	TestDeviceInstance("KinectAzure_000396300112", "{\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Yuv_8_88\"}", TestFrameCount);
