@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\KinectAzure.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PopCameraDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TCameraDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TestDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Json11\json11.cpp">
+      <Filter>Source\Json11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyDebug.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\memheap.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyArray.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyAssert.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyPng.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyFilesystem.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyFourcc.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyH264.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyImage.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyJson.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyMath.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyMedia.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyMediaFormat.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyPixels.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyWave.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyProtocol.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyRuntimeLibrary.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyScope.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyStream.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyString.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyThread.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyTime.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyTypes.cpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source_TestApp\PopCameraDevice_TestApp.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{491a47e3-6826-4589-9ffb-a0ba916170c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Json11">
+      <UniqueIdentifier>{488ad92a-d4b3-4979-84e2-60b6554f4ba1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SoyLib">
+      <UniqueIdentifier>{2ca15a3e-e271-4c1a-b8bf-d1bdcfa8c1d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SoyLib\src">
+      <UniqueIdentifier>{2efe2053-b5b6-4b87-8378-e0fa16947a0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SoyLib\magic_enum">
+      <UniqueIdentifier>{8881f3c2-2f10-447b-b0a3-d39636ea1f7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SoyLib\magic_enum\include">
+      <UniqueIdentifier>{a6a3326e-f1ce-46fb-95a7-56334be59159}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SoyLib\stb">
+      <UniqueIdentifier>{e08e6c9b-d933-4603-97b9-3cf5b671afb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\SoyLib\miniz">
+      <UniqueIdentifier>{38a8feeb-d2c5-4698-9ebb-9b805a48c4ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Makefile">
+      <UniqueIdentifier>{4b1c9e77-7be2-4363-a74d-b971c9a7734a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\KinectAzure.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PopCameraDevice.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\PopCameraDeviceFramework.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TCameraDevice.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TestDevice.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Json11\json11.hpp">
+      <Filter>Source\Json11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyDebug.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\Array.hpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\BufferArray.hpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\HeapArray.hpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\MemHeap.hpp">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\RemoteArray.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\scope_ptr.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SortArray.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyArray.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyAssert.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyAutoReleasePtr.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyPng.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyPool.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyEnum.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyFilesystem.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyFourcc.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyH264.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyImage.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyJson.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyMath.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyMedia.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyMediaFormat.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyPixels.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyWave.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyProtocol.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyRuntimeLibrary.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyScope.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyStream.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyString.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyThread.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTime.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTypes.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTypes_Linux.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTypes_Windows.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyVector.h">
+      <Filter>Source\SoyLib\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\magic_enum\include\magic_enum.hpp">
+      <Filter>Source\SoyLib\magic_enum\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\stb\stb_image.h">
+      <Filter>Source\SoyLib\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\SoyLib\src\miniz\miniz.h">
+      <Filter>Source\SoyLib\miniz</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\PopCameraDevice.Linux\Makefile">
+      <Filter>Makefile</Filter>
+    </None>
+  </ItemGroup>
+</Project>

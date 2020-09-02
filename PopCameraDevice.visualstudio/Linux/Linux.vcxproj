@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{b19f885e-65a9-4a02-8eeb-1912ae2cd4e7}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>Linux</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Raspberry</TargetLinuxPlatform>
+    <LinuxProjectType>{8748239F-558C-44D1-944B-07B09C35B330}</LinuxProjectType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Import Project="..\PopCameraDeviceLinux.props" />
+    <Import Project="Linux_KinectAzure.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi</LibraryDependencies>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>gpio export 17 out</Command>
+      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+    </RemotePostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi</LibraryDependencies>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>gpio export 17 out</Command>
+      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+    </RemotePostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Json11\json11.cpp" />
+    <ClCompile Include="..\..\Source\KinectAzure.cpp" />
+    <ClCompile Include="..\..\Source\PopCameraDevice.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\memheap.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyArray.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyAssert.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyDebug.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyFilesystem.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyFourcc.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyH264.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyImage.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyJson.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyMath.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyMedia.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyMediaFormat.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyPixels.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyPng.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyProtocol.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyRuntimeLibrary.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyScope.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyStream.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyString.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyThread.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyTime.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyTypes.cpp" />
+    <ClCompile Include="..\..\Source\SoyLib\src\SoyWave.cpp" />
+    <ClCompile Include="..\..\Source\TCameraDevice.cpp" />
+    <ClCompile Include="..\..\Source\TestDevice.cpp" />
+    <ClCompile Include="..\..\Source_TestApp\PopCameraDevice_TestApp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Json11\json11.hpp" />
+    <ClInclude Include="..\..\Source\KinectAzure.h" />
+    <ClInclude Include="..\..\Source\PopCameraDevice.h" />
+    <ClInclude Include="..\..\Source\PopCameraDeviceFramework.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\Array.hpp" />
+    <ClInclude Include="..\..\Source\SoyLib\src\BufferArray.hpp" />
+    <ClInclude Include="..\..\Source\SoyLib\src\HeapArray.hpp" />
+    <ClInclude Include="..\..\Source\SoyLib\src\magic_enum\include\magic_enum.hpp" />
+    <ClInclude Include="..\..\Source\SoyLib\src\MemHeap.hpp" />
+    <ClInclude Include="..\..\Source\SoyLib\src\miniz\miniz.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\RemoteArray.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\scope_ptr.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SortArray.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyArray.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyAssert.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyAutoReleasePtr.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyDebug.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyEnum.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyFilesystem.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyFourcc.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyH264.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyImage.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyJson.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyMath.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyMedia.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyMediaFormat.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyPixels.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyPng.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyPool.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyProtocol.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyRuntimeLibrary.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyScope.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyStream.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyString.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyThread.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTime.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTypes.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTypes_Linux.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyTypes_Windows.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyVector.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\SoyWave.h" />
+    <ClInclude Include="..\..\Source\SoyLib\src\stb\stb_image.h" />
+    <ClInclude Include="..\..\Source\TCameraDevice.h" />
+    <ClInclude Include="..\..\Source\TestDevice.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\PopCameraDevice.Linux\Makefile" />
+  </ItemGroup>
+  <ItemDefinitionGroup />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
