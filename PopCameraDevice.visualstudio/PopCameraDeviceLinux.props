@@ -8,25 +8,19 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <LibraryDependencies>k4a;depthengine</LibraryDependencies>
+      <LibraryDependencies>k4a;depthengine;dl</LibraryDependencies>
       <AdditionalOptions>-pthread %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ClCompile>
       <PreprocessorDefinitions>TARGET_LINUX;ENABLE_KINECTAZURE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CppLanguageStandard>c++17</CppLanguageStandard>
       <CppAdditionalWarning>no-reorder;no-unused-but-set-variable;no-unused-value;no-nonnull-compare;no-conversion;no-sign-compare;no-address;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <AdditionalOptions>-pthread -fPIC -g %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <RemotePreBuildEvent />
-    <RemotePreBuildEvent>
-      <Command>cd PopCameraDevice.Linux &amp;&amp; make KinectAzureDependencies</Command>
-    </RemotePreBuildEvent>
-    <RemotePreBuildEvent>
-      <Message>Download kinect azure dependencies (todo: copy headers back)</Message>
-    </RemotePreBuildEvent>
-    <PreBuildEvent>
-      <AdditionalSourcesToCopyMapping>$(ProjectDir)..\PopCameraDevice.Linux\Makefile:=$(RemoteProjectDir)</AdditionalSourcesToCopyMapping>
-      <Message>Copy makefile to remote</Message>
-    </PreBuildEvent>
+    <RemotePreBuildEvent />
+    <RemotePreBuildEvent />
+    <PreBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

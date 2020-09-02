@@ -58,18 +58,6 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyWave.cpp">
       <Filter>Source\SoyLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\KinectAzure.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\PopCameraDevice.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\TCameraDevice.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\TestDevice.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\smallsha1\sha1.cpp">
       <Filter>Source\SoyLib\smallsha1</Filter>
     </ClCompile>
@@ -81,6 +69,21 @@
     </ClCompile>
     <ClCompile Include="..\Source\SoyLib\src\SoyProtocol.cpp">
       <Filter>Source\SoyLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\KinectAzure.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PopCameraDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\PopOutputDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TCameraDevice.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TestDevice.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -105,14 +108,8 @@
     <Filter Include="Source\SoyLib\magic_enum\include">
       <UniqueIdentifier>{d72a2c5a-05e0-4809-8d98-45243131b501}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TestApp">
-      <UniqueIdentifier>{a35e8a5f-7f4c-426a-bef0-49ffd392583a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PopCameraDevice.Linux">
       <UniqueIdentifier>{87b21999-beb7-499a-8e18-93d2a7c4e4e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Libs">
-      <UniqueIdentifier>{2c777195-c051-45cb-8e31-2d447bc1b496}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -185,15 +182,6 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyWave.h">
       <Filter>Source\SoyLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TestDevice.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\KinectAzure.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\TCameraDevice.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\smallsha1\sha1.h">
       <Filter>Source\SoyLib\smallsha1</Filter>
     </ClInclude>
@@ -236,14 +224,23 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyImage.h">
       <Filter>Source\SoyLib</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\PopCameraDevice.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\SoyStream.h">
       <Filter>Source\SoyLib</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\SoyLib\src\SoyProtocol.h">
       <Filter>Source\SoyLib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\KinectAzure.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PopCameraDevice.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TCameraDevice.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TestDevice.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

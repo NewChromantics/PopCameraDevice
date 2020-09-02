@@ -60,10 +60,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <LibraryPath>/usr/lib/aarch64-linux-gnu/</LibraryPath>
   </PropertyGroup>
-   
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <RemotePreBuildEventUseInBuild>false</RemotePreBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\KinectAzure.cpp" />
     <ClCompile Include="..\Source\PopCameraDevice.cpp" />
+    <ClCompile Include="..\Source\PopOutputDevice.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\memheap.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\smallsha1\sha1.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyArray.cpp" />
@@ -143,9 +146,6 @@
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</DeploymentContent>
     </None>
   </ItemGroup>
-  
- 
-  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

@@ -276,6 +276,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
     </ClCompile>
     <Link />
     <Link />
