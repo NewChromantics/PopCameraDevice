@@ -74,11 +74,12 @@ void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixe
 		Soy::TScopeTimerPrint Timer("PopCameraDevice::TDevice::PushFrame Lock",5);
 		std::lock_guard<std::mutex> Lock(mFramesLock);
 
-		TFrame NewFrame;
+		std::shared_ptr<TFrame> pNewFrame( new TFrame );
+		auto& NewFrame = *pNewFrame;
 		NewFrame.mPixelBuffer = FramePixelBuffer;
 		NewFrame.mMeta = FrameMeta;
 		NewFrame.mFrameTime = FrameTime;
-		mFrames.PushBack(NewFrame);
+		mFrames.PushBack(pNewFrame);
 		
 		if (mFrames.GetSize() > mMaxFrameBuffers)
 		{
@@ -118,7 +119,7 @@ bool PopCameraDevice::TDevice::GetNextFrame(TFrame& Frame,bool DeleteFrame)
 	if (mFrames.IsEmpty())
 		return false;
 
-	Frame = mFrames[0];
+	Frame = *(mFrames[0]);
 	if (DeleteFrame)
 	{
 		mFrames.RemoveBlock(0, 1);

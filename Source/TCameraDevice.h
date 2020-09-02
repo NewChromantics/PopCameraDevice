@@ -51,6 +51,7 @@ public:
 class PopCameraDevice::TFrame
 {
 public:
+	//	on nvidia/linux, this seems to have some problems (seg fault) being copied
 	json11::Json::object			mMeta;
 	SoyTime							mFrameTime;
 	std::shared_ptr<TPixelBuffer>	mPixelBuffer;
@@ -83,7 +84,7 @@ public:
 private:
 	size_t			mCulledFrames = 0;	//	debug - running total of culled frames
 	std::mutex		mFramesLock;
-	Array<TFrame>	mFrames;		//	might be expensive to copy atm
-	size_t			mMaxFrameBuffers = 10;
+	Array<std::shared_ptr<TFrame>>	mFrames;		//	might be expensive to copy atm
+	size_t			mMaxFrameBuffers = 13;
 };
 
