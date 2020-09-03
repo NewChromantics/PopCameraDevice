@@ -662,7 +662,7 @@ int32_t PopCameraDevice::GetNextFrame(int32_t Instance, char* JsonBuffer, int32_
 		if ( !Device.GetNextFrame(Frame, DeleteFrame ) )
 			return PopCameraDevice::NoFrame;
 
-		auto Meta = Frame.mMeta;
+		auto Meta = Frame.GetMetaJson();
 
 		//	get extra meta
 		Device.GetDeviceMeta(Meta);

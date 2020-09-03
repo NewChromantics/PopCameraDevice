@@ -31,9 +31,22 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 	DebugPrint(OptionsJson);
 	
 	char ErrorBuffer[1024] = {};
-	auto Instance = PopCameraDevice_CreateCameraDevice(Name.c_str(), OptionsJson.c_str(), ErrorBuffer, std::size(ErrorBuffer));
+	int Instance = PopCameraDevice_CreateCameraDevice(Name.c_str(), OptionsJson.c_str(), ErrorBuffer, std::size(ErrorBuffer));
 	if (Instance <= 0)
 		throw std::runtime_error(std::string("Device failed to be created; ") + ErrorBuffer);
+
+	//	test callback
+	auto OnNewFrame = [](void* Meta)
+	{
+		auto* pInstance = (int*)Meta;
+		DebugPrint("New frame callback");
+		char MetaJson[1024];
+		PopCameraDevice_PeekNextFrame(*pInstance, MetaJson, std::size(MetaJson));
+		DebugPrint("New frame meta:");
+		DebugPrint(MetaJson);
+	};
+	PopCameraDevice_AddOnNewFrameCallback(Instance,OnNewFrame,&Instance);
+
 
 	//	we assume the test device instantly creates a first frame
 	int32_t FirstFrameTime = -1;
@@ -93,11 +106,14 @@ int main()
 	//	test device currently only pumps out one frame
 	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
 	
-	auto TestFrameCount = 100;
+	auto TestFrameCount = 200;
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
-	TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"SplitPlanes\":false,\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	
+	for ( auto i=0;	i<1000; i++ )
+		TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Yuv_8_88\",\"SplitPlanes\":false,\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"SplitPlanes\":false,\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	return 0;
 	TestDeviceInstance("Back Camera", "{\"Format\":\"avc1\"}", TestFrameCount);
 	TestDeviceInstance("Back Camera", "{\"Format\":\"Yuv_8_88\"}", TestFrameCount);
