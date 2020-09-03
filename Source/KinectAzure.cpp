@@ -45,6 +45,7 @@ namespace KinectAzure
 {
 	class TFrameReader;
 	class TPixelReader;
+	class TCaptureFrame;
 
 	void		IsOkay(k4a_result_t Error, const char* Context);
 	void		IsOkay(k4a_wait_result_t Error, const char* Context);
@@ -100,7 +101,7 @@ public:
 	~TFrameReader();
 
 protected:
-	virtual void		OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) = 0;
+	virtual void		OnFrame(TCaptureFrame& Frame) = 0;
 	virtual void		OnImuMoved() {}
 	virtual void		OnError(const char* Error) {}
 
@@ -129,6 +130,15 @@ private:
 };
 
 
+class KinectAzure::TCaptureFrame
+{
+public:
+	k4a_capture_t			mCapture;
+	k4a_imu_sample_t		mImu;
+	SoyTime					mTime;
+	k4a_calibration_t		mCalibration;
+	k4a_transformation_t	mDepthToImageTransform;
+};
 
 SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
 {
@@ -449,7 +459,7 @@ public:
 	~TPixelReader();
 
 private:
-	virtual void				OnFrame(const k4a_capture_t Frame, k4a_imu_sample_t Imu, SoyTime CaptureTime) override;
+	virtual void				OnFrame(TCaptureFrame& Frame) override;
 	virtual k4a_depth_mode_t	GetDepthMode() override { return mDepthMode; }
 	virtual k4a_colour_mode_t	GetColourMode() override { return mColourMode; }
 	virtual k4a_fps_t			GetFrameRate() override { return mFrameRate; }
@@ -969,16 +979,25 @@ bool KinectAzure::TFrameReader::HasImuMoved(k4a_imu_sample_t Imu)
 
 void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 {
-	//	keep copy for lifetime
-	//auto pDevice = mDevice;
-	if (!mDevice)
-		throw Soy::AssertException("TFrameReader::Iteration null device");
+	//	shutdown could null mDevice, and lock so we wanna grab any device stuff now, and let SDK
+	//	fail functions.
+	//	we could just copy mDevice, then this frame releases it, but better to ensure shutdown() releases it
+	//	we can't keep the lock all iteration, as OnFrame() could callback to the PopCameraDevice instances lock,
+	//	which whilst shutting down (when we need this lock) could be locked, so we get a deadlock
+	k4a_device_t Device = nullptr;
+	k4a_calibration_t Calibration = { 0 };
+	k4a_transformation_t DepthToImageTransform = { 0 };
+	{
+		//	quick fix for shutdown syncing (funcs in here refer to mDevice)
+		std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
+		if (!mDevice)
+			throw Soy::AssertException("TFrameReader::Iteration null device");
 
-	//	quick fix for shutdown syncing (funcs in here refer to mDevice)
-	std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
-
-	//auto& mTracker = mDevice->mTracker;
-	auto& Device = mDevice->mDevice;
+		//auto& mTracker = mDevice->mTracker;
+		Device = mDevice->mDevice;
+		Calibration = GetCalibration();
+		DepthToImageTransform = GetDepthToImageTransform();
+	}
 
 	k4a_capture_t Capture = nullptr;
 
@@ -1067,7 +1086,24 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		//	extract skeletons
 		if ( VerboseDebug )
 			std::Debug << "OnFrame start" << std::endl;
-		OnFrame(Capture, ImuSample, FrameCaptureTime);
+		TCaptureFrame CaptureFrame;
+		CaptureFrame.mCalibration = Calibration;
+		CaptureFrame.mCapture = Capture;
+		CaptureFrame.mImu = ImuSample;
+		CaptureFrame.mDepthToImageTransform = DepthToImageTransform;
+		CaptureFrame.mTime = FrameCaptureTime;
+
+		//	we can get a deadlock if the thread is waiting to shutdown, and the OnFrame callback results in
+		//	a call to the instances lock that called the shutdown, so skip if thread is stop[ping]
+		if (this->IsThreadRunning())
+		{
+			OnFrame(CaptureFrame);
+		}
+		else
+		{
+			std::Debug << "Skipping Capture frame callback as thread is stopping" << std::endl;
+		}
+
 		if ( VerboseDebug )
 			std::Debug << "OnFrame finished" << std::endl;
 
@@ -1180,8 +1216,14 @@ void GetMeta(k4a_calibration_camera_t Calibration, json11::Json::object& Json)
 	}
 }
 
-void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample_t Imu, SoyTime CaptureTime)
+
+void KinectAzure::TPixelReader::OnFrame(TCaptureFrame& CaptureFrame)
 {
+	auto& Frame = CaptureFrame.mCapture;
+	auto& Calibration = CaptureFrame.mCalibration;
+	auto& Imu = CaptureFrame.mImu;
+	auto& CaptureTime = CaptureFrame.mTime;
+
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
 	auto ColourImage = k4a_capture_get_color_image(Frame);
 	bool DepthIsAlignedToColour = false;
@@ -1209,7 +1251,7 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 	if (ColourImage && DepthImage)
 	{
 		auto ColourPixels = GetPixels(ColourImage);
-		auto Transform = this->GetDepthToImageTransform();
+		auto Transform = CaptureFrame.mDepthToImageTransform;
 		k4a_image_t TransformedDepthImage = nullptr;
 		auto Width = ColourPixels.GetWidth();
 		auto Height = ColourPixels.GetHeight();
@@ -1250,9 +1292,6 @@ void KinectAzure::TPixelReader::OnFrame(const k4a_capture_t Frame,k4a_imu_sample
 			std::Debug << __PRETTY_FUNCTION__ << " Frame had no depth or colour" << std::endl;
 		}
 
-		//	gr: GetDepthToImageTransform do we want this? if we have calibration for each, maybe it's not needed
-		auto Calibration = this->GetCalibration();
-		
 		if (DepthImage)
 			PushImage(DepthImage, Calibration.depth_camera_calibration);
 		if ( ColourImage )

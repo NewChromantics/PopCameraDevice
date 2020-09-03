@@ -531,16 +531,23 @@ uint32_t PopCameraDevice::CreateInstance(std::shared_ptr<TDevice> Device)
 
 void PopCameraDevice::FreeInstance(uint32_t Instance)
 {
-	std::lock_guard<std::mutex> Lock(InstancesLock);
-
-	auto InstanceIndex = Instances.FindIndex(Instance);
-	if ( InstanceIndex < 0 )
+	//	lock, pop, and destroy outside lock
+	TDeviceInstance InstanceCopy;
 	{
-		std::Debug << "No instance " << Instance << " to free" << std::endl;
-		return;
+		std::lock_guard<std::mutex> Lock(InstancesLock);
+
+		auto InstanceIndex = Instances.FindIndex(Instance);
+		if (InstanceIndex < 0)
+		{
+			std::Debug << "No instance " << Instance << " to free" << std::endl;
+			return;
+		}
+		InstanceCopy = Instances.PopAt(InstanceIndex);
 	}
 
-	Instances.RemoveBlock(InstanceIndex, 1);
+	//	actual destroy outside lock
+	//	gr: this line isn't needed, scope of Instance does it. But to aid debugging
+	InstanceCopy.mDevice.reset();
 }
 
 
