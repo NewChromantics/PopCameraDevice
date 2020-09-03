@@ -32,6 +32,7 @@
 #error Expected ENABLE_KINECTAZURE to be defined
 #endif
 
+static bool VerboseDebug = false;
 
 class k4a_colour_mode_t
 {
@@ -117,8 +118,11 @@ private:
 
 	void				Open();
 
-private:
+protected:
+	std::mutex								mDeviceLock;	//	to prevent nulling mDevice whilst in use
 	std::shared_ptr<KinectAzure::TDevice>	mDevice;
+
+private:
 	bool				mKeepAlive = false;
 	size_t				mDeviceIndex = 0;
 	vec3f				mLastAccell;			//	store accelleromter to detect movement & re-find floor plane
@@ -681,6 +685,7 @@ void KinectAzure::TDevice::Shutdown()
 	//k4abt_tracker_shutdown(mTracker);
 	//k4abt_tracker_destroy(mTracker);
 	k4a_device_close(mDevice);
+
 	mDevice = nullptr;
 }
 
@@ -857,8 +862,9 @@ void KinectAzure::IsOkay(k4a_buffer_result_t Error, const char* Context)
 	throw Soy::AssertException(ErrorString);
 }
 
+static int FrameReaderThreadCount = 0;
 KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
-	SoyThread		("TFrameReader"),
+	SoyThread		( std::string("TFrameReader ") + std::to_string(FrameReaderThreadCount++) ),
 	mDeviceIndex	( DeviceIndex ),
 	mKeepAlive		( KeepAlive )
 {
@@ -875,6 +881,7 @@ KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 
 KinectAzure::TFrameReader::~TFrameReader()
 {
+	std::Debug << "~TFrameReader" << std::endl;
 	try
 	{
 		this->Stop(true);
@@ -923,6 +930,10 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 
 		if (mKeepAlive)
 		{
+			//	quick fix for shutdown syncing (funcs in here refer to mDevice)
+			std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
+			if ( VerboseDebug )
+				std::Debug << "Reader clear mdevice" << std::endl;
 			//	close device and let next iteration reopen
 			mDevice.reset();
 		}
@@ -963,6 +974,9 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 	if (!mDevice)
 		throw Soy::AssertException("TFrameReader::Iteration null device");
 
+	//	quick fix for shutdown syncing (funcs in here refer to mDevice)
+	std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
+
 	//auto& mTracker = mDevice->mTracker;
 	auto& Device = mDevice->mDevice;
 
@@ -979,6 +993,8 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		* streaming data, and caller should stop the stream using k4a_device_stop_cameras().
 		*/
 	auto WaitError = k4a_device_get_capture(Device, &Capture, TimeoutMs);
+	if ( VerboseDebug )
+		std::Debug << "Got capture" << std::endl;
 	/*	gr: if we disconnect the device, we just get timeout, so we can't tell the difference
 	//		if timeout is high then we can assume its dead. so throw and let the system try and reconnect
 	if (WaitError == K4A_WAIT_RESULT_TIMEOUT)
@@ -997,6 +1013,8 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 
 	auto FreeCapture = [&]()
 	{
+		if ( VerboseDebug )
+			std::Debug << "Free capture" << std::endl;
 		k4a_capture_release(Capture);
 	};
 
@@ -1047,7 +1065,11 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		}
 	
 		//	extract skeletons
+		if ( VerboseDebug )
+			std::Debug << "OnFrame start" << std::endl;
 		OnFrame(Capture, ImuSample, FrameCaptureTime);
+		if ( VerboseDebug )
+			std::Debug << "OnFrame finished" << std::endl;
 
 		//	cleanup
 		FreeCapture();
@@ -1083,11 +1105,19 @@ SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
 
 KinectAzure::TPixelReader::~TPixelReader()
 {
+	if ( VerboseDebug )
+		std::Debug << "~TPixelReader" << std::endl;
 	//	we need to stop the thread here (before FrameReader destructor)
 	//	because as this class is destroyed, so is the virtual OnFrame func
 	//	which when called by the thread abort()s because we've destructed this class
 	try
 	{
+		this->Stop(false);
+		{
+			//	quick fix for shutdown syncing (funcs in here refer to mDevice)
+			std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
+			mDevice.reset();
+		}
 		this->Stop(true);
 	}
 	catch (std::exception& e)
