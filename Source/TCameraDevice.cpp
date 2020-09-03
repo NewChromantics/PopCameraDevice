@@ -3,6 +3,16 @@
 #include <magic_enum/include/magic_enum.hpp>
 #include "PopCameraDevice.h"
 
+
+
+json11::Json::object PopCameraDevice::TFrame::GetMetaJson()	
+{
+	std::string Error;
+	json11::Json Parsed = json11::Json::parse(mMeta,Error);
+	auto Object = Parsed.object_items();
+	return Object;
+}
+
 std::string PopCameraDevice::GetFormatString(SoyPixelsMeta Meta, size_t FrameRate)
 {
 	std::stringstream Format;
@@ -77,7 +87,7 @@ void PopCameraDevice::TDevice::PushFrame(std::shared_ptr<TPixelBuffer> FramePixe
 		std::shared_ptr<TFrame> pNewFrame( new TFrame );
 		auto& NewFrame = *pNewFrame;
 		NewFrame.mPixelBuffer = FramePixelBuffer;
-		NewFrame.mMeta = FrameMeta;
+		NewFrame.mMeta = json11::Json(FrameMeta).dump();
 		NewFrame.mFrameTime = FrameTime;
 		mFrames.PushBack(pNewFrame);
 		
@@ -119,7 +129,9 @@ bool PopCameraDevice::TDevice::GetNextFrame(TFrame& Frame,bool DeleteFrame)
 	if (mFrames.IsEmpty())
 		return false;
 
-	Frame = *(mFrames[0]);
+	auto pFrame0 = mFrames[0];
+	auto& Frame0 = *pFrame0;
+	Frame = Frame0;
 	if (DeleteFrame)
 	{
 		mFrames.RemoveBlock(0, 1);

@@ -48,13 +48,16 @@ public:
 	bool			mVerboseDebug = true;
 };
 
+
 class PopCameraDevice::TFrame
 {
 public:
 	//	on nvidia/linux, this seems to have some problems (seg fault) being copied
-	json11::Json::object			mMeta;
+	std::string						mMeta;
 	SoyTime							mFrameTime;
 	std::shared_ptr<TPixelBuffer>	mPixelBuffer;
+
+	json11::Json::object			GetMetaJson();
 };
 
 class PopCameraDevice::TDevice
