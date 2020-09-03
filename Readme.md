@@ -27,6 +27,7 @@ Kinect Azure
 	- `sudo apt install k4a-tools`
 	- `sudo ln /usr/lib/aarch64-linux-gnu/libk4a1.4/libdepthengine.so.2.0 /usr/lib/aarch64-linux-gnu/libk4a1.4/libdepthengine.so`
  	- enable headless mode `export DISPLAY=:0` otherwise we get error 204 from the depth engine (this is for opengl support)
+	- Allow SDK usage as non-root; `sudo curl https://raw.githubusercontent.com/microsoft/Azure-Kinect-Sensor-SDK/develop/scripts/99-k4a.rules /etc/udev/rules.d/./99-k4a.rules`
  
 - Windows
 	- We should be able to add packages.config to the project...
