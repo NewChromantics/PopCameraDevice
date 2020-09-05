@@ -96,7 +96,7 @@ int main()
 	PopCameraDevice_UnitTests();
 
 	DebugPrint("PopCameraDevice_EnumCameraDevicesJson");	
-	char EnumJson[1024*2];
+	char EnumJson[1024*10];
 	PopCameraDevice_EnumCameraDevicesJson(EnumJson, std::size(EnumJson));
 	
 	//	at least one of these should be the test device
@@ -110,6 +110,8 @@ int main()
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("Arkit Rear Depth", "{\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+		
 	
 	for ( auto i=0;	i<1000; i++ )
 		TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Yuv_8_88\",\"SplitPlanes\":false,\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);

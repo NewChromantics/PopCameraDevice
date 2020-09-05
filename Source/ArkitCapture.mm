@@ -22,13 +22,24 @@
 #endif
 
 
-@interface ARSessionProxy : NSObject <ARSessionDelegate>
+
+@interface ARSessionProxy : NSObject<ARSessionObserver,ARSCNViewDelegate,ARSessionDelegate>
 {
 	Arkit::TSession*	mParent;
 }
 
 - (id)initWithSession:(Arkit::TSession*)parent;
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame;
+
+- (void)session:(ARSession *)session didFailWithError:(NSError *)error;
+- (void)session:(ARSession *)session cameraDidChangeTrackingState:(ARCamera *)camera;
+- (void)sessionWasInterrupted:(ARSession *)session;
+- (void)sessionInterruptionEnded:(ARSession *)session;
+- (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session API_AVAILABLE(ios(11.3));
+- (void)session:(ARSession *)session didOutputAudioSampleBuffer:(CMSampleBufferRef)audioSampleBuffer;
+- (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data API_AVAILABLE(ios(13.0));
+- (void)session:(ARSession *)session didChangeGeoTrackingStatus:(ARGeoTrackingStatus*)geoTrackingStatus API_AVAILABLE(ios(14.0));
+
 
 @end
 
@@ -44,6 +55,9 @@ public:
 	std::function<void(ARFrame*)>	mOnFrame;
 	ObjcPtr<ARSessionProxy>			mSessionProxy;
 	ObjcPtr<ARSession>				mSession;
+
+	//	the test app sits on the main thread, so no frames were coming through
+	dispatch_queue_t				mQueue = nullptr;
 };
 
 
@@ -63,8 +77,58 @@ public:
 
 - (void)session:(ARSession *)session didUpdateFrame:(ARFrame *)frame
 {
-	mParent->OnFrame(frame);
+	try
+	{
+		mParent->OnFrame(frame);
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << " exception: " << e.what() << std::endl;
+	}
 }
+
+- (void)session:(ARSession *)session didFailWithError:(NSError *)error
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+- (void)session:(ARSession *)session cameraDidChangeTrackingState:(ARCamera *)camera
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+- (void)sessionWasInterrupted:(ARSession *)session
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+- (void)sessionInterruptionEnded:(ARSession *)session
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+- (BOOL)sessionShouldAttemptRelocalization:(ARSession *)session
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+	return true;
+}
+
+- (void)session:(ARSession *)session didOutputAudioSampleBuffer:(CMSampleBufferRef)audioSampleBuffer
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+- (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+- (void)session:(ARSession *)session didChangeGeoTrackingStatus:(ARGeoTrackingStatus*)geoTrackingStatus
+{
+	std::Debug << __PRETTY_FUNCTION__ << std::endl;
+}
+
+
 
 @end
 
@@ -98,8 +162,14 @@ Arkit::TSession::TSession(bool RearCamera)
 	mSessionProxy.Retain([[ARSessionProxy alloc] initWithSession:(this)]);
 	
 	mSession.Retain( [[ARSession alloc] init] );
-	mSession.mObject.delegate = mSessionProxy.mObject;
+	auto* Session = mSession.mObject;
 
+	id<ARSessionDelegate> Proxy = mSessionProxy.mObject;
+
+	mQueue = dispatch_queue_create( __PRETTY_FUNCTION__, NULL);
+		
+	Session.delegate = Proxy;
+	Session.delegateQueue = mQueue;
 	//	rear
 	//	ARWorldTrackingConfiguration
 	//	ARBodyTrackingConfiguration
@@ -115,21 +185,83 @@ Arkit::TSession::TSession(bool RearCamera)
 	
 	//	front camera
 	//	ARFaceTrackingConfiguration
+	auto WorldSupported = [ARWorldTrackingConfiguration isSupported];		
+	auto WorldSupportsMeshing = [ARWorldTrackingConfiguration supportsSceneReconstruction:ARSceneReconstructionMesh];
+	auto WorldSupportsMeshingWithClassification = [ARWorldTrackingConfiguration supportsSceneReconstruction:ARSceneReconstructionMeshWithClassification];
+	auto WorldSupportsFaceTracking = [ARWorldTrackingConfiguration supportsUserFaceTracking];
+	auto FrontSupported = [ARFaceTrackingConfiguration isSupported];		
+	auto BodyTrackingSupported = [ARBodyTrackingConfiguration isSupported];
 	
-	ARConfiguration* Configuration;
+	NSArray<ARVideoFormat *>* WorldVideoFormats = ARWorldTrackingConfiguration.supportedVideoFormats;
+
+	
+	std::Debug << "Rear supported=" << WorldSupported << std::endl;
+	std::Debug << "Rear SupportsMeshing=" << WorldSupportsMeshing << std::endl;
+	std::Debug << "Rear SupportsMeshingWithClassification=" << WorldSupportsMeshingWithClassification << std::endl;
+	std::Debug << "Rear SupportsFaceTracking=" << WorldSupportsFaceTracking << std::endl;
+	std::Debug << "FrontSupported=" << FrontSupported << std::endl;
+	std::Debug << "BodyTrackingSupported=" << BodyTrackingSupported << std::endl;
+
+	
+	ARConfiguration* Configuration = nullptr;
 	if ( RearCamera )
-		Configuration = [ARWorldTrackingConfiguration alloc];
+	{
+		auto* WorldConfig = [[ARWorldTrackingConfiguration alloc] init];
+		Configuration = WorldConfig;
+		
+		//	oo other format!
+		WorldConfig.wantsHDREnvironmentTextures = YES;	
+
+		//	on by default
+		WorldConfig.autoFocusEnabled = YES;
+
+		//	AREnvironmentTexturingNone, AREnvironmentTexturingManual, AREnvironmentTexturingAutomatic
+		WorldConfig.environmentTexturing = AREnvironmentTexturingAutomatic;
+		
+		//	enable various options
+		WorldConfig.planeDetection = ARPlaneDetectionHorizontal | ARPlaneDetectionVertical;
+		// NSSet<ARReferenceImage *> *detectionImages API_AVAILABLE(ios(11.3));
+
+		//	enable face tracking (not supported)
+		WorldConfig.userFaceTrackingEnabled = WorldSupportsFaceTracking;
+	
+		WorldConfig.lightEstimationEnabled = YES;
+		
+		//	WorldConfig.frameSemantics = ARFrameSemanticPersonSegmentationWithDepth | ARFrameSemanticSceneDepth | ARFrameSemanticBodyDetection;
+		
+		WorldConfig.worldAlignment = ARWorldAlignmentGravityAndHeading;
+		WorldConfig.worldAlignment = ARWorldAlignmentCamera;
+		WorldConfig.worldAlignment = ARWorldAlignmentGravity;
+		
+		WorldConfig.videoFormat = WorldVideoFormats[2];
+	}
 	else
-		Configuration = [ARFaceTrackingConfiguration alloc];
-	ARSessionRunOptions Options = 0;
+	{
+		Configuration = [[ARFaceTrackingConfiguration alloc] init];
+	}
+	ARSessionRunOptions Options = ARSessionRunOptionResetTracking;
 	//ARSessionRunOptionResetTracking
 	//ARSessionRunOptionRemoveExistingAnchors
-	[mSession runWithConfiguration:Configuration options:(Options)];
+	[Session runWithConfiguration:Configuration options:(Options)];
+	
+	auto* Frame = Session.currentFrame;
+	std::Debug << "Currentframe " << Frame << std::endl;
 }
 
 
 Arkit::TSession::~TSession()
 {
+	//	delete queue
+	if ( mQueue )
+	{
+#if !defined(ARC_ENABLED)
+		dispatch_release( mQueue );
+#endif
+		mQueue = nullptr;
+	}
+	
+	mSessionProxy.Release();
+	mSession.Release();
 }
 
 void Arkit::TSession::OnFrame(ARFrame* Frame)
@@ -521,6 +653,8 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	json11::Json::object Meta;
 	Avf::GetMeta( Frame, Meta );
 
+	//	gr: now we can handle multiple streams, just output anything we have
+
 	//	read specific pixels
 	switch( Source )
 	{
@@ -610,7 +744,10 @@ Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json
 	//	or if we have to have 1 global, restart it with new configuration
 	bool RearCameraSession = mSource == ArFrameSource::sceneDepth;
 	mSession.reset( new TSession(RearCameraSession) );
-	mSession->mOnFrame = [this](ARFrame* Frame)	{	this->OnFrame(Frame);	};
+	mSession->mOnFrame = [this](ARFrame* Frame)	
+	{	
+		this->OnFrame(Frame);	
+	};
 }
 
 void Arkit::TSessionCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
