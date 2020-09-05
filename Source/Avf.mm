@@ -24,8 +24,8 @@ vec2f Avf::GetMinMaxFrameRate(AVCaptureDeviceFormat* Format)
 	auto* FrameRateRanges = Format.videoSupportedFrameRateRanges;
 	auto EnumRange = [&](AVFrameRateRange* Range)
 	{
-		MinFrameRates.PushBack(Range.maxFrameRate);
-		MaxFrameRates.PushBack(Range.minFrameRate);
+		MinFrameRates.PushBack(Range.minFrameRate);
+		MaxFrameRates.PushBack(Range.maxFrameRate);
 	};
 	Platform::NSArray_ForEach<AVFrameRateRange*>(FrameRateRanges,EnumRange);
 	
