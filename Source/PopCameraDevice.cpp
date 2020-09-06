@@ -584,6 +584,13 @@ void CopyPlanes(ArrayBridge<SoyPixelsImpl*>&& PlaneSrcs,ArrayBridge<ArrayBridge<
 	
 	for (auto p = 0; p <PlaneSrcs.GetSize(); p++)
 	{
+		auto& PlaneSrc = *PlaneSrcs[p];
+		//	gr: get meta first, even if there's no buffer (for peek!)
+		auto PlaneMeta = PlaneSrc.GetMeta();
+		json11::Json::object PlaneMetaObject;
+		GetObjectJson(PlaneMetaObject, PlaneMeta);
+		PlaneMetas.push_back(PlaneMetaObject);
+	
 		//	is there a buffer for this plane?
 		if (p >= PlaneDsts.GetSize())
 			continue;
@@ -591,7 +598,6 @@ void CopyPlanes(ArrayBridge<SoyPixelsImpl*>&& PlaneSrcs,ArrayBridge<ArrayBridge<
 		if (!pPlaneDstArray)
 			continue;
 		
-		auto& PlaneSrc = *PlaneSrcs[p];
 		auto& PlaneSrcArray = PlaneSrc.GetPixelsArray();
 		auto& PlaneDstArray = *pPlaneDstArray;
 		
@@ -599,12 +605,6 @@ void CopyPlanes(ArrayBridge<SoyPixelsImpl*>&& PlaneSrcs,ArrayBridge<ArrayBridge<
 		//	copy as much as possible
 		auto PlaneSrcPixelsMin = GetRemoteArray(PlaneSrcArray.GetArray(), MaxSize);
 		PlaneDstArray.Copy(PlaneSrcPixelsMin);
-		
-		//	push meta
-		auto PlaneMeta = PlaneSrc.GetMeta();
-		json11::Json::object PlaneMetaObject;
-		GetObjectJson(PlaneMetaObject, PlaneMeta);
-		PlaneMetas.push_back(PlaneMetaObject);
 	}
 	JsonMeta["Planes"] = PlaneMetas;
 }
