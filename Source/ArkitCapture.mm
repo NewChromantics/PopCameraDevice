@@ -9,6 +9,8 @@
 #define ENABLE_IOS13    (__IPHONE_OS_VERSION_MAX_ALLOWED >= 130000)
 #define ENABLE_IOS12   (__IPHONE_OS_VERSION_MAX_ALLOWED >= 120000)
 
+#pragma warning ARKit sdk __IPHONE_OS_VERSION_MIN_REQUIRED
+
 #if ENABLE_IOS12
 #pragma message("IOS 12")
 #endif
@@ -654,55 +656,28 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	Avf::GetMeta( Frame, Meta );
 
 	//	gr: now we can handle multiple streams, just output anything we have
+	if ( Frame.capturedImage )
+		PushFrame( Frame.capturedImage, FrameTime, Meta );
 
-	//	read specific pixels
-	switch( Source )
-	{
-		case ArFrameSource::capturedImage:
-			PushFrame( Frame.capturedImage, FrameTime, Meta );
-			return;
+	if ( Frame.capturedDepthData )
+		PushFrame( Frame.capturedDepthData, CapDepthTime, Meta );
 			
-		case ArFrameSource::capturedDepthData:
-			PushFrame( Frame.capturedDepthData, CapDepthTime, Meta );
-			return;
-			
-#pragma warning ARKit sdk __IPHONE_OS_VERSION_MIN_REQUIRED
-
-		case ArFrameSource::segmentationBuffer:
 #if ENABLE_IOS13
-			PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta );
-#else
-			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::to_string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
-#pragma warning Compiling without ARFrame segmentationBuffer __IPHONE_OS_VERSION_MIN_REQUIRED
+	if ( Frame.segmentationBuffer )
+		PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta );
 #endif
-			return;
 			
-		case ArFrameSource::sceneDepth:
 #if ENABLE_IOS14
-			Avf::GetMeta( Frame.sceneDepth, Meta );
+	if ( Frame.sceneDepth )
+	{
+		Avf::GetMeta( Frame.sceneDepth, Meta );
+		if ( Frame.sceneDepth.depthMap )
 			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta );
-#else
-#pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
-			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::to_string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
-#endif
-			return;
 
-		case ArFrameSource::sceneDepthConfidence:
-#if ENABLE_IOS14
-			Avf::GetMeta( Frame.sceneDepth, Meta );
+		if ( Frame.sceneDepth.confidenceMap )
 			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta );
-#else
-#pragma warning Compiling without ARFrame SceneDepth __IPHONE_OS_VERSION_MIN_REQUIRED
-			throw Soy::AssertException(std::string("SegmentationBuffer requested, but library built against SDK 13 > ") + std::to_string(__IPHONE_OS_VERSION_MIN_REQUIRED) );
-#endif
-			return;
-
-		default:break;
 	}
-	
-	std::stringstream Debug;
-	Debug << __PRETTY_FUNCTION__ << " unhandled source type " << Source;
-	throw Soy::AssertException(Debug);
+#endif
 }
 
 void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta)
