@@ -105,6 +105,31 @@ public static class PopCameraDevice
 		public List<DeviceMeta> Devices;
 	};
 	
+	[System.Serializable]
+	public class DeviceParams
+	{
+		//	these are all optional in the API (if passed with a raw json string)
+		//	but in c# we want to document all availible options
+		//	todo: constructor with custom struct isntead of this default one
+		public bool		SkipFrames = true;
+		public int		FrameRate = 30;
+		public string	Format = "Yuv_8_88";		//	see Pop.PixelFormat
+		public string	DepthFormat = "Depth16mm";	//	see Pop.PixelFormat
+		public bool		Debug = false;
+		public bool		SplitPlanes = true;
+		
+		//	arkit
+		public bool		HdrColour = false;
+		public bool		AutoFocus = true;
+		public bool		PlaneTracking = true;
+		public bool		FaceTracking = false;
+		public bool		LightEstimation = false;
+		public bool		BodyTracking = false;
+		public bool		Segmentation = false;
+		public bool		ResetTracking = false;
+		public bool		ResetAnchors = false;
+	};
+
 
 	static public string GetString(byte[] Ascii)
 	{
@@ -133,12 +158,13 @@ public static class PopCameraDevice
 		List<byte[]> PlaneCaches;
 		byte[] UnusedBuffer = new byte[1];
 
-		public Device(string DeviceName,string Format="")
+		public Device(string DeviceName,DeviceParams Params=null)
 		{
+			var ParamsJson = (Params==null) ? "{}" : JSONUtility.stringify(Params);
 			var DeviceNameAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(DeviceName+"\0");
-			var FormatAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(Format + "\0");
+			var ParamsJsonAscii = System.Text.ASCIIEncoding.ASCII.GetBytes(ParamsJson + "\0");
 			var ErrorBuffer = new byte[100];
-			Instance = PopCameraDevice_CreateCameraDeviceWithFormat(DeviceNameAscii, FormatAscii, ErrorBuffer, ErrorBuffer.Length);
+			Instance = PopCameraDevice_CreateCameraDevice(DeviceNameAscii, ParamsJsonAscii, ErrorBuffer, ErrorBuffer.Length);
 			var Error = GetString(ErrorBuffer);
 			if ( Instance.Value <= 0 )
 				throw new System.Exception("Failed to create Camera device with name " + DeviceName + "; " + Error);
