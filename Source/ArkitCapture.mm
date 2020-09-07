@@ -590,8 +590,8 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 		Meta["LocalToWorld"] = LocalToWorld;
 	
 	Meta["LocalEulerRadians"] = LocalEulerRadians;
-	Meta["Tracking"] = Tracking;
-	Meta["TrackingStateReason"] = TrackingStateReason;
+	Meta["Tracking"] = std::string(Tracking);	//	json11 can't do string_view atm
+	Meta["TrackingStateReason"] = TrackingStateReason;	//	json11 can't do string_view atm
 	Meta["Intrinsics"] = Intrinsics;
 	//	write out original resolution to match Intrinsics matrix in case image gets resized
 	Meta["IntrinsicsCameraResolution"] = CameraResolution;
