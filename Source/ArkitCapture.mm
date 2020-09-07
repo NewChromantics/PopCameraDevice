@@ -785,11 +785,11 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 		PushFrame( Frame.capturedImage, FrameTime, Meta );
 
 	if ( Frame.capturedDepthData )
-		PushFrame( Frame.capturedDepthData, CapDepthTime, Meta );
+		PushFrame( Frame.capturedDepthData, CapDepthTime, Meta, "CapturedDepthData" );
 			
 #if ENABLE_IOS13
 	if ( Frame.segmentationBuffer )
-		PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta );
+		PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta, "SegmentationBuffer" );
 #endif
 			
 #if ENABLE_IOS14
@@ -797,34 +797,43 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	{
 		Avf::GetMeta( Frame.sceneDepth, Meta );
 		if ( Frame.sceneDepth.depthMap )
-			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta );
+			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta, "SceneDepthMap" );
 
 		if ( Frame.sceneDepth.confidenceMap )
-			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta );
+			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta, "SceneDepthConfidence" );
 	}
 #endif
 }
 
-void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta)
+void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName)
 {
 	Soy::TScopeTimerPrint Timer("PushFrame(AVDepthData",5);
 	auto DepthPixels = Avf::GetDepthPixelBuffer(DepthData);
 	
 	Avf::GetMeta( DepthData, Meta );
-	PushFrame( DepthPixels, Timestamp, Meta );
+	PushFrame( DepthPixels, Timestamp, Meta, StreamName );
 }
 
 
 
-void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta)
+void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName)
 {
 	Soy::TScopeTimerPrint Timer("PushFrame(CVPixelBufferRef",5);
 	float3x3 Transform;
 	auto DoRetain = true;
 	std::shared_ptr<AvfDecoderRenderer> Renderer;
-	
 	std::shared_ptr<TPixelBuffer> Buffer( new CVPixelBuffer( PixelBuffer, DoRetain, Renderer, Transform ) );
-	PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, Meta );
+	
+	if ( StreamName )
+	{
+		json11::Json::object MetaCopy = Meta;
+		MetaCopy["StreamName"] = StreamName;
+		PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, MetaCopy );
+	}
+	else
+	{
+		PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, Meta );
+	}
 }
 
 

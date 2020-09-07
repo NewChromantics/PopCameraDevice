@@ -74,9 +74,9 @@ class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 public:
 	TFrameDevice(json11::Json& Options);
 	
-	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta);
-	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
-	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
+	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName=nullptr);
+	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName=nullptr);
+	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName=nullptr);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
 	
 	TCaptureParams	mParams;
