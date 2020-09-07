@@ -189,6 +189,9 @@ Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetBool( POPCAMERADEVICE_KEY_ENABLESEGMENTATION, mEnablePersonSegmentation );
 	SetBool( POPCAMERADEVICE_KEY_RESETTRACKING, mResetTracking );
 	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
+	SetBool( POPCAMERADEVICE_KEY_FEATURES, mOutputFeatures );
+	SetBool( POPCAMERADEVICE_KEY_DEPTHCONFIDENCE, mOutputSceneDepthConfidence );
+	
 
 	//	probably don't need this to be seperate
 	mEnablePlanesVert = mEnablePlanesHorz;
@@ -800,7 +803,8 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta, "SceneDepthMap" );
 
 		if ( Frame.sceneDepth.confidenceMap )
-			PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta, "SceneDepthConfidence" );
+			if ( mParams.mOutputSceneDepthConfidence )
+				PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta, "SceneDepthConfidence" );
 	}
 #endif
 }
