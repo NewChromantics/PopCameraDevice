@@ -15,7 +15,8 @@ namespace Arkit
 	class TFrameProxyDevice;	//	device which doesn't own/open any sessions, but you can pass in an ARFrame externally (ie. unity) and pull out frames on demand
 	class TFrameDevice;			//	base class for ARFrame
 	class TSessionCamera;		//	arkit session which reads a certain source
-
+	class TCaptureParams;
+	
 	namespace ArFrameSource
 	{
 		enum Type
@@ -45,6 +46,25 @@ namespace Arkit
 }
 
 
+class Arkit::TCaptureParams
+{
+public:
+	TCaptureParams(json11::Json& Options);
+
+	bool	mHdrColour = false;	//	maybe should be a pixel format
+	bool	mEnableAutoFocus = true;
+	bool	mEnablePlanesHorz = true;
+	bool	mEnablePlanesVert = true;
+	bool	mEnableFaceTracking = true;
+	bool	mEnableLightEstimation = true;
+	bool	mEnableBodyDetection = false;	//	body+scene not allowed, so this is off by default
+	bool	mEnableSceneDepth = false;		//	should this be depthformat != null?
+	bool	mEnablePersonSegmentation = true;
+	bool	mResetTracking = false;	//	on start
+	bool	mResetAnchors = false;	//	on start
+	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
+	//	todo: colour format
+};
 
 
 

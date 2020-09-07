@@ -3,6 +3,7 @@
 #include "SoyAvf.h"
 #import <ARKit/ARKit.h>
 #include "Json11/json11.hpp"
+#include "PopCameraDevice.h"
 
 //  gr: make this a proper check, quickly disabling for build here
 #define ENABLE_IOS14    (__IPHONE_OS_VERSION_MAX_ALLOWED >= 140000)
@@ -49,7 +50,7 @@
 class Arkit::TSession
 {
 public:
-	TSession(bool RearCamera);
+	TSession(bool RearCamera,TCaptureParams& Params);
 	~TSession();
 	
 	void				OnFrame(ARFrame* Frame);
@@ -135,6 +136,70 @@ public:
 @end
 
 
+Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
+{
+	auto SetInt = [&](const char* Name,size_t& ValueUnsigned)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_number() )
+			return false;
+		auto Value = Handle.int_value();
+		if ( Value < 0 )
+		{
+			std::stringstream Error;
+			Error << "Value for " << Name << " is " << Value << ", not expecting negative";
+			throw Soy::AssertException(Error);
+		}
+		ValueUnsigned = Value;
+		return true;
+	};
+	auto SetBool = [&](const char* Name,bool& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_bool() )
+			return false;
+		Value = Handle.bool_value();
+		return true;
+	};
+	auto SetString = [&](const char* Name,std::string& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_string() )
+			return false;
+		Value = Handle.string_value();
+		return true;
+	};
+
+	auto SetPixelFormat = [&](const char* Name,SoyPixelsFormat::Type& Value)
+	{
+		std::string EnumString;
+		if ( !SetString(Name,EnumString) )
+			return false;
+		
+		Value = SoyPixelsFormat::Validate(EnumString);
+		return true;
+	};
+
+	SetBool( POPCAMERADEVICE_KEY_HDRCOLOUR, mHdrColour );
+	SetBool( POPCAMERADEVICE_KEY_ENABLEAUTOFOCUS, mEnableAutoFocus );
+	SetBool( POPCAMERADEVICE_KEY_ENBALEPLANETRACKING, mEnablePlanesHorz );
+	SetBool( POPCAMERADEVICE_KEY_ENABLEFACETRACKING, mEnableFaceTracking );
+	SetBool( POPCAMERADEVICE_KEY_ENABLELIGHTESTIMATION, mEnableLightEstimation );
+	SetBool( POPCAMERADEVICE_KEY_ENABLEBODYTRACKING, mEnableBodyDetection );
+	SetBool( POPCAMERADEVICE_KEY_ENABLESEGMENTATION, mEnablePersonSegmentation );
+	SetBool( POPCAMERADEVICE_KEY_RESETTRACKING, mResetTracking );
+	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
+
+	//	probably don't need this to be seperate
+	mEnablePlanesVert = mEnablePlanesHorz;
+
+	//	any format = enable	
+	auto DepthFormat = SoyPixelsFormat::Invalid;
+	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, DepthFormat );
+	mEnableSceneDepth = ( DepthFormat != SoyPixelsFormat::Invalid );
+	
+	SetPixelFormat( POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
+}
 
 void Arkit::EnumDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> EnumName)
 {
@@ -159,7 +224,7 @@ void Arkit::EnumDevices(std::function<void(const std::string&,ArrayBridge<std::s
 }
 
 
-Arkit::TSession::TSession(bool RearCamera)
+Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params)
 {
 	mSessionProxy.Retain([[ARSessionProxy alloc] initWithSession:(this)]);
 	
@@ -212,39 +277,59 @@ Arkit::TSession::TSession(bool RearCamera)
 		Configuration = WorldConfig;
 		
 		//	oo other format!
-		WorldConfig.wantsHDREnvironmentTextures = YES;	
+		WorldConfig.wantsHDREnvironmentTextures = Params.mHdrColour;	
 
 		//	on by default
-		WorldConfig.autoFocusEnabled = YES;
+		WorldConfig.autoFocusEnabled = Params.mEnableAutoFocus;
 
+		//	gr: does this need to be if colourformat != null ?
 		//	AREnvironmentTexturingNone, AREnvironmentTexturingManual, AREnvironmentTexturingAutomatic
 		WorldConfig.environmentTexturing = AREnvironmentTexturingAutomatic;
 		
 		//	enable various options
-		WorldConfig.planeDetection = ARPlaneDetectionHorizontal | ARPlaneDetectionVertical;
+		WorldConfig.planeDetection = ARPlaneDetectionNone;
+		if ( Params.mEnablePlanesHorz )
+			WorldConfig.planeDetection |= ARPlaneDetectionHorizontal;
+		if ( Params.mEnablePlanesVert )
+			WorldConfig.planeDetection |= ARPlaneDetectionVertical;
+			
 		// NSSet<ARReferenceImage *> *detectionImages API_AVAILABLE(ios(11.3));
 
 		//	enable face tracking (not supported)
-		WorldConfig.userFaceTrackingEnabled = WorldSupportsFaceTracking;
+		WorldConfig.userFaceTrackingEnabled = Params.mEnableFaceTracking && WorldSupportsFaceTracking;
 	
-		WorldConfig.lightEstimationEnabled = YES;
+		WorldConfig.lightEstimationEnabled = Params.mEnableLightEstimation;
 		
-		//	WorldConfig.frameSemantics = ARFrameSemanticPersonSegmentationWithDepth | ARFrameSemanticSceneDepth | ARFrameSemanticBodyDetection;
+		WorldConfig.frameSemantics = ARFrameSemanticNone;
+		if ( Params.mEnableBodyDetection )
+			WorldConfig.frameSemantics |= ARFrameSemanticBodyDetection;
+		if ( Params.mEnableSceneDepth )
+			WorldConfig.frameSemantics |= ARFrameSemanticSceneDepth;
+		if ( Params.mEnablePersonSegmentation )
+			WorldConfig.frameSemantics |= ARFrameSemanticPersonSegmentation;
 		
 		WorldConfig.worldAlignment = ARWorldAlignmentGravityAndHeading;
 		WorldConfig.worldAlignment = ARWorldAlignmentCamera;
 		WorldConfig.worldAlignment = ARWorldAlignmentGravity;
 		
+		//	todo: use colour format
 		WorldConfig.videoFormat = WorldVideoFormats[2];
 	}
 	else
 	{
 		Configuration = [[ARFaceTrackingConfiguration alloc] init];
 	}
-	ARSessionRunOptions Options = ARSessionRunOptionResetTracking;
-	//ARSessionRunOptionResetTracking
-	//ARSessionRunOptionRemoveExistingAnchors
-	[Session runWithConfiguration:Configuration options:(Options)];
+	
+	ARSessionRunOptions Options = 0;
+	if ( Params.mResetTracking )
+		Options |= ARSessionRunOptionResetTracking;
+	if ( Params.mResetAnchors )
+		Options |= ARSessionRunOptionRemoveExistingAnchors;
+
+	if ( Options == 0 )
+		[Session runWithConfiguration:Configuration];
+	else
+		[Session runWithConfiguration:Configuration options:(Options)];
 	
 	auto* Frame = Session.currentFrame;
 	std::Debug << "Currentframe " << Frame << std::endl;
@@ -472,9 +557,25 @@ namespace Avf
 	}
 }
 
+bool IsIdentity(simd_float4x4 Matrix)
+{
+	static const simd_float4x4 Identity = 
+	{
+		.columns[0]={1,0,0,0},
+		.columns[1]={0,1,0,0},
+		.columns[2]={0,0,1,0},
+		.columns[3]={0,0,0,1} 
+	};
+	for ( int c=0;	c<std::size(Matrix.columns);	c++ )
+		for ( int r=0;	r<4;	r++ )
+			if ( Matrix.columns[c][r] != Identity.columns[c][r] )
+				return false;
+	return true;
+}
 
 void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 {
+
 	//	"rotation and translation in world space"
 	//	so camera to world?
 	auto LocalToWorld = GetJsonArray(Camera.transform);
@@ -484,11 +585,16 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	auto Intrinsics = GetJsonArray(Camera.intrinsics);
 	auto CameraResolution = GetJsonArray(Camera.imageResolution);
 	
-	Meta["LocalToWorld"] = LocalToWorld;
+	//	skip transform if it's identity rather than write out bad data
+	if ( IsIdentity(Camera.transform) )
+		Meta["LocalToWorld"] = LocalToWorld;
+	
 	Meta["LocalEulerRadians"] = LocalEulerRadians;
 	Meta["Tracking"] = Tracking;
 	Meta["TrackingStateReason"] = TrackingStateReason;
 	Meta["Intrinsics"] = Intrinsics;
+	//	write out original resolution to match Intrinsics matrix in case image gets resized
+	Meta["IntrinsicsCameraResolution"] = CameraResolution;
 }
 
 
@@ -714,11 +820,23 @@ Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json
 	else
 		throw Soy::AssertException( DeviceName + std::string(" is unhandled ARKit session camera name"));
 
+	//	todo; get capabilities and reject params here
+	TCaptureParams Param(Options);
+
 	//	here we may need to join an existing session
 	//	or create one with specific configuration
 	//	or if we have to have 1 global, restart it with new configuration
 	bool RearCameraSession = mSource == ArFrameSource::sceneDepth;
-	mSession.reset( new TSession(RearCameraSession) );
+	@try
+	{
+		mSession.reset( new TSession(RearCameraSession,Param) );
+	}
+	@catch (NSException* e)
+	{
+		std::stringstream Debug;
+		Debug << "NSException " << Soy::NSErrorToString( e );
+		throw Soy::AssertException(Debug);
+	}
 	mSession->mOnFrame = [this](ARFrame* Frame)	
 	{	
 		this->OnFrame(Frame);	

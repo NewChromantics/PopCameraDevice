@@ -31,6 +31,17 @@
 #define POPCAMERADEVICE_KEY_DEBUG		"Debug"			//	extra verbose debug output
 #define POPCAMERADEVICE_KEY_SPLITPLANES	"SplitPlanes"	//	by default we split YUV formats into multiple planes
 
+//	ARKit options
+#define POPCAMERADEVICE_KEY_HDRCOLOUR				"HdrColour"		//	probably wants to be a specific colour format
+#define POPCAMERADEVICE_KEY_ENABLEAUTOFOCUS			"AutoFocus"
+#define POPCAMERADEVICE_KEY_ENBALEPLANETRACKING		"PlaneTracking"
+#define POPCAMERADEVICE_KEY_ENABLEFACETRACKING		"FaceTracking"
+#define POPCAMERADEVICE_KEY_ENABLELIGHTESTIMATION	"LightEstimation"
+#define POPCAMERADEVICE_KEY_ENABLEBODYTRACKING		"BodyTracking"
+#define POPCAMERADEVICE_KEY_ENABLESEGMENTATION		"Segmentation"	//	person segmentation in arkit
+#define POPCAMERADEVICE_KEY_RESETTRACKING			"ResetTracking"
+#define POPCAMERADEVICE_KEY_RESETANCHORS			"ResetAnchors"
+
 //	function pointer type for new frame callback
 typedef void PopCameraDevice_OnNewFrame(void* Meta);
 
