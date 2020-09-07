@@ -42,6 +42,7 @@
 #define POPCAMERADEVICE_KEY_ENABLESEGMENTATION		"Segmentation"	//	person segmentation in arkit
 #define POPCAMERADEVICE_KEY_RESETTRACKING			"ResetTracking"
 #define POPCAMERADEVICE_KEY_RESETANCHORS			"ResetAnchors"
+#define POPCAMERADEVICE_KEY_FEATURES				"Features"		//	option to not output features as they start to make the meta huge (1000's). Consider a pixel output for features
 
 //	function pointer type for new frame callback
 typedef void PopCameraDevice_OnNewFrame(void* Meta);

@@ -429,7 +429,7 @@ class ARSkeleton2D
 
 namespace Avf
 {
-	void	GetMeta(ARFrame* Frame,json11::Json::object& Meta);
+	void	GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParams& Params);
 	void	GetMeta(AVDepthData* Depth,json11::Json::object& Meta);
 	void	GetMeta(ARCamera* Camera,json11::Json::object& Meta);
 	void	GetMeta(ARDepthData* Camera,json11::Json::object& Meta);
@@ -623,7 +623,7 @@ json11::Json::object Avf::GetSkeleton(ARSkeleton2D* Skeleton)
 	return SkeletonJson;
 }
 	
-void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
+void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParams& Params)
 {
 	if ( !Frame )
 		return;
@@ -672,24 +672,29 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta)
 	{
 		//	write all positions and their 64 bit id's (as string)
 		auto* PointCloud = Frame.rawFeaturePoints;
-		json11::Json::array PositionArray;
-		json11::Json::array UidArray;
-		for ( auto i=0;	i<PointCloud.count;	i++ )
-		{
-			auto& Uid64 = PointCloud.identifiers[i];
-			auto& Pos3 = PointCloud.points[i];
-			auto UidString = std::to_string(Uid64);
-			PositionArray.push_back(Pos3[0]);
-			PositionArray.push_back(Pos3[1]);
-			PositionArray.push_back(Pos3[2]);
-			UidArray.push_back(UidString);
+		Meta["FeatureCount"] = static_cast<int>(PointCloud.count);
+		
+		if ( Params.mOutputFeatures )
+		{	
+			json11::Json::array PositionArray;
+			json11::Json::array UidArray;
+			for ( auto i=0;	i<PointCloud.count;	i++ )
+			{
+				auto& Uid64 = PointCloud.identifiers[i];
+				auto& Pos3 = PointCloud.points[i];
+				auto UidString = std::to_string(Uid64);
+				PositionArray.push_back(Pos3[0]);
+				PositionArray.push_back(Pos3[1]);
+				PositionArray.push_back(Pos3[2]);
+				UidArray.push_back(UidString);
+			}
+			json11::Json::object Features =
+			{
+				{"Positions",PositionArray},
+				{"Uids",UidArray}
+			};
+			Meta["Features"] = Features;
 		}
-		json11::Json::object Features =
-		{
-			{"Positions",PositionArray},
-			{"Uids",UidArray}
-		};
-		Meta["Features"] = Features;
 	}
 	
 
@@ -751,15 +756,29 @@ void Avf::GetMeta(ARDepthData* Depth,json11::Json::object& Meta)
 	//	no meta here!
 }
 
+
+Arkit::TFrameDevice::TFrameDevice(json11::Json& Options) : 
+	TDevice	( Options ),
+	mParams	( Options )
+{
+	//	todo; get capabilities and reject params here
+}
+
+
 void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 {
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
 	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
 
+	//	todo: allow user to specify params here with json
+	json11::Json JsonOptions;
+	TCaptureParams Params(JsonOptions);
+	Params.mOutputFeatures = false;
+
 	//	get meta out of the ARFrame
 	json11::Json::object Meta;
-	Avf::GetMeta( Frame, Meta );
+	Avf::GetMeta( Frame, Meta, Params );
 
 	//	gr: now we can handle multiple streams, just output anything we have
 	if ( Frame.capturedImage )
@@ -810,6 +829,8 @@ void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timesta
 
 
 
+
+
 Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json& Options) :
 	TFrameDevice	( Options )
 {
@@ -820,16 +841,14 @@ Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json
 	else
 		throw Soy::AssertException( DeviceName + std::string(" is unhandled ARKit session camera name"));
 
-	//	todo; get capabilities and reject params here
-	TCaptureParams Param(Options);
-
+	
 	//	here we may need to join an existing session
 	//	or create one with specific configuration
 	//	or if we have to have 1 global, restart it with new configuration
 	bool RearCameraSession = mSource == ArFrameSource::sceneDepth;
 	@try
 	{
-		mSession.reset( new TSession(RearCameraSession,Param) );
+		mSession.reset( new TSession(RearCameraSession,mParams) );
 	}
 	@catch (NSException* e)
 	{

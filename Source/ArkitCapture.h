@@ -63,6 +63,7 @@ public:
 	bool	mResetTracking = false;	//	on start
 	bool	mResetAnchors = false;	//	on start
 	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
+	bool	mOutputFeatures = false;	//	these get huge in quantity, so explicitly enable
 	//	todo: colour format
 };
 
@@ -71,12 +72,14 @@ public:
 class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 {
 public:
-	TFrameDevice(json11::Json& Options) : TDevice	( Options )	{}
+	TFrameDevice(json11::Json& Options);
 	
 	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta);
 	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
 	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
+	
+	TCaptureParams	mParams;
 };
 
 
