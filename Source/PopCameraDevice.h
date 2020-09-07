@@ -22,6 +22,7 @@
 //	2.1.4	Added KinectAzure meta, now propogating properly out
 //	2.1.7	PopCameraDevice_CreateCameraDevice is now the prefered instantiator with JSON options
 //	2.2.0	Removed PopCameraDevice_CreateCameraDeviceWithFormat
+//	2.2.4	Added Arkit options
 
 #define POPCAMERADEVICE_KEY_SKIPFRAMES	"SkipFrames"
 #define POPCAMERADEVICE_KEY_FRAMERATE	"FrameRate"
