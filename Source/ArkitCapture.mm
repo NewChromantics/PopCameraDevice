@@ -589,7 +589,7 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	auto CameraResolution = GetJsonArray(Camera.imageResolution);
 	
 	//	skip transform if it's identity rather than write out bad data
-	if ( IsIdentity(Camera.transform) )
+	if ( !IsIdentity(Camera.transform) )
 		Meta["LocalToWorld"] = LocalToWorld;
 	
 	Meta["LocalEulerRadians"] = LocalEulerRadians;
@@ -597,6 +597,7 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	Meta["TrackingStateReason"] = TrackingStateReason;	//	json11 can't do string_view atm
 	Meta["Intrinsics"] = Intrinsics;
 	//	write out original resolution to match Intrinsics matrix in case image gets resized
+	//	gr: convert to normalised projection matrix here!
 	Meta["IntrinsicsCameraResolution"] = CameraResolution;
 }
 
