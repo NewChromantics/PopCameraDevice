@@ -108,6 +108,7 @@ protected:
 	//	as we keep-alive, we need to know these modes
 	virtual k4a_depth_mode_t	GetDepthMode() = 0;
 	virtual k4a_colour_mode_t	GetColourMode() = 0;
+	bool						IsExpectingDepthAndColour();
 	virtual k4a_fps_t			GetFrameRate() = 0;
 	k4a_calibration_t			GetCalibration() { return mDevice->mCalibration; }
 	k4a_transformation_t		GetDepthToImageTransform() { return mDevice->GetDepthToImageTransform(); }
@@ -133,11 +134,11 @@ private:
 class KinectAzure::TCaptureFrame
 {
 public:
-	k4a_capture_t			mCapture;
-	k4a_imu_sample_t		mImu;
+	k4a_capture_t			mCapture = nullptr;
+	k4a_imu_sample_t		mImu = { 0 };
 	SoyTime					mTime;
-	k4a_calibration_t		mCalibration;
-	k4a_transformation_t	mDepthToImageTransform;
+	k4a_calibration_t		mCalibration = { 0 };
+	k4a_transformation_t	mDepthToImageTransform = nullptr;
 };
 
 SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
@@ -873,6 +874,7 @@ void KinectAzure::IsOkay(k4a_buffer_result_t Error, const char* Context)
 }
 
 static int FrameReaderThreadCount = 0;
+
 KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
 	SoyThread		( std::string("TFrameReader ") + std::to_string(FrameReaderThreadCount++) ),
 	mDeviceIndex	( DeviceIndex ),
@@ -954,6 +956,16 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 	}
 	return true;
 }
+
+bool KinectAzure::TFrameReader::IsExpectingDepthAndColour()
+{
+	auto Colour = GetColourMode();
+	auto Depth = GetDepthMode();
+	auto HasDepth = (Depth != K4A_DEPTH_MODE_OFF);
+	auto HasColour = (Colour.resolution != K4A_COLOR_RESOLUTION_OFF);
+	return HasDepth && HasColour;
+}
+
 
 bool KinectAzure::TFrameReader::HasImuMoved(k4a_imu_sample_t Imu)
 {
@@ -1227,6 +1239,22 @@ void KinectAzure::TPixelReader::OnFrame(TCaptureFrame& CaptureFrame)
 	auto DepthImage = k4a_capture_get_depth_image(Frame);
 	auto ColourImage = k4a_capture_get_color_image(Frame);
 	bool DepthIsAlignedToColour = false;
+
+	//	gr: we had a problem where we got depth with no colour, so was full res
+	//		then subsequent frames were resized, or went back and forth
+	auto ExpectingDepthAndColour = IsExpectingDepthAndColour();
+	if (ExpectingDepthAndColour)
+	{
+		if (DepthImage && ColourImage)
+		{
+
+		}
+		else
+		{
+			throw Soy::AssertException("Skipping frame as we require depth and colour");
+		}
+	}
+
 
 	//	extract general meta
 	json11::Json::object FrameMeta;
