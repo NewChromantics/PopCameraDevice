@@ -1251,7 +1251,9 @@ void KinectAzure::TPixelReader::OnFrame(TCaptureFrame& CaptureFrame)
 		}
 		else
 		{
-			throw Soy::AssertException("Skipping frame as we require depth and colour");
+			//throw Soy::AssertException("Skipping frame as we require depth and colour");
+			std::Debug << "Skipping frame (" << CaptureTime << ") as we require depth and colour" << std::endl;
+			return;
 		}
 	}
 
