@@ -665,7 +665,8 @@ int32_t PopCameraDevice::GetNextFrame(int32_t Instance, char* JsonBuffer, int32_
 	try
 	{
 		//	always clear json buffer
-		Soy::StringToBuffer("", JsonBuffer, JsonBufferSize);
+		if ( JsonBuffer )
+			Soy::StringToBuffer("", JsonBuffer, JsonBufferSize);
 
 		auto& Device = PopCameraDevice::GetCameraDevice(Instance);
 		TFrame Frame;
