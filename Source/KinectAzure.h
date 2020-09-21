@@ -22,6 +22,8 @@ public:
 	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
 	SoyPixelsFormat::Type	mDepthFormat = SoyPixelsFormat::Depth16mm;
 	bool					mVerboseDebug = false;
+	bool					mSyncMaster = false;
+	bool					mSyncSub = false;
 };
 
 

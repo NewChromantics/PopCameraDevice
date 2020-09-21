@@ -41,8 +41,8 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 		auto* pInstance = (int*)Meta;
 		DebugPrint("New frame callback");
 		char MetaJson[1024];
-		PopCameraDevice_PeekNextFrame(*pInstance, MetaJson, std::size(MetaJson));
-		DebugPrint("New frame meta:");
+		auto NextFrame = PopCameraDevice_PeekNextFrame(*pInstance, MetaJson, std::size(MetaJson));
+		DebugPrint(std::string("New frame meta (") + std::to_string(NextFrame) + "): ");
 		DebugPrint(MetaJson);
 	};
 	PopCameraDevice_AddOnNewFrameCallback(Instance,OnNewFrame,&Instance);
@@ -106,12 +106,13 @@ int main()
 	//	test device currently only pumps out one frame
 	//TestDeviceInstance("Test", "RGBA^100x100@30", 1);
 	
-	auto TestFrameCount = 20;
+	auto TestFrameCount = 20000;
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
-	TestDeviceInstance("Arkit Rear Depth", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
-		
+	//TestDeviceInstance("Arkit Rear Depth", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("KinectAzure_000023201312", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	
 	
 	for ( auto i=0;	i<1000; i++ )
 		TestDeviceInstance("KinectAzure_000396300112", "{\"Format\":\"Yuv_8_88\",\"SplitPlanes\":false,\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);

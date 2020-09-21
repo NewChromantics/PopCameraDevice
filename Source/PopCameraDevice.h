@@ -23,6 +23,7 @@
 //	2.1.7	PopCameraDevice_CreateCameraDevice is now the prefered instantiator with JSON options
 //	2.2.0	Removed PopCameraDevice_CreateCameraDeviceWithFormat
 //	2.2.4	Added Arkit options
+//	2.2.8	Azure kinect master & sub options
 
 #define POPCAMERADEVICE_KEY_SKIPFRAMES	"SkipFrames"
 #define POPCAMERADEVICE_KEY_FRAMERATE	"FrameRate"
@@ -44,6 +45,11 @@
 #define POPCAMERADEVICE_KEY_RESETANCHORS			"ResetAnchors"
 #define POPCAMERADEVICE_KEY_FEATURES				"Features"		//	option to not output features as they start to make the meta huge (1000's). Consider a pixel output for features
 #define POPCAMERADEVICE_KEY_DEPTHCONFIDENCE			"DepthConfidence"
+
+//	kinect azure
+#define POPCAMERADEVICE_KEY_SYNCMASTER				"SyncMaster"
+#define POPCAMERADEVICE_KEY_SYNCSUB					"SyncSub"
+
 
 //	function pointer type for new frame callback
 typedef void PopCameraDevice_OnNewFrame(void* Meta);

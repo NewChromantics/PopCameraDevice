@@ -75,7 +75,7 @@ namespace KinectAzure
 class KinectAzure::TDevice
 {
 public:
-	TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate);
+	TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate, k4a_wired_sync_mode_t SyncMode);
 	~TDevice();
 
 	std::string				GetSerial();
@@ -106,13 +106,14 @@ protected:
 	virtual void		OnError(const char* Error) {}
 
 	//	as we keep-alive, we need to know these modes
-	virtual k4a_depth_mode_t	GetDepthMode() = 0;
-	virtual k4a_colour_mode_t	GetColourMode() = 0;
-	bool						IsExpectingDepthAndColour();
-	virtual k4a_fps_t			GetFrameRate() = 0;
-	k4a_calibration_t			GetCalibration() { return mDevice->mCalibration; }
-	k4a_transformation_t		GetDepthToImageTransform() { return mDevice->GetDepthToImageTransform(); }
-	
+	virtual k4a_depth_mode_t		GetDepthMode() = 0;
+	virtual k4a_colour_mode_t		GetColourMode() = 0;
+	bool							IsExpectingDepthAndColour();
+	virtual k4a_fps_t				GetFrameRate() = 0;
+	k4a_calibration_t				GetCalibration() { return mDevice->mCalibration; }
+	k4a_transformation_t			GetDepthToImageTransform() { return mDevice->GetDepthToImageTransform(); }
+	virtual k4a_wired_sync_mode_t	GetSyncMode() = 0;
+
 private:
 	void				Iteration(int32_t TimeoutMs);
 	virtual bool		ThreadIteration() override;
@@ -139,6 +140,8 @@ public:
 	SoyTime					mTime;
 	k4a_calibration_t		mCalibration = { 0 };
 	k4a_transformation_t	mDepthToImageTransform = nullptr;
+	bool					mSyncInCable = false;
+	bool					mSyncOutCable = false;
 };
 
 SoyPixelsMeta GetPixelMeta(k4a_depth_mode_t Mode, size_t& FrameRate)
@@ -448,12 +451,13 @@ k4a_image_format_t KinectAzure::GetColourFormat(SoyPixelsFormat::Type Format)
 class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate) :
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate, k4a_wired_sync_mode_t SyncMode) :
 		TFrameReader	(DeviceIndex, KeepAlive),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
 		mColourMode		( ColourMode ),
-		mFrameRate		( FrameRate )
+		mFrameRate		( FrameRate ),
+		mSyncMode		( SyncMode )
 	{
 		Start();
 	}
@@ -464,11 +468,13 @@ private:
 	virtual k4a_depth_mode_t	GetDepthMode() override { return mDepthMode; }
 	virtual k4a_colour_mode_t	GetColourMode() override { return mColourMode; }
 	virtual k4a_fps_t			GetFrameRate() override { return mFrameRate; }
+	virtual k4a_wired_sync_mode_t	GetSyncMode() override { return mSyncMode; }
 
 	std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime,json11::Json::object&)>	mOnNewFrame;
 	k4a_depth_mode_t		mDepthMode = K4A_DEPTH_MODE_OFF;
 	k4a_colour_mode_t		mColourMode;
 	k4a_fps_t				mFrameRate = K4A_FRAMES_PER_SECOND_30;
+	k4a_wired_sync_mode_t	mSyncMode = K4A_WIRED_SYNC_MODE_STANDALONE;
 };
 
 
@@ -578,7 +584,8 @@ void KinectAzure::EnumDeviceNameAndFormats(std::function<void(const std::string&
 	{
 		try
 		{
-			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_OFF, k4a_colour_mode_t(), K4A_FRAMES_PER_SECOND_5);
+			auto SyncMode = K4A_WIRED_SYNC_MODE_STANDALONE;
+			KinectAzure::TDevice Device(i, K4A_DEPTH_MODE_OFF, k4a_colour_mode_t(), K4A_FRAMES_PER_SECOND_5,SyncMode);
 			auto Serial = Device.GetSerial();
 
 			Enum(Serial, GetArrayBridge(Formats));
@@ -614,7 +621,7 @@ size_t KinectAzure::GetDeviceIndex(const std::string& Serial)
 	return SerialIndex;
 }
 
-KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate)
+KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode, k4a_fps_t FrameRate, k4a_wired_sync_mode_t SyncMode)
 {
 	//	this fails the second time if we didn't close properly (app still has exclusive access)
 	//	so make sure we shutdown if we fail
@@ -631,6 +638,7 @@ KinectAzure::TDevice::TDevice(size_t DeviceIndex, k4a_depth_mode_t DepthMode, k4
 		k4a_device_configuration_t DeviceConfig = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
 		DeviceConfig.depth_mode = DepthMode;
 		DeviceConfig.color_resolution = ColourMode.resolution;
+		DeviceConfig.wired_sync_mode = SyncMode;
 		//	start_cameras fails if this is set to say, custom, so don't change from default(mjpg)
 		if (ColourMode.resolution != K4A_COLOR_RESOLUTION_OFF )
 			DeviceConfig.color_format = ColourMode.format;
@@ -777,7 +785,9 @@ KinectAzure::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetPixelFormat(POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
 	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
-
+	SetBool(POPCAMERADEVICE_KEY_SYNCMASTER, mSyncMaster);
+	SetBool(POPCAMERADEVICE_KEY_SYNCSUB, mSyncSub);
+	
 	//	Allow our default of Depth, but if provided "depth" as format, let this happen
 	if (mDepthFormat == mColourFormat)
 		mDepthFormat = SoyPixelsFormat::Invalid;
@@ -795,6 +805,14 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json
 	TCaptureParams Params(Options);
 	if (!Soy::StringBeginsWith(Serial, KinectAzure::SerialPrefix, true))
 		throw PopCameraDevice::TInvalidNameException();
+
+	k4a_wired_sync_mode_t SyncMode = K4A_WIRED_SYNC_MODE_STANDALONE;
+	if (Params.mSyncMaster && Params.mSyncSub)
+		throw Soy::AssertException("Cannot be configured as sync master and sync sub");
+	if (Params.mSyncMaster)
+		SyncMode = K4A_WIRED_SYNC_MODE_MASTER;
+	if (Params.mSyncSub)
+		SyncMode = K4A_WIRED_SYNC_MODE_SUBORDINATE;
 
 	LoadDll();
 	InitDebugHandler( Params.mVerboseDebug );
@@ -826,7 +844,7 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json
 		PushFrame(FramePixelBuffer, FrameTime, FrameMeta);
 	};
 
-	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode, Fps) );
+	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode, Fps, SyncMode) );
 }
 
 KinectAzure::TCameraDevice::~TCameraDevice()
@@ -912,7 +930,8 @@ void KinectAzure::TFrameReader::Open()
 	auto DepthMode = GetDepthMode();
 	auto ColourMode = GetColourMode();
 	auto FrameRate = GetFrameRate();
-	mDevice.reset(new TDevice(mDeviceIndex, DepthMode, ColourMode, FrameRate ));
+	auto SyncMode = GetSyncMode();
+	mDevice.reset(new TDevice(mDeviceIndex, DepthMode, ColourMode, FrameRate,SyncMode ));
 }
 
 bool KinectAzure::TFrameReader::ThreadIteration()
@@ -1105,6 +1124,19 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		CaptureFrame.mDepthToImageTransform = DepthToImageTransform;
 		CaptureFrame.mTime = FrameCaptureTime;
 
+		//	get sync-connection meta
+		{
+			auto Result = k4a_device_get_sync_jack(Device, &CaptureFrame.mSyncInCable, &CaptureFrame.mSyncOutCable);
+			try
+			{
+				IsOkay(Result, "k4a_device_get_sync_jack");
+			}
+			catch (std::exception&e)
+			{
+				std::Debug << e.what() << std::endl;
+			}
+		}
+
 		//	we can get a deadlock if the thread is waiting to shutdown, and the OnFrame callback results in
 		//	a call to the instances lock that called the shutdown, so skip if thread is stop[ping]
 		if (this->IsThreadRunning())
@@ -1263,6 +1295,8 @@ void KinectAzure::TPixelReader::OnFrame(TCaptureFrame& CaptureFrame)
 	FrameMeta["Temperature"] = Imu.temperature;
 	FrameMeta["Accelerometer"] = json11::Json::array{ Imu.acc_sample.xyz.x, Imu.acc_sample.xyz.y, Imu.acc_sample.xyz.z };
 	FrameMeta["Gyro"] = json11::Json::array{ Imu.gyro_sample.xyz.x, Imu.gyro_sample.xyz.y, Imu.gyro_sample.xyz.z };
+	FrameMeta["SyncInCable"] = CaptureFrame.mSyncInCable;
+	FrameMeta["SyncOutCable"] = CaptureFrame.mSyncOutCable;
 
 	auto PushImage = [&](k4a_image_t Image, k4a_calibration_camera_t Calibration)
 	{
