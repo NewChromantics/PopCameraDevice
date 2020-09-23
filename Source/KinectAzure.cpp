@@ -1060,6 +1060,13 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		if (Capture)
 			k4a_capture_release(Capture);
 	};
+	/*
+	static int Counter = 0;
+	if (Counter++ > 10)
+	{
+		FreeCapture();
+		throw Soy::AssertException("Fail");
+	}*/
 	if (WaitError != K4A_WAIT_RESULT_SUCCEEDED)
 	{
 		std::Debug << __PRETTY_FUNCTION__ << "Non-success message (" << WaitError << "), explicitly freeing capture(" << (Capture?"non-null":"null") <<" (source of previous crash?)" << std::endl;
@@ -1291,7 +1298,7 @@ void KinectAzure::TPixelReader::OnFrame(TCaptureFrame& CaptureFrame)
 		else
 		{
 			//throw Soy::AssertException("Skipping frame as we require depth and colour");
-			std::Debug << "Skipping frame (" << CaptureTime << ") as we require depth" << (DepthImage?"":"(null)") << " and colour" << (ColourImage?"":"(null)" << std::endl;
+			std::Debug << "Skipping frame (" << CaptureTime << ") as we require depth" << (DepthImage?"":"(null)") << " and colour" << (ColourImage?"":"(null)") << std::endl;
 			return;
 		}
 	}
