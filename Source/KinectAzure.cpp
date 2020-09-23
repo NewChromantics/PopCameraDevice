@@ -963,7 +963,7 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 		{
 			//	quick fix for shutdown syncing (funcs in here refer to mDevice)
 			std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
-			if ( VerboseDebug )
+			//if ( VerboseDebug )
 				std::Debug << "Reader clear mdevice" << std::endl;
 			//	close device and let next iteration reopen
 			mDevice.reset();
@@ -1284,7 +1284,7 @@ void KinectAzure::TPixelReader::OnFrame(TCaptureFrame& CaptureFrame)
 		else
 		{
 			//throw Soy::AssertException("Skipping frame as we require depth and colour");
-			std::Debug << "Skipping frame (" << CaptureTime << ") as we require depth and colour" << std::endl;
+			std::Debug << "Skipping frame (" << CaptureTime << ") as we require depth" << (DepthImage?"":"(null)") << " and colour" << (ColourImage?"":"(null)" << std::endl;
 			return;
 		}
 	}
