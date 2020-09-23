@@ -785,8 +785,8 @@ KinectAzure::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetPixelFormat(POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
 	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
-	SetBool(POPCAMERADEVICE_KEY_SYNCMASTER, mSyncMaster);
-	SetBool(POPCAMERADEVICE_KEY_SYNCSUB, mSyncSub);
+	SetBool(POPCAMERADEVICE_KEY_SYNCPRIMARY, mSyncPrimary);
+	SetBool(POPCAMERADEVICE_KEY_SYNCSECONDARY, mSyncSecondary);
 	
 	//	Allow our default of Depth, but if provided "depth" as format, let this happen
 	if (mDepthFormat == mColourFormat)
@@ -807,11 +807,11 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json
 		throw PopCameraDevice::TInvalidNameException();
 
 	k4a_wired_sync_mode_t SyncMode = K4A_WIRED_SYNC_MODE_STANDALONE;
-	if (Params.mSyncMaster && Params.mSyncSub)
+	if (Params.mSyncPrimary && Params.mSyncSecondary)
 		throw Soy::AssertException("Cannot be configured as sync master and sync sub");
-	if (Params.mSyncMaster)
+	if (Params.mSyncPrimary)
 		SyncMode = K4A_WIRED_SYNC_MODE_MASTER;
-	if (Params.mSyncSub)
+	if (Params.mSyncSecondary)
 		SyncMode = K4A_WIRED_SYNC_MODE_SUBORDINATE;
 
 	LoadDll();

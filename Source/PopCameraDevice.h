@@ -47,8 +47,8 @@
 #define POPCAMERADEVICE_KEY_DEPTHCONFIDENCE			"DepthConfidence"
 
 //	kinect azure
-#define POPCAMERADEVICE_KEY_SYNCMASTER				"SyncMaster"
-#define POPCAMERADEVICE_KEY_SYNCSUB					"SyncSub"
+#define POPCAMERADEVICE_KEY_SYNCPRIMARY				"SyncPrimary"
+#define POPCAMERADEVICE_KEY_SYNCSECONDARY			"SyncSecondary"
 
 
 //	function pointer type for new frame callback
