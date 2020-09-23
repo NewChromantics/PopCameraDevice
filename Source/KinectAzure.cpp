@@ -1053,6 +1053,18 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		return;
 	}
 	*/
+	auto FreeCapture = [&]()
+	{
+		if (VerboseDebug)
+			std::Debug << "Free capture" << std::endl;
+		if (Capture)
+			k4a_capture_release(Capture);
+	};
+	if (WaitError != K4A_WAIT_RESULT_SUCCEEDED)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << "Non-success message (" << WaitError << "), explicitly freeing capture(" << (Capture?"non-null":"null") <<" (source of previous crash?)" << std::endl;
+		FreeCapture();
+	}
 	IsOkay(WaitError, "k4a_device_get_capture");
 
 	//	kinect provides a device timestamp (relative only to itself)
@@ -1061,12 +1073,7 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 	//	k4a_image_get_system_timestamp_nsec
 	SoyTime FrameCaptureTime(true);
 
-	auto FreeCapture = [&]()
-	{
-		if ( VerboseDebug )
-			std::Debug << "Free capture" << std::endl;
-		k4a_capture_release(Capture);
-	};
+	
 
 	try
 	{
