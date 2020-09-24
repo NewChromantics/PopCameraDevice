@@ -93,6 +93,8 @@ CFLAGS = -c $(LIB_DEFINES) $(LIB_INCLUDES) -std=c++17 -fPIC -g
 LDFLAGS = -pthread
 LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
+# Don't let symbols get overriden on load	https://stackoverflow.com/questions/6538501/linking-two-shared-libraries-with-some-of-the-same-symbols
+LDFLAGS += '-Wl,-Bsymbolic'
 
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
 APP_LINK_FLAGS = $(LDFLAGS) 

@@ -8,7 +8,9 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>ENABLE_KINECTAZURE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CppLanguageStandard>c++17</CppLanguageStandard>
     </ClCompile>
+    <Link />
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
