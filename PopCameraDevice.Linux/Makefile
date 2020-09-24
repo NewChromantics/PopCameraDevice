@@ -89,7 +89,7 @@ endif
 # -g stops symbol stripping
 # -f[lag] PIC position independent code (for dyanmically loaded code)
 # -rpath $ORIGIN makes the shared object runtimepath be same place as executable
-CFLAGS = -c $(LIB_DEFINES) $(LIB_INCLUDES) -std=gnu++17 -fPIC -g
+CFLAGS = -c $(LIB_DEFINES) $(LIB_INCLUDES) -std=c++17 -fPIC -g
 LDFLAGS = -pthread
 LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
