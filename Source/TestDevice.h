@@ -13,6 +13,10 @@ public:
 	size_t					mFrameRate = 30;
 	size_t					mWidth = 200;
 	size_t					mHeight = 100;
+	
+	bool					mRenderSphere = false;
+	vec3x<float>			mSpherePosition = vec3x<float>(0,0,2);
+	float					mSphereRadius = 1;
 };
 
 
@@ -28,6 +32,7 @@ public:
 
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
 	void			GenerateFrame();
+	void			GenerateSphereFrame(float x,float y,float z,float Radius);
 
 	TTestDeviceParams	mParams;
 	size_t				mFrameNumber = 0;

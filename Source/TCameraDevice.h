@@ -43,6 +43,7 @@ public:
 class PopCameraDevice::TCaptureParams
 {
 public:
+	bool			Read(json11::Json& Options,const char* Name,float& Value);
 	bool			Read(json11::Json& Options,const char* Name,size_t& Value);
 	bool			Read(json11::Json& Options,const char* Name,bool& Value);
 	bool			Read(json11::Json& Options,const char* Name,std::string& Value);

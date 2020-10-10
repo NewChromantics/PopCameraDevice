@@ -90,6 +90,8 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 	PopCameraDevice_FreeCameraDevice(Instance);
 }
 
+
+
 int main()
 {
 	DebugPrint("PopCameraDevice_UnitTests");
@@ -104,7 +106,8 @@ int main()
 	DebugPrint(EnumJson);
 
 	//	test device currently only pumps out one frame
-	TestDeviceInstance("Test", "{\"Format\":\"RGBA\"}", 1);
+	//ReadFrameToPng("Test", "{\"Format\":\"RGBA\"}", "Test.png");
+	TestDeviceInstance("Test", "{\"SphereZ\":2}", 1);
 		
 	auto TestFrameCount = 20000;
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);

@@ -48,6 +48,14 @@ bool PopCameraDevice::TCaptureParams::Read(json11::Json& Options,const char* Nam
 	return true;
 }
 
+bool PopCameraDevice::TCaptureParams::Read(json11::Json& Options,const char* Name,float& Value)
+{
+	auto& Handle = Options[Name];
+	if ( !Handle.is_number() )
+		return false;
+	Value = Handle.number_value();
+	return true;
+}
 
 
 json11::Json::object PopCameraDevice::TFrame::GetMetaJson()	
