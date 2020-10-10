@@ -14,7 +14,19 @@ TTestDeviceParams::TTestDeviceParams(json11::Json& Options)
 	mRenderSphere |= Read( Options, "SphereX", mSpherePosition.x ); 
 	mRenderSphere |= Read( Options, "SphereY", mSpherePosition.y ); 
 	mRenderSphere |= Read( Options, "SphereZ", mSpherePosition.z ); 
-	mRenderSphere |= Read( Options, "SphereR", mSphereRadius ); 
+	mRenderSphere |= Read( Options, "SphereRadius", mSphereRadius ); 
+	mRenderSphere |= Read( Options, "VerticalFov", mVerticalFov ); 
+	mRenderSphere |= Read( Options, "NearDepth", mNearDepth ); 
+	mRenderSphere |= Read( Options, "FarDepth", mFarDepth ); 
+	mRenderSphere |= Read( Options, "InvalidDepth", mInvalidDepth ); 
+	mRenderSphere |= Read( Options, "ProjectionMatrix", GetArrayBridge(mProjectionMatrix) );
+	
+	if ( mProjectionMatrix.GetSize() != 0 && mProjectionMatrix.GetSize() != 16 )
+	{
+		std::stringstream Error;
+		Error << "ProjectionMatrix x" << mProjectionMatrix.GetSize() << " but expecting 4x4; ";
+		throw Soy::AssertException(Error);
+	}
 }
 
 
@@ -221,14 +233,20 @@ vec4f Raymarch(float4x4 ScreenToCameraMatrix,float u,float v,std::function<float
 	{
 		auto ViewPosMtx = CreateTranslationMatrix(u,v,z,1.0f);
 		auto CamPosMtx = MatrixMultiply4x4( ScreenToCameraMatrix, ViewPosMtx );
-		//	this is in camera space, so z is NOT world space...
-		vec3f CameraPos = GetMatrixTranslation(CamPosMtx,true);	
-		return CameraPos;
+		
+		//	gr: somewhere we're missing perspective correction... need this extra multiply?
+		//auto CameraToWorldMtx = float4x4();
+		//auto WorldPosMtx = MatrixMultiply4x4( CameraToWorldMtx, CamPosMtx );
+		//vec3f WorldPos = GetMatrixTranslation(WorldPosMtx,true);	
+		//return WorldPos;
+		//	gr: this works, but no perspective correction...
+		vec3f CamPos = GetMatrixTranslation(CamPosMtx,true);	
+		return CamPos;
 	};
 
-	auto RayStart = ScreenToCamera(0);
-	auto RayEnd = ScreenToCamera(1);
-	auto RayDir = normalize(RayStart,RayEnd);
+	auto RayStart = ScreenToCamera(0.01f);
+	auto RayEnd = ScreenToCamera(10.f);
+	auto RayDir = normalize(RayEnd,RayStart);
 	
 	auto GetRayPosition = [&](float WorldZ)
 	{
@@ -268,7 +286,7 @@ float4x4 GetProjectionMatrix(float FovVertical,vec2f FocalCenter,float NearDista
 	auto GetOpenglFocalLengths = [&](float& fx,float& fy,float& cx,float& cy,float& s)
 	{
 		auto Aspect = ViewRect[2] / ViewRect[3];
-		fy = 1.0 / tanf( radians(FovVertical) / 2);
+		fy = 1.0f / tanf( radians(FovVertical) / 2.0f);
 		//OpenglFocal.fx = 1.0 / Math.tan( Math.radians(FovHorizontal) / 2);
 		fx = fy / Aspect;
 		cx = FocalCenter.x;
@@ -359,6 +377,7 @@ float4x4 MatrixInverse4x4(float4x4 Matrix)
 
 void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 {
+	Soy::TScopeTimerPrint Timer(__PRETTY_FUNCTION__,10);
 	SoyTime FrameTime = SoyTime::UpTime();
 
 
@@ -369,7 +388,10 @@ void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 	Pixelsf.SetSize( w * h * 1);
 
 	vec4f ViewRect(0,0,w,h);
-	float4x4 ProjectionMatrix = GetProjectionMatrix( 45.f, vec2f(0,0), 0.01f, 10.0f, ViewRect );
+	float4x4 ProjectionMatrix = GetProjectionMatrix( mParams.mVerticalFov, vec2f(0,0), mParams.mNearDepth, mParams.mFarDepth, ViewRect );
+	if ( !mParams.mProjectionMatrix.IsEmpty() )
+		ProjectionMatrix = float4x4(mParams.mProjectionMatrix.GetArray());
+	
 	auto ScreenToCamera = MatrixInverse4x4(ProjectionMatrix);
 
 	auto SetPixel = [&](int x,int y,float Depth)
@@ -397,7 +419,7 @@ void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 			auto u = (x-ViewRect.x) / ViewRect.z;
 			auto v = (y-ViewRect.y) / ViewRect.w;
 			auto HitPosition4 = Raymarch( ScreenToCamera, u, v, SdfSceneDistance );
-			float Depth = 0.0;
+			float Depth = mParams.mInvalidDepth;
 			if ( HitPosition4.w > 0.0f )
 			{
 				Depth = length( HitPosition4.xyz() );

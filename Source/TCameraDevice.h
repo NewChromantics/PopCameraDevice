@@ -48,6 +48,7 @@ public:
 	bool			Read(json11::Json& Options,const char* Name,bool& Value);
 	bool			Read(json11::Json& Options,const char* Name,std::string& Value);
 	bool			Read(json11::Json& Options,const char* Name,SoyPixelsFormat::Type& Value);
+	bool			Read(json11::Json& Options,const char* Name,ArrayBridge<float>&& Floats);
 
 	//	include some params they all use here
 	//std::string		mSerial;

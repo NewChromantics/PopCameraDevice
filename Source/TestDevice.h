@@ -17,6 +17,11 @@ public:
 	bool					mRenderSphere = false;
 	vec3x<float>			mSpherePosition = vec3x<float>(0,0,2);
 	float					mSphereRadius = 1;
+	float					mVerticalFov = 45;
+	float					mNearDepth = 0.001f;
+	float					mFarDepth = 0.001f;
+	float					mInvalidDepth = 0.f;
+	Array<float>			mProjectionMatrix;
 };
 
 
