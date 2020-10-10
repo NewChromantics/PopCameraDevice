@@ -168,7 +168,6 @@ float4x4 CreateTranslationMatrix(float x,float y,float z,float w)
 
 vec3f GetMatrixTranslation(float4x4 Matrix,float DivW)
 {
-	//	do we need to /w here?
 	vec3f xyz;
 	xyz.x = Matrix[12];
 	xyz.y = Matrix[13];
@@ -183,28 +182,6 @@ vec3f GetMatrixTranslation(float4x4 Matrix,float DivW)
 	return xyz;
 }
 
-//	return hit position, w = hit or miss
-vec4f Raymarch(float4x4 ProjectionMatrix,float u,float v,std::function<float(vec3f&)>& GetSceneDistance)
-{
-	float z = 0;
-	auto MaxSteps = 10;
-	auto MinDistance = 0.01f;
-	
-	for ( auto i=0;	i<MaxSteps;	i++ )
-	{
-		auto ViewPosMtx = CreateTranslationMatrix(u,v,z,1.0f);
-		auto CamPosMtx = MatrixMultiply4x4( ProjectionMatrix, ViewPosMtx );
-		vec3f WorldPos = GetMatrixTranslation(CamPosMtx,true);
-		auto Distance = GetSceneDistance(WorldPos);
-		if ( Distance <= MinDistance )
-		{
-			return vec4f( WorldPos.x, WorldPos.y, WorldPos.z, 1.0f );
-		}
-	}
-	
-	//	missed
-	return vec4f(0,0,0,0);		
-}
 
 float length(const vec3f& Vector)
 {
@@ -221,6 +198,69 @@ float radians(float Degrees)
 	auto Rad = (Degrees * PI) / 180.0f;
 	return Rad;
 }
+
+vec3f normalize(vec3f From,vec3f To)
+{
+	vec3f Delta;
+	Delta.x = To.x - From.x;
+	Delta.y = To.y - From.y;
+	Delta.z = To.z - From.z;
+	float Length = length(Delta);
+	Delta *= 1.0f / Length;
+	return Delta;
+}
+
+//	return hit position, w = hit or miss
+vec4f Raymarch(float4x4 ScreenToCameraMatrix,float u,float v,std::function<float(vec3f&)>& GetSceneDistance)
+{
+	//	part of me thinks i shouldn't have to do this...
+	u -= 0.5f;	u *= 2.0f;
+	v -= 0.5f;	v *= 2.0f;
+
+	auto ScreenToCamera = [&](float z)
+	{
+		auto ViewPosMtx = CreateTranslationMatrix(u,v,z,1.0f);
+		auto CamPosMtx = MatrixMultiply4x4( ScreenToCameraMatrix, ViewPosMtx );
+		//	this is in camera space, so z is NOT world space...
+		vec3f CameraPos = GetMatrixTranslation(CamPosMtx,true);	
+		return CameraPos;
+	};
+
+	auto RayStart = ScreenToCamera(0);
+	auto RayEnd = ScreenToCamera(1);
+	auto RayDir = normalize(RayStart,RayEnd);
+	
+	auto GetRayPosition = [&](float WorldZ)
+	{
+		vec3f Pos = RayDir;
+		Pos.x *= WorldZ;
+		Pos.y *= WorldZ;
+		Pos.z *= WorldZ;
+		Pos.x += RayStart.x;
+		Pos.y += RayStart.y;
+		Pos.z += RayStart.z;
+		return Pos;
+	};
+		
+	float RayWorldz = 0.0f;
+	auto MaxSteps = 10;
+	auto MinDistance = 0.01f;	
+	
+	for ( auto i=0;	i<MaxSteps;	i++ )
+	{
+		auto WorldPos = GetRayPosition(RayWorldz);
+		auto Distance = GetSceneDistance(WorldPos);
+		if ( Distance <= MinDistance )
+		{
+			return vec4f( WorldPos.x, WorldPos.y, WorldPos.z, 1.0f );
+		}
+		RayWorldz += Distance;
+	}
+	
+	//	missed
+	return vec4f(0,0,0,0);		
+}
+
 
 //	taken from PopEngineCommon js
 float4x4 GetProjectionMatrix(float FovVertical,vec2f FocalCenter,float NearDistance,float FarDistance,vec4f ViewRect)
@@ -284,6 +324,39 @@ float4x4 GetProjectionMatrix(float FovVertical,vec2f FocalCenter,float NearDista
 }
 
 
+float4x4 MatrixInverse4x4(float4x4 Matrix)
+{
+	auto& m = Matrix;
+	float4x4 r;
+	
+	r[0] = m[5]*m[10]*m[15] - m[5]*m[14]*m[11] - m[6]*m[9]*m[15] + m[6]*m[13]*m[11] + m[7]*m[9]*m[14] - m[7]*m[13]*m[10];
+	r[1] = -m[1]*m[10]*m[15] + m[1]*m[14]*m[11] + m[2]*m[9]*m[15] - m[2]*m[13]*m[11] - m[3]*m[9]*m[14] + m[3]*m[13]*m[10];
+	r[2] = m[1]*m[6]*m[15] - m[1]*m[14]*m[7] - m[2]*m[5]*m[15] + m[2]*m[13]*m[7] + m[3]*m[5]*m[14] - m[3]*m[13]*m[6];
+	r[3] = -m[1]*m[6]*m[11] + m[1]*m[10]*m[7] + m[2]*m[5]*m[11] - m[2]*m[9]*m[7] - m[3]*m[5]*m[10] + m[3]*m[9]*m[6];
+	
+	r[4] = -m[4]*m[10]*m[15] + m[4]*m[14]*m[11] + m[6]*m[8]*m[15] - m[6]*m[12]*m[11] - m[7]*m[8]*m[14] + m[7]*m[12]*m[10];
+	r[5] = m[0]*m[10]*m[15] - m[0]*m[14]*m[11] - m[2]*m[8]*m[15] + m[2]*m[12]*m[11] + m[3]*m[8]*m[14] - m[3]*m[12]*m[10];
+	r[6] = -m[0]*m[6]*m[15] + m[0]*m[14]*m[7] + m[2]*m[4]*m[15] - m[2]*m[12]*m[7] - m[3]*m[4]*m[14] + m[3]*m[12]*m[6];
+	r[7] = m[0]*m[6]*m[11] - m[0]*m[10]*m[7] - m[2]*m[4]*m[11] + m[2]*m[8]*m[7] + m[3]*m[4]*m[10] - m[3]*m[8]*m[6];
+	
+	r[8] = m[4]*m[9]*m[15] - m[4]*m[13]*m[11] - m[5]*m[8]*m[15] + m[5]*m[12]*m[11] + m[7]*m[8]*m[13] - m[7]*m[12]*m[9];
+	r[9] = -m[0]*m[9]*m[15] + m[0]*m[13]*m[11] + m[1]*m[8]*m[15] - m[1]*m[12]*m[11] - m[3]*m[8]*m[13] + m[3]*m[12]*m[9];
+	r[10] = m[0]*m[5]*m[15] - m[0]*m[13]*m[7] - m[1]*m[4]*m[15] + m[1]*m[12]*m[7] + m[3]*m[4]*m[13] - m[3]*m[12]*m[5];
+	r[11] = -m[0]*m[5]*m[11] + m[0]*m[9]*m[7] + m[1]*m[4]*m[11] - m[1]*m[8]*m[7] - m[3]*m[4]*m[9] + m[3]*m[8]*m[5];
+	
+	r[12] = -m[4]*m[9]*m[14] + m[4]*m[13]*m[10] + m[5]*m[8]*m[14] - m[5]*m[12]*m[10] - m[6]*m[8]*m[13] + m[6]*m[12]*m[9];
+	r[13] = m[0]*m[9]*m[14] - m[0]*m[13]*m[10] - m[1]*m[8]*m[14] + m[1]*m[12]*m[10] + m[2]*m[8]*m[13] - m[2]*m[12]*m[9];
+	r[14] = -m[0]*m[5]*m[14] + m[0]*m[13]*m[6] + m[1]*m[4]*m[14] - m[1]*m[12]*m[6] - m[2]*m[4]*m[13] + m[2]*m[12]*m[5];
+	r[15] = m[0]*m[5]*m[10] - m[0]*m[9]*m[6] - m[1]*m[4]*m[10] + m[1]*m[8]*m[6] + m[2]*m[4]*m[9] - m[2]*m[8]*m[5];
+	
+	auto det = m[0]*r[0] + m[1]*r[4] + m[2]*r[8] + m[3]*r[12];
+	for ( auto i=0;	i<16;	i++ )
+		r[i] /= det;
+	
+	return r;
+}
+
+
 void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 {
 	SoyTime FrameTime = SoyTime::UpTime();
@@ -296,8 +369,8 @@ void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 	Pixelsf.SetSize( w * h * 1);
 
 	vec4f ViewRect(0,0,w,h);
-	float4x4 ProjectionMatrix = GetProjectionMatrix( 45.f, vec2f(0,0), 0.001f, 10.0f, ViewRect );
-
+	float4x4 ProjectionMatrix = GetProjectionMatrix( 45.f, vec2f(0,0), 0.01f, 10.0f, ViewRect );
+	auto ScreenToCamera = MatrixInverse4x4(ProjectionMatrix);
 
 	auto SetPixel = [&](int x,int y,float Depth)
 	{
@@ -307,7 +380,12 @@ void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 		
 	std::function<float(vec3f&)> SdfSceneDistance = [&](vec3f& Position)
 	{
-		float Distance = length(Position);
+		//	get position in sphere space
+		vec3f PositionLocal = Position;
+		PositionLocal.x -= x;
+		PositionLocal.y -= y;
+		PositionLocal.z -= z;
+		float Distance = length(PositionLocal);
 		return Distance - Radius;
 	};
 	
@@ -318,7 +396,7 @@ void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 		{
 			auto u = (x-ViewRect.x) / ViewRect.z;
 			auto v = (y-ViewRect.y) / ViewRect.w;
-			auto HitPosition4 = Raymarch( ProjectionMatrix, u, v, SdfSceneDistance );
+			auto HitPosition4 = Raymarch( ScreenToCamera, u, v, SdfSceneDistance );
 			float Depth = 0.0;
 			if ( HitPosition4.w > 0.0f )
 			{
