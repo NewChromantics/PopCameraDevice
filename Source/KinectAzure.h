@@ -13,7 +13,7 @@ namespace KinectAzure
 }
 
 
-class KinectAzure::TCaptureParams
+class KinectAzure::TCaptureParams : public PopCameraDevice::TCaptureParams
 {
 public:
 	TCaptureParams(json11::Json& Options);

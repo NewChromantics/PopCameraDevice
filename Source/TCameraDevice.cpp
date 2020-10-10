@@ -4,6 +4,51 @@
 #include "PopCameraDevice.h"
 
 
+bool PopCameraDevice::TCaptureParams::Read(json11::Json& Options,const char* Name,size_t& ValueUnsigned)
+{
+	auto& Handle = Options[Name];
+	if ( !Handle.is_number() )
+		return false;
+	auto Value = Handle.int_value();
+	if ( Value < 0 )
+	{
+		std::stringstream Error;
+		Error << "Value for " << Name << " is " << Value << ", not expecting negative";
+		throw Soy::AssertException(Error);
+	}
+	ValueUnsigned = Value;
+	return true;
+}
+
+bool PopCameraDevice::TCaptureParams::Read(json11::Json& Options,const char* Name,bool& Value)
+{
+	auto& Handle = Options[Name];
+	if ( !Handle.is_bool() )
+		return false;
+	Value = Handle.bool_value();
+	return true;
+}
+
+bool PopCameraDevice::TCaptureParams::Read(json11::Json& Options,const char* Name,std::string& Value)
+{
+	auto& Handle = Options[Name];
+	if (!Handle.is_string())
+		return false;
+	Value = Handle.string_value();
+	return true;
+}
+
+bool PopCameraDevice::TCaptureParams::Read(json11::Json& Options,const char* Name,SoyPixelsFormat::Type& Value)
+{
+	std::string EnumString;
+	if ( !Read(Options,Name,EnumString) )
+		return false;
+		
+	Value = SoyPixelsFormat::Validate(EnumString);
+	return true;
+}
+
+
 
 json11::Json::object PopCameraDevice::TFrame::GetMetaJson()	
 {

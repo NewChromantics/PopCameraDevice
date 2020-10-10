@@ -10,8 +10,8 @@ class TPixelBuffer;
 namespace PopCameraDevice
 {
 	class TDevice;
+	class TCaptureParams;
 	class TInvalidNameException;
-	class TParams;
 	class TFrame;
 	
 	std::string	GetFormatString(SoyPixelsMeta Meta, size_t FrameRate = 0);
@@ -40,12 +40,17 @@ public:
 
 
 //	move towards params with json. like Poph264
-class PopCameraDevice::TParams
+class PopCameraDevice::TCaptureParams
 {
 public:
-	std::string		mSerial;
-	std::string		mFormat;
-	bool			mVerboseDebug = true;
+	bool			Read(json11::Json& Options,const char* Name,size_t& Value);
+	bool			Read(json11::Json& Options,const char* Name,bool& Value);
+	bool			Read(json11::Json& Options,const char* Name,std::string& Value);
+	bool			Read(json11::Json& Options,const char* Name,SoyPixelsFormat::Type& Value);
+
+	//	include some params they all use here
+	//std::string		mSerial;
+	bool			mVerboseDebug = true;	
 };
 
 

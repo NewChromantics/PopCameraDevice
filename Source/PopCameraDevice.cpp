@@ -339,15 +339,12 @@ __export void PopCameraDevice_EnumCameraDevicesJson(char* StringBuffer,int32_t S
 
 uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,json11::Json& Options)
 {
-	//	legacy support
-	auto Format = Options["Format"].string_value();
-
 	//	alloc device
 	if (Name == TestDevice::DeviceName)
 	{
 		try
 		{
-			std::shared_ptr<TDevice> Device(new TestDevice(Format));
+			std::shared_ptr<TDevice> Device(new TestDevice(Options));
 			if (Device)
 				return PopCameraDevice::CreateInstance(Device);
 		}

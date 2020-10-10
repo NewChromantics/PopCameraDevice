@@ -740,53 +740,13 @@ k4a_transformation_t KinectAzure::TDevice::GetDepthToImageTransform()
 
 KinectAzure::TCaptureParams::TCaptureParams(json11::Json& Options)
 {
-	auto SetInt = [&](const char* Name,size_t& ValueUnsigned)
-	{
-		auto& Handle = Options[Name];
-		if ( !Handle.is_number() )
-			return false;
-		auto Value = Handle.int_value();
-		if ( Value < 0 )
-		{
-			std::stringstream Error;
-			Error << "Value for " << Name << " is " << Value << ", not expecting negative";
-			throw Soy::AssertException(Error);
-		}
-		ValueUnsigned = Value;
-		return true;
-	};
-	auto SetBool = [&](const char* Name,bool& Value)
-	{
-		auto& Handle = Options[Name];
-		if ( !Handle.is_bool() )
-			return false;
-		Value = Handle.bool_value();
-		return true;
-	};
-	auto SetString = [&](const char* Name, std::string& Value)
-	{
-		auto& Handle = Options[Name];
-		if (!Handle.is_string())
-			return false;
-		Value = Handle.string_value();
-		return true;
-	};
-	auto SetPixelFormat = [&](const char* Name,SoyPixelsFormat::Type& Value)
-	{
-		std::string EnumString;
-		if ( !SetString(Name,EnumString) )
-			return false;
-		
-		Value = SoyPixelsFormat::Validate(EnumString);
-		return true;
-	};
 
-	SetInt( POPCAMERADEVICE_KEY_FRAMERATE, mFrameRate );
-	SetPixelFormat(POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
-	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
-	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
-	SetBool(POPCAMERADEVICE_KEY_SYNCPRIMARY, mSyncPrimary);
-	SetBool(POPCAMERADEVICE_KEY_SYNCSECONDARY, mSyncSecondary);
+	Read( Options, POPCAMERADEVICE_KEY_FRAMERATE, mFrameRate );
+	Read( Options, POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
+	Read( Options, POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
+	Read( Options, POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
+	Read( Options, POPCAMERADEVICE_KEY_SYNCPRIMARY, mSyncPrimary);
+	Read( Options, POPCAMERADEVICE_KEY_SYNCSECONDARY, mSyncSecondary);
 	
 	//	Allow our default of Depth, but if provided "depth" as format, let this happen
 	if (mDepthFormat == mColourFormat)
