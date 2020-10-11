@@ -440,6 +440,7 @@ void TestDevice::GenerateSphereFrame(float x,float y,float z,float Radius)
 	BufferArray<float,4> Sphere4{x,y,z,Radius};
 	Meta["Sphere"] = GetJsonArray( GetArrayBridge(Sphere4) );
 	Meta["GeneratedFrameNumer"] = static_cast<int>(mFrameNumber);
+	Meta["ProjectionMatrix"] = GetJsonArray( GetArrayBridge( ProjectionMatrix.GetArray() ) );
 
 	this->PushFrame(pPixelBuffer, FrameTime, Meta);
 	mFrameNumber++;

@@ -441,6 +441,25 @@ namespace Avf
 }
 
 
+matrix_float3x3 Get3x3(const matrix_float4x3& FourThree)
+{
+	matrix_float3x3 ThreeThree;
+	for ( auto r=0;	r<3;	r++ )
+		for ( auto c=0;	c<3;	c++ )
+ 			ThreeThree.columns[c][r] = FourThree.columns[c][r];
+ 	return ThreeThree;
+}
+
+
+json11::Json::array GetJsonArray(vec3f Values)
+{
+	json11::Json::array Array;
+	Array.push_back( Values.x );
+	Array.push_back( Values.y );
+	Array.push_back( Values.z );
+	return Array;
+}
+
 json11::Json::array GetJsonArray(simd_float2 Values)
 {
 	json11::Json::array Array;
@@ -505,6 +524,14 @@ json11::Json::array GetJsonArray(CGSize Values)
 	json11::Json::array Array;
 	Array.push_back( Values.width );
 	Array.push_back( Values.height );
+	return Array;
+}
+
+json11::Json::array GetJsonArray(CGPoint Values)
+{
+	json11::Json::array Array;
+	Array.push_back( Values.x );
+	Array.push_back( Values.y );
 	return Array;
 }
 
@@ -578,7 +605,6 @@ bool IsIdentity(simd_float4x4 Matrix)
 
 void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 {
-
 	//	"rotation and translation in world space"
 	//	so camera to world?
 	auto LocalToWorld = GetJsonArray(Camera.transform);
@@ -586,6 +612,7 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	auto Tracking = magic_enum::enum_name(Camera.trackingState);
 	auto TrackingStateReason = magic_enum::enum_name(Camera.trackingStateReason);
 	auto Intrinsics = GetJsonArray(Camera.intrinsics);
+	auto ProjectionMatrix = GetJsonArray(Camera.projectionMatrix);
 	auto CameraResolution = GetJsonArray(Camera.imageResolution);
 	
 	//	skip transform if it's identity rather than write out bad data
@@ -596,6 +623,7 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 	Meta["Tracking"] = std::string(Tracking);	//	json11 can't do string_view atm
 	Meta["TrackingStateReason"] = TrackingStateReason;	//	json11 can't do string_view atm
 	Meta["Intrinsics"] = Intrinsics;
+	Meta["ProjectionMatrix"] = ProjectionMatrix;
 	//	write out original resolution to match Intrinsics matrix in case image gets resized
 	//	gr: convert to normalised projection matrix here!
 	Meta["IntrinsicsCameraResolution"] = CameraResolution;

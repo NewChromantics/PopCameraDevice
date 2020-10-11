@@ -17,6 +17,7 @@
 namespace Avf
 {
 	class TCaptureParams;
+	class TFrame;
 }
 
 namespace TVideoQuality
@@ -43,30 +44,34 @@ public:
 };
 
 
+class Avf::TFrame
+{
+public:
+	std::shared_ptr<TPixelBuffer>	mPixelBuffer;
+	SoyTime							mTimestamp;
+	json11::Json::object			mMeta;
+	size_t							mStreamIndex = 0;
+};
+
 #if defined(__OBJC__)
 class AvfMediaExtractor
 {
 public:
 	AvfMediaExtractor(std::shared_ptr<Opengl::TContext>& OpenglContext);
 	
-	void			OnSampleBuffer(CMSampleBufferRef SampleBufferRef,size_t StreamIndex,bool DoRetain);
-	void			OnSampleBuffer(CVPixelBufferRef PixelBufferRef,SoyTime Timestamp,size_t StreamIndex,bool DoRetain);
+	void			OnSampleBuffer(CMSampleBufferRef SampleBufferRef,size_t StreamIndex,json11::Json::object& Meta,bool DoRetain);
+	void			OnSampleBuffer(CVPixelBufferRef PixelBufferRef,SoyTime Timestamp,size_t StreamIndex,json11::Json::object& Meta,bool DoRetain);
 	void			OnDepthFrame(AVDepthData* DepthData,CMTime Timestamp,size_t StreamIndex,bool DoRetain);
-
-	std::shared_ptr<TMediaPacket>	PopPacket(size_t StreamIndex);
 	
 protected:
 	TStreamMeta		GetFrameMeta(CMSampleBufferRef sampleBufferRef,size_t StreamIndex);
 	TStreamMeta		GetFrameMeta(CVPixelBufferRef sampleBufferRef,size_t StreamIndex);
-	void			QueuePacket(std::shared_ptr<TMediaPacket>& Packet);
 	
 public:
 	std::shared_ptr<Opengl::TContext>	mOpenglContext;
 	std::shared_ptr<AvfDecoderRenderer>	mRenderer;	//	persistent rendering data
 
-	std::function<void(const SoyTime,size_t)>	mOnPacketQueued;
-	std::mutex								mPacketQueueLock;
-	Array<std::shared_ptr<TMediaPacket>>	mPacketQueue;	//	extracted frames
+	std::function<void(Avf::TFrame&)>	mOnFrame;
 };
 #endif
 	

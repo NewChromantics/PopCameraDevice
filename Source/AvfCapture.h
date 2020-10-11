@@ -11,6 +11,7 @@ namespace Avf
 {
 	class TCaptureExtractor;
 	class TCamera;
+	class TFrame;
 }
 class AvfVideoCapture;
 #if defined(__OBJC__)
@@ -45,7 +46,7 @@ class Avf::TCamera : public PopCameraDevice::TDevice
 public:
 	TCamera(const std::string& DeviceName,json11::Json& Options);
 
-	void			PushLatestFrame(size_t StreamIndex);
+	void			OnFrame(Avf::TFrame& Frame);
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;
 
 	std::shared_ptr<AvfVideoCapture>	mExtractor;

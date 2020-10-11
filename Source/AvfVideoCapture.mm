@@ -24,6 +24,19 @@ namespace Avf
 
 
 
+json11::Json::array GetJsonArray(simd_float2 Values);
+json11::Json::array GetJsonArray(simd_float3 Values);
+json11::Json::array GetJsonArray(vec3f Values);
+json11::Json::array GetJsonArray(simd_float4 Values);
+json11::Json::array GetJsonArray(matrix_float3x3 Values);
+json11::Json::array GetJsonArray(simd_float4x4 Values);
+json11::Json::array GetJsonArrayAs4x4(simd_float4x3 Values);
+json11::Json::array GetJsonArray(simd_float3x3 Values);
+json11::Json::array GetJsonArray(CGSize Values);
+json11::Json::array GetJsonArray(CGPoint Values);
+matrix_float3x3 Get3x3(const matrix_float4x3& FourThree);
+
+
 @class VideoCaptureProxy;
 @class DepthCaptureProxy;
 
@@ -83,7 +96,8 @@ namespace Avf
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
 	static bool DoRetain = true;
-	mParent->OnSampleBuffer( sampleBuffer, mStreamIndex, DoRetain );
+	json11::Json::object Meta;
+	mParent->OnSampleBuffer( sampleBuffer, mStreamIndex, Meta, DoRetain );
 }
 
 
@@ -296,14 +310,6 @@ AvfVideoCapture::~AvfVideoCapture()
 
 void AvfVideoCapture::Shutdown()
 {
-	//	gr: shutdown the parent (frames) first as the renderer will dangle and then get freed up in a frame
-	//	todo: Better link between them so the CFPixelBuffer's never have ownership
-	{
-		//ReleaseFrames();
-		std::lock_guard<std::mutex> Lock( mPacketQueueLock );
-		mPacketQueue.Clear();
-	}
-	
 	//	deffer all opengl shutdown to detach the renderer
 	PopWorker::DeferDelete( mOpenglContext, mRenderer );
 	
@@ -770,34 +776,6 @@ TStreamMeta AvfMediaExtractor::GetFrameMeta(CVPixelBufferRef SampleBuffer,size_t
 }
 
 
-std::shared_ptr<TMediaPacket> AvfMediaExtractor::PopPacket(size_t StreamIndex)
-{
-	if ( mPacketQueue.IsEmpty() )
-		return nullptr;
-
-	//	todo: filter stream indexes!
-	std::lock_guard<std::mutex> Lock( mPacketQueueLock );
-	auto Oldest = mPacketQueue.PopAt(0);
-
-	return Oldest;
-}
-
-
-void AvfMediaExtractor::QueuePacket(std::shared_ptr<TMediaPacket>& Packet)
-{
-	if ( !Packet )
-		throw Soy::AssertException("Packet expected");
-	
-	{
-		std::lock_guard<std::mutex> Lock( mPacketQueueLock );
-	
-		mPacketQueue.PushBack( Packet );
-	}
-
-	//	callback AFTER packet is queued
-	if ( mOnPacketQueued )
-		mOnPacketQueued( Packet->mTimecode, Packet->mMeta.mStreamIndex );
-}
 
 
 AvfMediaExtractor::AvfMediaExtractor(std::shared_ptr<Opengl::TContext>& OpenglContext) :
@@ -807,7 +785,7 @@ AvfMediaExtractor::AvfMediaExtractor(std::shared_ptr<Opengl::TContext>& OpenglCo
 	
 }
 
-void AvfMediaExtractor::OnSampleBuffer(CMSampleBufferRef sampleBufferRef,size_t StreamIndex,bool DoRetain)
+void AvfMediaExtractor::OnSampleBuffer(CMSampleBufferRef sampleBufferRef,size_t StreamIndex,json11::Json::object& Meta,bool DoRetain)
 {
 	//	gr: I think stalling too long here can make USB bus crash (killing bluetooth, hid, audio etc)
 	Soy::TScopeTimerPrint Timer("AvfMediaExtractor::OnSampleBuffer",5);
@@ -822,13 +800,14 @@ void AvfMediaExtractor::OnSampleBuffer(CMSampleBufferRef sampleBufferRef,size_t 
 		CMTime CmTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBufferRef);
 		SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
 		
-		auto pPacket = std::make_shared<TMediaPacket>();
-		auto& Packet = *pPacket;
-		Packet.mMeta = GetFrameMeta( sampleBufferRef, StreamIndex );
-		Packet.mTimecode = Timestamp;
-		Packet.mPixelBuffer = std::make_shared<CFPixelBuffer>( sampleBufferRef, DoRetain, mRenderer, Packet.mMeta.mTransform );
-		
-		QueuePacket( pPacket );
+		Avf::TFrame Frame;
+		Frame.mMeta = Meta;
+		Frame.mStreamIndex = StreamIndex;
+		Frame.mTimestamp = Timestamp;
+		//Packet.mMeta = GetFrameMeta( sampleBufferRef, StreamIndex );
+		float3x3 Transform;	//	remove this from TPixelBuffer
+		Frame.mPixelBuffer = std::make_shared<CFPixelBuffer>( sampleBufferRef, DoRetain, mRenderer, Transform );
+		mOnFrame(Frame);
 	}
 	catch(std::exception& e)
 	{
@@ -839,7 +818,7 @@ void AvfMediaExtractor::OnSampleBuffer(CMSampleBufferRef sampleBufferRef,size_t 
 }
 
 
-void AvfMediaExtractor::OnSampleBuffer(CVPixelBufferRef sampleBufferRef,SoyTime Timestamp,size_t StreamIndex,bool DoRetain)
+void AvfMediaExtractor::OnSampleBuffer(CVPixelBufferRef sampleBufferRef,SoyTime Timestamp,size_t StreamIndex,json11::Json::object& Meta,bool DoRetain)
 {
 	if ( !sampleBufferRef )
 		return;
@@ -847,13 +826,14 @@ void AvfMediaExtractor::OnSampleBuffer(CVPixelBufferRef sampleBufferRef,SoyTime 
 	//	callback on another thread, so need to catch exceptions
 	try
 	{
-		auto pPacket = std::make_shared<TMediaPacket>();
-		auto& Packet = *pPacket;
-		Packet.mMeta = GetFrameMeta( sampleBufferRef, StreamIndex );
-		Packet.mTimecode = Timestamp;
-		Packet.mPixelBuffer = std::make_shared<CVPixelBuffer>( sampleBufferRef, DoRetain, mRenderer, Packet.mMeta.mTransform );
-		
-		QueuePacket( pPacket );
+		Avf::TFrame Frame;
+		Frame.mMeta = Meta;
+		Frame.mStreamIndex = StreamIndex;
+		Frame.mTimestamp = Timestamp;
+		//Packet.mMeta = GetFrameMeta( sampleBufferRef, StreamIndex );
+		float3x3 Transform;	//	remove this from TPixelBuffer
+		Frame.mPixelBuffer = std::make_shared<CVPixelBuffer>( sampleBufferRef, DoRetain, mRenderer, Transform );
+		mOnFrame(Frame);
 	}
 	catch(std::exception& e)
 	{
@@ -863,6 +843,8 @@ void AvfMediaExtractor::OnSampleBuffer(CVPixelBufferRef sampleBufferRef,SoyTime 
 	}
 
 }
+
+
 
 void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,size_t StreamIndex,bool DoRetain)
 {
@@ -896,13 +878,29 @@ void AvfMediaExtractor::OnDepthFrame(AVDepthData* DepthData,CMTime CmTimestamp,s
 	SoyTime Timestamp = Soy::Platform::GetTime(CmTimestamp);
 	auto DepthPixels = DepthData.depthDataMap;
 	//Soy::TFourcc DepthFormat(DepthData.depthDataType);
-	auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
-	auto Accuracy = magic_enum::enum_name(DepthData.depthDataAccuracy);
+	
+	json11::Json::object Meta;
+	//auto Quality = magic_enum::enum_name(DepthData.depthDataQuality);
+	auto Quality = (DepthData.depthDataQuality == AVDepthDataQualityLow) ? 0 : 1;
 	auto IsFiltered = DepthData.depthDataFiltered;
+	Meta["DepthQuality"] = Quality;
+	Meta["DepthAccuracy"] = magic_enum::enum_name(DepthData.depthDataAccuracy);
+	Meta["DepthFiltered"] = IsFiltered;
 	AVCameraCalibrationData* CameraCalibration = DepthData.cameraCalibrationData;
+	if ( CameraCalibration )
+	{
+		Meta["Intrinsic"] = GetJsonArray(CameraCalibration.intrinsicMatrix);
+		Meta["IntrinsicSize"] = GetJsonArray(CameraCalibration.intrinsicMatrixReferenceDimensions);
+		matrix_float4x3 ExtrinsicMat = CameraCalibration.extrinsicMatrix;
+		vec3f ExtrinsicTrans( ExtrinsicMat.columns[3][0], ExtrinsicMat.columns[3][1], ExtrinsicMat.columns[3][2] );
+		matrix_float3x3 ExtrinsicRot = Get3x3(ExtrinsicMat);
+		Meta["ExtrinsicRot"] = GetJsonArray(ExtrinsicRot);
+		Meta["ExtrinsicTrans"] = GetJsonArray(ExtrinsicTrans);
+		Meta["LensDistortionCenter"] = GetJsonArray(CameraCalibration.lensDistortionCenter);
+	}
 		
 	//std::Debug << "Depth format " << DepthFormat << " quality=" << Quality << " Accuracy=" << Accuracy << " IsFiltered=" << IsFiltered << std::endl;
-	OnSampleBuffer( DepthPixels, Timestamp, StreamIndex, DoRetain );
+	OnSampleBuffer( DepthPixels, Timestamp, StreamIndex, Meta, DoRetain );
 }
 
 

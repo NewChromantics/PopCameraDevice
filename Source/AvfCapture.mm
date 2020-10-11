@@ -38,28 +38,15 @@ Avf::TCamera::TCamera(const std::string& DeviceName,json11::Json& Options) :
 	
 	mExtractor.reset(new AvfVideoCapture( Serial, Params, OpenglContext ));
 	
-	mExtractor->mOnPacketQueued = [this](const SoyTime,size_t StreamIndex)
+	mExtractor->mOnFrame = [this](Avf::TFrame& Frame)
 	{
-		PushLatestFrame(StreamIndex);
+		OnFrame(Frame);
 	};
 }
 
-void Avf::TCamera::PushLatestFrame(size_t StreamIndex)
+void Avf::TCamera::OnFrame(Avf::TFrame& Frame)
 {
-	if ( !mExtractor )
-	{
-		std::Debug << "MediaFoundation::TCamera::PushLatestFrame(" << StreamIndex << ") null extractor" << std::endl;
-		return;
-	}
-	
-	auto LatestPacket = mExtractor->PopPacket(StreamIndex);
-	if ( !LatestPacket )
-		return;
-	
-	//	todo: get all the frame meta
-	json11::Json::object Meta;
-	SoyTime FrameTime = LatestPacket->GetStartTime();
-	this->PushFrame( LatestPacket->mPixelBuffer, FrameTime, Meta );
+	this->PushFrame( Frame.mPixelBuffer, Frame.mTimestamp, Frame.mMeta );
 }
 
 void Avf::TCamera::EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable)
