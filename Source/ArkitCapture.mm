@@ -275,6 +275,20 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 	std::Debug << "FrontSupported=" << FrontSupported << std::endl;
 	std::Debug << "BodyTrackingSupported=" << BodyTrackingSupported << std::endl;
 
+	std::Debug << "Rear/world ARVideoFormats x" << [WorldVideoFormats count] << std::endl;
+	auto DebugVideoFormat = [&](ARVideoFormat* Format)
+	{
+		if ( !Format )
+		{
+			std::Debug << "ARVideoFormat* <null>"<<std::endl;
+			return;
+		}
+		auto Size = Format.imageResolution;
+		auto Fps = Format.framesPerSecond;
+		std::Debug << Size.width << "x" << Size.height << " at " << Fps << " fps" << std::endl;
+	};
+	Platform::NSArray_ForEach<ARVideoFormat*>(WorldVideoFormats,DebugVideoFormat);
+
 	
 	ARConfiguration* Configuration = nullptr;
 	if ( RearCamera )
