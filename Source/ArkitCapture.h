@@ -65,6 +65,7 @@ public:
 	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
 	bool	mOutputFeatures = false;	//	these get huge in quantity, so explicitly enable
 	bool	mOutputSceneDepthConfidence = false;
+	bool	mVerboseDebug = false;
 	//	todo: colour format
 };
 

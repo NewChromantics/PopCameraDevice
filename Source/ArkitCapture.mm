@@ -5,6 +5,7 @@
 #include "Json11/json11.hpp"
 #include "PopCameraDevice.h"
 
+
 //  gr: make this a proper check, quickly disabling for build here
 #define ENABLE_IOS14    (__IPHONE_OS_VERSION_MAX_ALLOWED >= 140000)
 #define ENABLE_IOS13    (__IPHONE_OS_VERSION_MAX_ALLOWED >= 130000)
@@ -61,6 +62,7 @@ public:
 
 	//	the test app sits on the main thread, so no frames were coming through
 	dispatch_queue_t				mQueue = nullptr;
+	TCaptureParams					mParams;
 };
 
 
@@ -191,7 +193,7 @@ Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
 	SetBool( POPCAMERADEVICE_KEY_FEATURES, mOutputFeatures );
 	SetBool( POPCAMERADEVICE_KEY_DEPTHCONFIDENCE, mOutputSceneDepthConfidence );
-	
+	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
 
 	//	probably don't need this to be seperate
 	mEnablePlanesVert = mEnablePlanesHorz;
@@ -227,7 +229,8 @@ void Arkit::EnumDevices(std::function<void(const std::string&,ArrayBridge<std::s
 }
 
 
-Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params)
+Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
+	mParams	( Params )
 {
 	mSessionProxy.Retain([[ARSessionProxy alloc] initWithSession:(this)]);
 	
@@ -356,7 +359,8 @@ Arkit::TSession::~TSession()
 
 void Arkit::TSession::OnFrame(ARFrame* Frame)
 {
-	std::Debug << "New ARkit frame" << std::endl;
+	if ( mParams.mVerboseDebug )
+		std::Debug << "New ARkit frame" << std::endl;
 	if ( mOnFrame )
 		mOnFrame( Frame );
 }
@@ -801,7 +805,8 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 {
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
-	std::Debug << "timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
+	if ( mParams.mVerboseDebug )
+		std::Debug << __PRETTY_FUNCTION__ << " timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
 
 	//	todo: allow user to specify params here with json
 	json11::Json JsonOptions;
