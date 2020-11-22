@@ -15,6 +15,8 @@
 #include "SoyFourcc.h"
 #include <magic_enum/include/magic_enum.hpp>
 #include "PopCameraDevice.h"
+#include "JsonFunctions.h"
+
 
 namespace Avf
 {
@@ -22,19 +24,6 @@ namespace Avf
 	vec2f				GetMinMaxFrameRate(AVCaptureDeviceFormat* Format);
 }
 
-
-
-json11::Json::array GetJsonArray(simd_float2 Values);
-json11::Json::array GetJsonArray(simd_float3 Values);
-json11::Json::array GetJsonArray(vec3f Values);
-json11::Json::array GetJsonArray(simd_float4 Values);
-json11::Json::array GetJsonArray(matrix_float3x3 Values);
-json11::Json::array GetJsonArray(simd_float4x4 Values);
-json11::Json::array GetJsonArrayAs4x4(simd_float4x3 Values);
-json11::Json::array GetJsonArray(simd_float3x3 Values);
-json11::Json::array GetJsonArray(CGSize Values);
-json11::Json::array GetJsonArray(CGPoint Values);
-matrix_float3x3 Get3x3(const matrix_float4x3& FourThree);
 
 
 @class VideoCaptureProxy;
@@ -74,7 +63,7 @@ matrix_float3x3 Get3x3(const matrix_float4x3& FourThree);
 	{
 		//	gr: this might be an NSError
 		auto* ErrorValue = notification.userInfo[AVCaptureSessionErrorKey];
-		NSString* Error = auto[NSString stringWithFormat:@"%@", ErrorValue];
+		NSString* Error = [NSString stringWithFormat:@"%@", ErrorValue];
 		auto ErrorStr = Soy::NSStringToString( Error );
 		std::Debug << "Video error: "  << ErrorStr << std::endl;
 	}

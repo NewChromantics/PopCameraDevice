@@ -1,6 +1,7 @@
 #include "TestDevice.h"
 #include "SoyLib/src/SoyMedia.h"
 #include "PopCameraDevice.h"
+#include "JsonFunctions.h"
 
 
 TTestDeviceParams::TTestDeviceParams(json11::Json& Options)
