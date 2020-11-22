@@ -6,6 +6,22 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		BF51B8D6256AD31B004DE4C7 /* PopCameraDevice_Universal */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = BF51B8D9256AD31B004DE4C7 /* Build configuration list for PBXAggregateTarget "PopCameraDevice_Universal" */;
+			buildPhases = (
+				BF51B8E1256AD33C004DE4C7 /* ShellScript */,
+			);
+			dependencies = (
+				BF51B8DE256AD339004DE4C7 /* PBXTargetDependency */,
+				BF51B8E0256AD339004DE4C7 /* PBXTargetDependency */,
+			);
+			name = PopCameraDevice_Universal;
+			productName = PopCameraDevice_Universal;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		BF012AD12268DE24003AEB55 /* AvfCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.mm */; };
 		BF012AD22269FAE2003AEB55 /* PopCameraDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AB42268DBF8003AEB55 /* PopCameraDevice.cpp */; };
@@ -105,6 +121,8 @@
 		BF22BD2224FA7D11002B9AC0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205223855F1F00A70EBF /* UIKit.framework */; };
 		BF39C0CC2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
+		BF51B8E6256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */; };
+		BF51B8E7256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */; };
 		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
 		BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF67C86524373BD700D7492E /* CoreMediaIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF67C86424373BD600D7492E /* CoreMediaIO.framework */; };
@@ -130,6 +148,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = BF15200F2384861D00A70EBF;
 			remoteInfo = PopCameraDevice_Ios;
+		};
+		BF51B8DD256AD339004DE4C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF4A6A0C1EA16D7C00613A64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF15200F2384861D00A70EBF;
+			remoteInfo = PopCameraDevice_Ios;
+		};
+		BF51B8DF256AD339004DE4C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BF4A6A0C1EA16D7C00613A64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BF012AC42268DC95003AEB55;
+			remoteInfo = PopCameraDevice_Osx;
 		};
 		BF5C4ACE23FB04D1007D6393 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -284,6 +316,9 @@
 		BF2E7CAF22E4EB26008B905F /* PopCameraDevice_TestAppOsx_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_TestAppOsx_Info.plist; sourceTree = "<group>"; };
 		BF39C0C9240089E9000C7E56 /* Array.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Array.hpp; sourceTree = "<group>"; };
 		BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PopCameraDevice.cs; path = Unity/PopCameraDevice/Assets/PopCameraDevice/PopCameraDevice.cs; sourceTree = "<group>"; };
+		BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JsonFunctions.cpp; path = Source/JsonFunctions.cpp; sourceTree = "<group>"; };
+		BF51B8EB256AD9A3004DE4C7 /* JsonFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JsonFunctions.h; path = Source/JsonFunctions.h; sourceTree = "<group>"; };
+		BF51B8F2256AE1A4004DE4C7 /* BuildUniversal.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = BuildUniversal.sh; sourceTree = "<group>"; };
 		BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CoreMediaOutputDevice.mm; path = Source/CoreMediaOutputDevice.mm; sourceTree = "<group>"; };
 		BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreMediaOutputDevice.h; path = Source/CoreMediaOutputDevice.h; sourceTree = "<group>"; };
 		BF67C86424373BD600D7492E /* CoreMediaIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMediaIO.framework; path = System/Library/Frameworks/CoreMediaIO.framework; sourceTree = SDKROOT; };
@@ -531,6 +566,7 @@
 		BF1520112384861D00A70EBF /* Source_Ios */ = {
 			isa = PBXGroup;
 			children = (
+				BF51B8F2256AE1A4004DE4C7 /* BuildUniversal.sh */,
 				BF15201F2385555500A70EBF /* PopCameraDevice_Ios.xcconfig */,
 				BF1520132384861D00A70EBF /* PopCameraDevice_Framework_Ios_Info.plist */,
 			);
@@ -635,6 +671,8 @@
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
 				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
+				BF51B8EB256AD9A3004DE4C7 /* JsonFunctions.h */,
+				BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */,
 				BF108A872296F476003DDC5F /* Freenect.cpp */,
 				BF108A862296F476003DDC5F /* Freenect.h */,
 				BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */,
@@ -819,6 +857,11 @@
 						DevelopmentTeam = X52DR36JY2;
 						ProvisioningStyle = Automatic;
 					};
+					BF51B8D6256AD31B004DE4C7 = {
+						CreatedOnToolsVersion = 12.0;
+						DevelopmentTeam = X52DR36JY2;
+						ProvisioningStyle = Automatic;
+					};
 					BFE462C124B3C9C100D04A4C = {
 						CreatedOnToolsVersion = 10.1;
 						DevelopmentTeam = 2HGDT7H2KX;
@@ -845,6 +888,7 @@
 				BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */,
 				BFE462C124B3C9C100D04A4C /* PopCameraDevice_Linux */,
 				BF09A5DD24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios */,
+				BF51B8D6256AD31B004DE4C7 /* PopCameraDevice_Universal */,
 			);
 		};
 /* End PBXProject section */
@@ -897,6 +941,24 @@
 			shellScript = "
 ";
 		};
+		BF51B8E1256AD33C004DE4C7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				./build/$PopCameraDevice.xcframework,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "chmod +x ./Source_Ios/BuildUniversal.sh\n./Source_Ios/BuildUniversal.sh ${PROJECT_NAME}\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -941,6 +1003,7 @@
 				BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */,
 				BF216EA024CA1B81003FD00B /* json11.cpp in Sources */,
 				BF8534D222B3FE370049C01B /* audio.c in Sources */,
+				BF51B8E6256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */,
 				BF152043238559F000A70EBF /* SoyFourcc.cpp in Sources */,
 				BF012AF12269FE13003AEB55 /* SoyDebug.mm in Sources */,
 				BF012B5E226A30A6003AEB55 /* SoyVector.cpp in Sources */,
@@ -1006,6 +1069,7 @@
 				BF152029238559A200A70EBF /* SoyAssert.cpp in Sources */,
 				BF15201C2384863900A70EBF /* PopCameraDevice.cpp in Sources */,
 				BF15202A238559A200A70EBF /* SoyAvf.mm in Sources */,
+				BF51B8E7256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */,
 				BF15204F23855BDD00A70EBF /* SoyArray.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1017,6 +1081,16 @@
 			isa = PBXTargetDependency;
 			target = BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */;
 			targetProxy = BF09A5F824FA752C002F56DB /* PBXContainerItemProxy */;
+		};
+		BF51B8DE256AD339004DE4C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */;
+			targetProxy = BF51B8DD256AD339004DE4C7 /* PBXContainerItemProxy */;
+		};
+		BF51B8E0256AD339004DE4C7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BF012AC42268DC95003AEB55 /* PopCameraDevice_Osx */;
+			targetProxy = BF51B8DF256AD339004DE4C7 /* PBXContainerItemProxy */;
 		};
 		BF5C4ACF23FB04D1007D6393 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1426,6 +1500,24 @@
 			};
 			name = Release;
 		};
+		BF51B8D7256AD31B004DE4C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = X52DR36JY2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BF51B8D8256AD31B004DE4C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = X52DR36JY2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		BFE462C324B3C9C100D04A4C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1531,6 +1623,15 @@
 			buildConfigurations = (
 				BF4A6A181EA16D7D00613A64 /* Debug */,
 				BF4A6A191EA16D7D00613A64 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF51B8D9256AD31B004DE4C7 /* Build configuration list for PBXAggregateTarget "PopCameraDevice_Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF51B8D7256AD31B004DE4C7 /* Debug */,
+				BF51B8D8256AD31B004DE4C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
