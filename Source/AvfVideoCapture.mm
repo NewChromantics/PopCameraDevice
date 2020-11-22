@@ -72,7 +72,9 @@ matrix_float3x3 Get3x3(const matrix_float4x3& FourThree);
 	*/
 	try
 	{
-		NSString* Error = notification.userInfo[AVCaptureSessionErrorKey];
+		//	gr: this might be an NSError
+		auto* ErrorValue = notification.userInfo[AVCaptureSessionErrorKey];
+		NSString* Error = auto[NSString stringWithFormat:@"%@", ErrorValue];
 		auto ErrorStr = Soy::NSStringToString( Error );
 		std::Debug << "Video error: "  << ErrorStr << std::endl;
 	}
