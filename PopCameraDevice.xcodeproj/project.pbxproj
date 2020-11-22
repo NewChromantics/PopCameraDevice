@@ -953,7 +953,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				./build/$PopCameraDevice.xcframework,
+				./build/PopCameraDevice.xcframework,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
