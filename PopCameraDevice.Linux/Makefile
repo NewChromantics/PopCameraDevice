@@ -27,7 +27,7 @@ $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
 $(SRC_PATH)/Json11/json11.cpp	\
-$(SRC_PATH)/JsonFunctions.cpp	\
+# $(SRC_PATH)/JsonFunctions.cpp	\
 
 # soy lib files
 LIB_SRC_FILES  += \
@@ -172,4 +172,3 @@ $(K4A_LIB):
 	# at runtime the code(maybe depth engine?) tries to load libk4a.1.4 instead of 1.4.1
 	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4
 
-	
