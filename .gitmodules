@@ -10,6 +10,3 @@
 [submodule "Unity/PopCameraDevice/Assets/PopUnityYuvShader"]
 	path = Unity/PopCameraDevice/Assets/PopUnityYuvShader
 	url = https://github.com/NewChromantics/PopUnityYuvShader.git
-[submodule "Source/Json11"]
-	path = Source/Json11
-	url = https://github.com/NewChromantics/json11.git
