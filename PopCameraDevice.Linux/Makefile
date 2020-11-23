@@ -27,6 +27,7 @@ $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
 $(SRC_PATH)/Json11/json11.cpp	\
+$(SRC_PATH)/JsonFunctions.cpp	\
 
 # soy lib files
 LIB_SRC_FILES  += \
