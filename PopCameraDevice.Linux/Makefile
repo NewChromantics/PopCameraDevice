@@ -27,7 +27,7 @@ $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
 $(SRC_PATH)/Json11/json11.cpp	\
-# $(SRC_PATH)/JsonFunctions.cpp	\
+$(SRC_PATH)/JsonFunctions.cpp	\
 
 # soy lib files
 LIB_SRC_FILES  += \
@@ -50,6 +50,7 @@ $(SOY_PATH)/src/SoyWave.cpp \
 $(SOY_PATH)/src/SoyRuntimeLibrary.cpp \
 $(SOY_PATH)/src/SoyThread.cpp \
 $(SOY_PATH)/src/SoyFilesystem.cpp \
+$(SOY_PATH)/src/SoyPlatform.cpp \
 
 
 APP_SRC_FILES =	\
