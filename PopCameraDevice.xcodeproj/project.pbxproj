@@ -14,8 +14,6 @@
 				BF51B8E1256AD33C004DE4C7 /* ShellScript */,
 			);
 			dependencies = (
-				BF51B8DE256AD339004DE4C7 /* PBXTargetDependency */,
-				BF51B8E0256AD339004DE4C7 /* PBXTargetDependency */,
 			);
 			name = PopCameraDevice_Universal;
 			productName = PopCameraDevice_Universal;
@@ -148,20 +146,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = BF15200F2384861D00A70EBF;
 			remoteInfo = PopCameraDevice_Ios;
-		};
-		BF51B8DD256AD339004DE4C7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BF4A6A0C1EA16D7C00613A64 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BF15200F2384861D00A70EBF;
-			remoteInfo = PopCameraDevice_Ios;
-		};
-		BF51B8DF256AD339004DE4C7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BF4A6A0C1EA16D7C00613A64 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BF012AC42268DC95003AEB55;
-			remoteInfo = PopCameraDevice_Osx;
 		};
 		BF5C4ACE23FB04D1007D6393 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1081,16 +1065,6 @@
 			isa = PBXTargetDependency;
 			target = BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */;
 			targetProxy = BF09A5F824FA752C002F56DB /* PBXContainerItemProxy */;
-		};
-		BF51B8DE256AD339004DE4C7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */;
-			targetProxy = BF51B8DD256AD339004DE4C7 /* PBXContainerItemProxy */;
-		};
-		BF51B8E0256AD339004DE4C7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BF012AC42268DC95003AEB55 /* PopCameraDevice_Osx */;
-			targetProxy = BF51B8DF256AD339004DE4C7 /* PBXContainerItemProxy */;
 		};
 		BF5C4ACF23FB04D1007D6393 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
