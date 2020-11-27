@@ -182,7 +182,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BF012AA92268DBF7003AEB55 /* PopCameraDevice_Framework_Osx_Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PopCameraDevice_Framework_Osx_Info.plist; sourceTree = "<group>"; };
+		BF012AA92268DBF7003AEB55 /* PopCameraDevice_Osx_Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PopCameraDevice_Osx_Info.plist; sourceTree = "<group>"; };
 		BF012AAA2268DBF7003AEB55 /* MfCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MfCapture.h; path = Source/MfCapture.h; sourceTree = "<group>"; };
 		BF012AAB2268DBF7003AEB55 /* MfDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MfDecoder.h; path = Source/MfDecoder.h; sourceTree = "<group>"; };
 		BF012AAC2268DBF7003AEB55 /* TestDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TestDevice.cpp; path = Source/TestDevice.cpp; sourceTree = "<group>"; };
@@ -280,7 +280,7 @@
 		BF108AEE22972F23003DDC5F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BF108AF322980C2C003DDC5F /* Build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = Build.sh; path = Source/Libs/LibFreenect2/Build.sh; sourceTree = SOURCE_ROOT; };
 		BF1520102384861D00A70EBF /* PopCameraDevice_Ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PopCameraDevice_Ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF1520132384861D00A70EBF /* PopCameraDevice_Framework_Ios_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_Framework_Ios_Info.plist; sourceTree = "<group>"; };
+		BF1520132384861D00A70EBF /* PopCameraDevice_Ios_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_Ios_Info.plist; sourceTree = "<group>"; };
 		BF15201F2385555500A70EBF /* PopCameraDevice_Ios.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = PopCameraDevice_Ios.xcconfig; sourceTree = "<group>"; };
 		BF1520202385593C00A70EBF /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreMedia.framework; sourceTree = DEVELOPER_DIR; };
 		BF1520222385594100A70EBF /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/VideoToolbox.framework; sourceTree = DEVELOPER_DIR; };
@@ -552,7 +552,7 @@
 			children = (
 				BF51B8F2256AE1A4004DE4C7 /* BuildUniversal.sh */,
 				BF15201F2385555500A70EBF /* PopCameraDevice_Ios.xcconfig */,
-				BF1520132384861D00A70EBF /* PopCameraDevice_Framework_Ios_Info.plist */,
+				BF1520132384861D00A70EBF /* PopCameraDevice_Ios_Info.plist */,
 			);
 			path = Source_Ios;
 			sourceTree = "<group>";
@@ -571,7 +571,7 @@
 			isa = PBXGroup;
 			children = (
 				BF012AAE2268DBF8003AEB55 /* BundleInfo.plist */,
-				BF012AA92268DBF7003AEB55 /* PopCameraDevice_Framework_Osx_Info.plist */,
+				BF012AA92268DBF7003AEB55 /* PopCameraDevice_Osx_Info.plist */,
 				BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */,
 			);
 			path = Source_Osx;
