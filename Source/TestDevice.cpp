@@ -3,6 +3,10 @@
 #include "PopCameraDevice.h"
 #include "JsonFunctions.h"
 
+#if defined (TARGET_LINUX)
+#include <math.h>
+#include <cmath>
+#endif
 
 TTestDeviceParams::TTestDeviceParams(json11::Json& Options)
 {
