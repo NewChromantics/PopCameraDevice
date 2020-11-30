@@ -19,6 +19,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Source\Json11\json11.cpp" />
+    <ClCompile Include="..\Source\JsonFunctions.cpp" />
     <ClCompile Include="..\Source\Kinect.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_NoKinect|x64'">true</ExcludedFromBuild>
@@ -75,6 +76,7 @@
     <ClCompile Include="..\Source\SoyLib\src\SoyMediaFormat.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyMediaFoundation.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyPixels.cpp" />
+    <ClCompile Include="..\Source\SoyLib\src\SoyPlatform.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyPng.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyRuntimeLibrary.cpp" />
     <ClCompile Include="..\Source\SoyLib\src\SoyString.cpp" />
@@ -104,6 +106,7 @@
     </ClInclude>
     <ClInclude Include="..\Source\Freenect.h" />
     <ClInclude Include="..\Source\Json11\json11.hpp" />
+    <ClInclude Include="..\Source\JsonFunctions.h" />
     <ClInclude Include="..\Source\Kinect.h" />
     <ClInclude Include="..\Source\Freenect2.h" />
     <ClInclude Include="..\Source\Kinect2.h" />
@@ -147,6 +150,7 @@
     <ClInclude Include="..\Source\SoyLib\src\SoyMediaFormat.h" />
     <ClInclude Include="..\Source\SoyLib\src\soymediafoundation.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyPixels.h" />
+    <ClInclude Include="..\Source\SoyLib\src\SoyPlatform.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyPng.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyRuntimeLibrary.h" />
     <ClInclude Include="..\Source\SoyLib\src\SoyString.h" />

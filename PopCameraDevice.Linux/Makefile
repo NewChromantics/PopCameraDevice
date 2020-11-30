@@ -50,6 +50,7 @@ $(SOY_PATH)/src/SoyWave.cpp \
 $(SOY_PATH)/src/SoyRuntimeLibrary.cpp \
 $(SOY_PATH)/src/SoyThread.cpp \
 $(SOY_PATH)/src/SoyFilesystem.cpp \
+$(SOY_PATH)/src/SoyPlatform.cpp \
 
 
 APP_SRC_FILES =	\
@@ -172,4 +173,3 @@ $(K4A_LIB):
 	# at runtime the code(maybe depth engine?) tries to load libk4a.1.4 instead of 1.4.1
 	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4
 
-	

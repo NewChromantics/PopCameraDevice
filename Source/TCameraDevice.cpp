@@ -199,7 +199,14 @@ bool PopCameraDevice::TDevice::GetNextFrame(TFrame& Frame,bool DeleteFrame)
 
 	auto pFrame0 = mFrames[0];
 	auto& Frame0 = *pFrame0;
-	Frame = Frame0;
+	auto Meta = Frame0.mMeta;
+	auto FrameTime = Frame0.mFrameTime;
+	auto PixelBuffer = Frame0.mPixelBuffer;
+	Frame.mMeta = "Test";
+	Frame.mMeta = Meta;
+	Frame.mFrameTime = FrameTime;
+	Frame.mPixelBuffer = PixelBuffer;
+
 	if (DeleteFrame)
 	{
 		mFrames.RemoveBlock(0, 1);
