@@ -532,12 +532,12 @@ void Avf::GetMeta(ARCamera* Camera,json11::Json::object& Meta)
 {
 	//	"rotation and translation in world space"
 	//	so camera to world?
-	auto LocalToWorld = GetJsonArray(Camera.transform);
+	auto LocalToWorld = GetJsonArray(Camera.transform);	//	todo: this needs to be transposed!
 	auto LocalEulerRadians = GetJsonArray( Camera.eulerAngles );
 	auto Tracking = magic_enum::enum_name(Camera.trackingState);
 	auto TrackingStateReason = magic_enum::enum_name(Camera.trackingStateReason);
 	auto Intrinsics = GetJsonArray(Camera.intrinsics);
-	auto ProjectionMatrix = GetJsonArray(Camera.projectionMatrix);
+	auto ProjectionMatrix = GetJsonArray(Camera.projectionMatrix);	//	todo: transpose and convert to 4x4
 	auto CameraResolution = GetJsonArray(Camera.imageResolution);
 	
 	//	skip transform if it's identity rather than write out bad data
