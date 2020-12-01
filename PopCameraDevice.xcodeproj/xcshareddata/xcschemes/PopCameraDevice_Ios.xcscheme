@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BF15200F2384861D00A70EBF"
-               BuildableName = "PopCameraDevice_Ios.framework"
+               BuildableName = "PopCameraDevice.xcframework"
                BlueprintName = "PopCameraDevice_Ios"
                ReferencedContainer = "container:PopCameraDevice.xcodeproj">
             </BuildableReference>
@@ -29,8 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -47,13 +45,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF15200F2384861D00A70EBF"
-            BuildableName = "PopCameraDevice_Ios.framework"
+            BuildableName = "PopCameraDevice.xcframework"
             BlueprintName = "PopCameraDevice_Ios"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -65,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF15200F2384861D00A70EBF"
-            BuildableName = "PopCameraDevice_Ios.framework"
+            BuildableName = "PopCameraDevice.xcframework"
             BlueprintName = "PopCameraDevice_Ios"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>

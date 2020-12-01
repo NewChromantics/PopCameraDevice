@@ -26,3 +26,6 @@ OTHER_LDFLAGS = -fembed-bitcode;
 //	but despite none showing, a build using this framework still succeeded
 //	with just -fenable_bitcode and enable bitcode, it failed
 BITCODE_GENERATION_MODE = bitcode
+
+// tsdk: Mirroring config from PopH264
+BUILD_LIBRARY_FOR_DISTRIBUTION = YES
