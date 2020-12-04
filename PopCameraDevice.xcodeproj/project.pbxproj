@@ -196,7 +196,7 @@
 		BF012AB52268DBF8003AEB55 /* TCameraDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TCameraDevice.cpp; path = Source/TCameraDevice.cpp; sourceTree = "<group>"; };
 		BF012AB62268DBF8003AEB55 /* PopCameraDeviceFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PopCameraDeviceFramework.h; path = Source/PopCameraDeviceFramework.h; sourceTree = "<group>"; };
 		BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = PopCameraDevice_Osx.xcconfig; sourceTree = "<group>"; };
-		BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = PopCameraDevice_Osx.framework; path = PopCameraDevice.xcframework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PopCameraDevice_Osx.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF012ACD2268DE24003AEB55 /* AvfCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AvfCapture.h; path = Source/AvfCapture.h; sourceTree = "<group>"; };
 		BF012ACE2268DE24003AEB55 /* AvfCapture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AvfCapture.mm; path = Source/AvfCapture.mm; sourceTree = "<group>"; };
 		BF012AD62269FC83003AEB55 /* SoyPixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoyPixels.h; sourceTree = "<group>"; };
@@ -260,7 +260,7 @@
 		BF012B74226A3296003AEB55 /* SoyTime.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SoyTime.mm; sourceTree = "<group>"; };
 		BF012B77226A3303003AEB55 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BF09A5D824F7F1EB002F56DB /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = Source/Version.xcconfig; sourceTree = "<group>"; };
-		BF09A5DE24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = PopCameraDevice_TestApp_Ios.app; path = PopCameraDevice.xcframework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF09A5DE24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = PopCameraDevice_TestApp_Ios.app; path = PopCameraDevice_TestApp_Ios; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF09A5E924FA73F3002F56DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF09A5EE24FA73F3002F56DB /* PopCameraDevice_TestAppIos_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_TestAppIos_Info.plist; sourceTree = "<group>"; };
 		BF0A19C21EA428F4007EBC95 /* Unity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Unity; sourceTree = "<group>"; };
@@ -269,7 +269,7 @@
 		BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Kinect2.cpp; path = Source/Kinect2.cpp; sourceTree = "<group>"; };
 		BF108A8C2296F4BE003DDC5F /* Kinect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kinect2.h; path = Source/Kinect2.h; sourceTree = "<group>"; };
 		BF108A912296F7D6003DDC5F /* LibFreenect2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LibFreenect2; sourceTree = "<group>"; };
-		BF108A9622970C92003DDC5F /* TestApp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = TestApp; path = PopCameraDevice.xcframework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF108A9622970C92003DDC5F /* TestApp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TestApp; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PopCameraDevice_TestApp.cpp; sourceTree = "<group>"; };
 		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = lib/libfreenect2.a; sourceTree = "<group>"; };
 		BF108AA6229714F5003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.a"; sourceTree = "<group>"; };
@@ -279,7 +279,7 @@
 		BF108AE922972877003DDC5F /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		BF108AEE22972F23003DDC5F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		BF108AF322980C2C003DDC5F /* Build.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = Build.sh; path = Source/Libs/LibFreenect2/Build.sh; sourceTree = SOURCE_ROOT; };
-		BF1520102384861D00A70EBF /* PopCameraDevice_Ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = PopCameraDevice_Ios.framework; path = PopCameraDevice.xcframework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF1520102384861D00A70EBF /* PopCameraDevice_Ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PopCameraDevice_Ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF1520132384861D00A70EBF /* PopCameraDevice_Framework_Ios_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_Framework_Ios_Info.plist; sourceTree = "<group>"; };
 		BF15201F2385555500A70EBF /* PopCameraDevice_Ios.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = PopCameraDevice_Ios.xcconfig; sourceTree = "<group>"; };
 		BF1520202385593C00A70EBF /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreMedia.framework; sourceTree = DEVELOPER_DIR; };
