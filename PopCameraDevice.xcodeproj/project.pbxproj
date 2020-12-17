@@ -260,7 +260,7 @@
 		BF012B74226A3296003AEB55 /* SoyTime.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SoyTime.mm; sourceTree = "<group>"; };
 		BF012B77226A3303003AEB55 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		BF09A5D824F7F1EB002F56DB /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = Source/Version.xcconfig; sourceTree = "<group>"; };
-		BF09A5DE24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = PopCameraDevice_TestApp_Ios.app; path = PopCameraDevice_TestApp_Ios; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF09A5DE24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PopCameraDevice_TestApp_Ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF09A5E924FA73F3002F56DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF09A5EE24FA73F3002F56DB /* PopCameraDevice_TestAppIos_Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PopCameraDevice_TestAppIos_Info.plist; sourceTree = "<group>"; };
 		BF0A19C21EA428F4007EBC95 /* Unity */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Unity; sourceTree = "<group>"; };
@@ -1460,9 +1460,11 @@
 		BF51B8D7256AD31B004DE4C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X52DR36JY2;
 				FULL_PRODUCT_NAME = "${PRODUCT_NAME}.xcframework";
+				OBJROOT = "$(SYMROOT)$(EFFECTIVE_PLATFORM_NAME)";
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 			};
 			name = Debug;
@@ -1470,9 +1472,12 @@
 		BF51B8D8256AD31B004DE4C7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X52DR36JY2;
+				ENABLE_TESTABILITY = NO;
 				FULL_PRODUCT_NAME = "${PRODUCT_NAME}.xcframework";
+				OBJROOT = "$(SYMROOT)$(EFFECTIVE_PLATFORM_NAME)";
 				PRODUCT_NAME = "$(PROJECT_NAME)";
 			};
 			name = Release;
