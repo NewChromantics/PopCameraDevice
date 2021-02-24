@@ -8,7 +8,7 @@ on:
 
 jobs:
   Build:
-    runs-on: [self-hosted, windows]
+    runs-on: windows-latest
     env:
       project: PopCameraDevice
     
@@ -24,7 +24,7 @@ jobs:
       uses: NewChromantics/PopAction_BuildWindows@v1
       with:
         BuildPlatform: x64
-        BuildConfiguration: Debug_NoKinect
+        BuildConfiguration: Release_NoKinect
         # would be nice to extract this from visual studio
-        BuildDirectory: PopCameraDevice.visualstudio\x64\Debug_NoKinect
+        BuildDirectory: PopCameraDevice.visualstudio\x64\Release_NoKinect
         project: ${{ env.project }}
