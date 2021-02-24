@@ -24,7 +24,7 @@ jobs:
       uses: NewChromantics/PopAction_BuildWindows@v1
       with:
         BuildPlatform: x64
-        BuildConfiguration: Debug
+        BuildConfiguration: Release
         # would be nice to extract this from visual studio
-        BuildDirectory: Build\Debug_x6
+        BuildDirectory: Build\Release_x64
         project: ${{ env.project }}
