@@ -728,14 +728,15 @@ const char* Arkit::GetColourStreamName(ArFrameSource::Type Source)
 		case ArFrameSource::FrontColour:
 		case ArFrameSource::FrontDepth:
 			return "FrontColour";
-			
+	
+		case ArFrameSource::sceneDepth:	
 		case ArFrameSource::RearDepth:
 		case ArFrameSource::RearDepthConfidence:
 			return "RearColour";
 		
-		//	return what we were doing before
+		//	gr: we should make sure of others are correct, but output something instead of null as we did before 
 		default:
-			return nullptr;
+			return "Colour";
 	};
 }
 
@@ -765,8 +766,6 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 		ColourIsNew = false;
 	}
 	
-	if ( !DepthIsValid )
-		std::Debug << "Zero depth time" << std::endl;
 	if ( mParams.mVerboseDebug )
 		std::Debug << __PRETTY_FUNCTION__ << " timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
 
