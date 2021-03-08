@@ -59,12 +59,13 @@ public:
 	bool	mEnableLightEstimation = true;
 	bool	mEnableBodyDetection = false;	//	body+scene not allowed, so this is off by default
 	bool	mEnableSceneDepth = false;		//	should this be depthformat != null?
-	bool	mEnablePersonSegmentation = true;
+	bool	mEnablePersonSegmentation = false;
 	bool	mResetTracking = false;	//	on start
 	bool	mResetAnchors = false;	//	on start
 	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
 	bool	mOutputFeatures = false;	//	these get huge in quantity, so explicitly enable
 	bool	mOutputSceneDepthConfidence = false;
+	bool	mOutputSceneDepthSmooth = false;
 	bool	mVerboseDebug = false;
 	//	todo: colour format
 };
@@ -76,11 +77,13 @@ class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 public:
 	TFrameDevice(json11::Json& Options);
 	
-	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName=nullptr);
-	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName=nullptr);
-	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName=nullptr);
+	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
+	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
+	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
 	
+	SoyTime			mPreviousDepthTime;
+	SoyTime			mPreviousFrameTime;
 	TCaptureParams	mParams;
 };
 

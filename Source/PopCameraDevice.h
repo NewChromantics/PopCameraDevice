@@ -43,8 +43,9 @@
 #define POPCAMERADEVICE_KEY_ENABLESEGMENTATION		"Segmentation"	//	person segmentation in arkit
 #define POPCAMERADEVICE_KEY_RESETTRACKING			"ResetTracking"
 #define POPCAMERADEVICE_KEY_RESETANCHORS			"ResetAnchors"
-#define POPCAMERADEVICE_KEY_FEATURES				"Features"		//	option to not output features as they start to make the meta huge (1000's). Consider a pixel output for features
+#define POPCAMERADEVICE_KEY_FEATURES				"Features"		//	option to not output features as they start to make the meta huge (1000's). Consider a pixel output for features, or let this be per-frame and intermittently request
 #define POPCAMERADEVICE_KEY_DEPTHCONFIDENCE			"DepthConfidence"
+#define POPCAMERADEVICE_KEY_DEPTHSMOOTH				"DepthSmooth"	//	use ARFrame.smoothedscenedepth if availible
 
 //	kinect azure
 #define POPCAMERADEVICE_KEY_SYNCPRIMARY				"SyncPrimary"

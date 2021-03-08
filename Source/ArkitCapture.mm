@@ -25,6 +25,11 @@
 #pragma message("IOS 14")
 #endif
 
+namespace Arkit
+{
+	const char*	GetColourStreamName(ArFrameSource::Type Source);
+};
+
 
 
 @interface ARSessionProxy : NSObject<ARSessionObserver,ARSCNViewDelegate,ARSessionDelegate>
@@ -193,6 +198,7 @@ Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
 	SetBool( POPCAMERADEVICE_KEY_FEATURES, mOutputFeatures );
 	SetBool( POPCAMERADEVICE_KEY_DEPTHCONFIDENCE, mOutputSceneDepthConfidence );
+	SetBool( POPCAMERADEVICE_KEY_DEPTHSMOOTH, mOutputSceneDepthSmooth );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
 
 	//	probably don't need this to be seperate
@@ -714,6 +720,25 @@ void Avf::GetMeta(ARDepthData* Depth,json11::Json::object& Meta)
 }
 
 
+//	we don't have stream names for the colour frames
+const char* Arkit::GetColourStreamName(ArFrameSource::Type Source)
+{
+	switch(Source)
+	{
+		case ArFrameSource::FrontColour:
+		case ArFrameSource::FrontDepth:
+			return "FrontColour";
+			
+		case ArFrameSource::RearDepth:
+		case ArFrameSource::RearDepthConfidence:
+			return "RearColour";
+		
+		//	return what we were doing before
+		default:
+			return nullptr;
+	};
+}
+
 Arkit::TFrameDevice::TFrameDevice(json11::Json& Options) : 
 	TDevice	( Options ),
 	mParams	( Options )
@@ -724,48 +749,75 @@ Arkit::TFrameDevice::TFrameDevice(json11::Json& Options) :
 
 void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 {
+	auto* ColourStreamName = GetColourStreamName(Source);
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
+	auto DepthIsValid = CapDepthTime.GetTime() != 0;
+	if ( CapDepthTime <= mPreviousDepthTime && DepthIsValid )
+	{
+		std::Debug << "PushFrame(ARFrame*) ignoring depth frame prev=" << mPreviousDepthTime << " this=" << CapDepthTime << std::endl;
+		DepthIsValid = false;
+	}
+	bool ColourIsNew = true;
+	if ( FrameTime <= mPreviousFrameTime )
+	{
+		std::Debug << "PushFrame(ARFrame*) ignoring [colour] frame prev=" << mPreviousFrameTime << " this=" << FrameTime << std::endl;
+		ColourIsNew = false;
+	}
+	
+	if ( !DepthIsValid )
+		std::Debug << "Zero depth time" << std::endl;
 	if ( mParams.mVerboseDebug )
 		std::Debug << __PRETTY_FUNCTION__ << " timestamp=" << FrameTime << " capturedDepthDataTimestamp=" << CapDepthTime << std::endl;
 
-	//	todo: allow user to specify params here with json
-	json11::Json JsonOptions;
-	TCaptureParams Params(JsonOptions);
-	Params.mOutputFeatures = false;
-
 	//	get meta out of the ARFrame
 	json11::Json::object Meta;
-	Avf::GetMeta( Frame, Meta, Params );
+	Avf::GetMeta( Frame, Meta, mParams );
 
 	//	gr: now we can handle multiple streams, just output anything we have
 	if ( Frame.capturedImage )
-		PushFrame( Frame.capturedImage, FrameTime, Meta );
+		if ( ColourIsNew )
+			PushFrame( Frame.capturedImage, FrameTime, Meta, ColourStreamName );
 
 	if ( Frame.capturedDepthData )
-		PushFrame( Frame.capturedDepthData, CapDepthTime, Meta, "CapturedDepthData" );
+		if ( DepthIsValid )
+			PushFrame( Frame.capturedDepthData, CapDepthTime, Meta, "CapturedDepthData" );
 			
 #if ENABLE_IOS13
-	if ( Frame.segmentationBuffer )
-		PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta, "SegmentationBuffer" );
+	if ( mParams.mEnablePersonSegmentation )	//	this may not be enabled by user, but still output
+		if ( Frame.segmentationBuffer )
+			PushFrame( Frame.segmentationBuffer, CapDepthTime, Meta, "SegmentationBuffer" );
 #endif
-			
-#if ENABLE_IOS14
-	if ( Frame.sceneDepth )
-	{
-		Avf::GetMeta( Frame.sceneDepth, Meta );
-		if ( Frame.sceneDepth.depthMap )
-			PushFrame( Frame.sceneDepth.depthMap, FrameTime, Meta, "SceneDepthMap" );
 
-		if ( Frame.sceneDepth.confidenceMap )
+#if ENABLE_IOS13
+	if ( Frame.estimatedDepthData )
+		PushFrame( Frame.estimatedDepthData, CapDepthTime, Meta, "EstimatedDepthData" );
+#endif
+
+#if ENABLE_IOS14
+	auto SmoothDepth = Frame.smoothedSceneDepth ? Frame.smoothedSceneDepth : Frame.sceneDepth;
+	auto NormalDepth = Frame.sceneDepth ? Frame.sceneDepth : Frame.smoothedSceneDepth;
+	auto SceneDepth = mParams.mOutputSceneDepthSmooth ? SmoothDepth : NormalDepth;
+	if ( SceneDepth )
+	{
+		Avf::GetMeta( SceneDepth, Meta );
+		if ( SceneDepth.depthMap )
+			PushFrame( SceneDepth.depthMap, FrameTime, Meta, "SceneDepthMap" );
+
+		if ( SceneDepth.confidenceMap )
 			if ( mParams.mOutputSceneDepthConfidence )
-				PushFrame( Frame.sceneDepth.confidenceMap, FrameTime, Meta, "SceneDepthConfidence" );
+				PushFrame( SceneDepth.confidenceMap, FrameTime, Meta, "SceneDepthConfidence" );
 	}
 #endif
+
+	mPreviousFrameTime = FrameTime;
+	mPreviousDepthTime = CapDepthTime;
 }
 
 void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName)
 {
+	if ( !DepthData )
+		return;
 	Soy::TScopeTimerPrint Timer("PushFrame(AVDepthData",5);
 	auto DepthPixels = Avf::GetDepthPixelBuffer(DepthData);
 	
@@ -777,6 +829,8 @@ void Arkit::TFrameDevice::PushFrame(AVDepthData* DepthData,SoyTime Timestamp,jso
 
 void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName)
 {
+	if ( !PixelBuffer )
+		return;
 	Soy::TScopeTimerPrint Timer("PushFrame(CVPixelBufferRef",5);
 	float3x3 Transform;
 	auto DoRetain = true;
