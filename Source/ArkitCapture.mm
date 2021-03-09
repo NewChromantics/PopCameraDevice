@@ -331,6 +331,8 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 			WorldConfig.frameSemantics |= ARFrameSemanticBodyDetection;
 		if ( Params.mEnableSceneDepth )
 			WorldConfig.frameSemantics |= ARFrameSemanticSceneDepth;
+		if ( Params.mOutputSceneDepthSmooth )
+			WorldConfig.frameSemantics |= ARFrameSemanticSmoothedSceneDepth;
 		if ( Params.mEnablePersonSegmentation )
 			WorldConfig.frameSemantics |= ARFrameSemanticPersonSegmentation;
 		
@@ -803,9 +805,10 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	auto SceneDepth = mParams.mOutputSceneDepthSmooth ? SmoothDepth : NormalDepth;
 	if ( SceneDepth )
 	{
+		auto IsSmoothed = SceneDepth == Frame.smoothedSceneDepth;
 		Avf::GetMeta( SceneDepth, Meta );
 		if ( SceneDepth.depthMap )
-			PushFrame( SceneDepth.depthMap, FrameTime, Meta, "SceneDepthMap" );
+			PushFrame( SceneDepth.depthMap, FrameTime, Meta, IsSmoothed ? "SceneDepthSmoothed" : "SceneDepthMap" );
 
 		if ( SceneDepth.confidenceMap )
 			if ( mParams.mOutputSceneDepthConfidence )
