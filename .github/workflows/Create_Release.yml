@@ -37,7 +37,7 @@ jobs:
           #   type: linux
           #   architecture: arm64
 
-          - os: windows
+          - os: windows-latest
             type: x64
 
           - os: macOS
@@ -59,7 +59,7 @@ jobs:
           BuildPlatform: x64
           BuildConfiguration: Debug
           # would be nice to extract this from visual studio
-          BuildDirectory: Build\Debug_x6
+          BuildDirectory: Build\Debug_x64
           project: ${{ env.project }}
 
       - name: Apple
