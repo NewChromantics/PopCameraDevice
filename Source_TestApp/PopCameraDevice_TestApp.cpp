@@ -115,7 +115,7 @@ int main()
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
-	TestDeviceInstance("Arkit Rear Depth", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\",\"DepthConfidence\":true}", TestFrameCount);
+	TestDeviceInstance("Arkit Rear Depth", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\",\"DepthSmooth\":true,\"DepthConfidence\":true}", TestFrameCount);
 	TestDeviceInstance("Arkit Rear Depth", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	TestDeviceInstance("KinectAzure_000023201312", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	
