@@ -26,5 +26,5 @@ jobs:
         BuildPlatform: x64
         BuildConfiguration: Release_NoKinect
         # would be nice to extract this from visual studio
-        BuildDirectory: PopCameraDevice.visualstudio\x64\Release_NoKinect
+        BuildDirectory: Build\Release_NoKinect_x64
         project: ${{ env.project }}
