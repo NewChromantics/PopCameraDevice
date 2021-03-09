@@ -16,7 +16,8 @@ namespace PopCameraDevice
 	//	2.2.14	Arkit stream now skipping depth if frame is 0 (no new data), or if repeat frame. 
 	//			Colour streams from Arkit now named RearColour/FrontColour/Colour
 	//			Arkit now skipping segmentation creation by default. Option to use smooth depth
-	const Soy::TVersion	Version(2, 2, 14);
+	//	2.2.15	Arkit smoothed scene depthmap wasn't being turned on. Now works & has SceneDepthSmoothed stream name
+	const Soy::TVersion	Version(2, 2, 15);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }

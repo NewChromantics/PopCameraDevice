@@ -3,7 +3,7 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
-  "version": "2.2.14",
+  "version": "2.2.15",
   "description": "Pop Camera Device",
   "main": "index.js",
   "scripts": {
