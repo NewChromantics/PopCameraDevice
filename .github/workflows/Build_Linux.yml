@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         config:
-          # tsdk: Disabled as the kinect dependencies break the build
           - os: ubuntu-latest
             type: linux
             architecture: x86_64
@@ -23,9 +22,10 @@ jobs:
             type: linux
             architecture: arm64
 
-          - os: Pi4
-            type: linux
-            architecture: arm64
+          # disabled pi whilst pi build machine is offline.
+          #- os: Pi4
+          #  type: linux
+          #  architecture: arm64
 
     steps:
       # gr: fetch-depth:0 to override tags. To get rid of "existing tag will be clobbered" when we move a tag. This only seems to happen on the pi self runner (git version?)
