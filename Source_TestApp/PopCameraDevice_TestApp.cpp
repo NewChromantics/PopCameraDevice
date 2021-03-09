@@ -38,12 +38,14 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 	//	test callback
 	auto OnNewFrame = [](void* Meta)
 	{
+	/*
 		auto* pInstance = (int*)Meta;
 		DebugPrint("New frame callback");
 		char MetaJson[1024];
 		auto NextFrame = PopCameraDevice_PeekNextFrame(*pInstance, MetaJson, std::size(MetaJson));
 		DebugPrint(std::string("New frame meta (") + std::to_string(NextFrame) + "): ");
 		DebugPrint(MetaJson);
+		*/
 	};
 	PopCameraDevice_AddOnNewFrameCallback(Instance,OnNewFrame,&Instance);
 
@@ -66,13 +68,13 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 	{
 		//DebugPrint("Pop Frame:");
 		uint8_t Plane0[100 * 100 * 4];
-		char MetaJson[1024];
+		char MetaJson[1024*10];
 		auto FrameTime = PopCameraDevice_PopNextFrame(Instance, MetaJson, std::size(MetaJson), Plane0, std::size(Plane0), nullptr, 0, nullptr, 0);
 		if (FrameTime == -1)
 		{
 			//DebugPrint("No frame, waiting...");
-			std::this_thread::sleep_for(std::chrono::milliseconds(20));
-			i--;
+			std::this_thread::sleep_for(std::chrono::milliseconds(2));
+			//i--;
 			continue;
 		}
 		/*
@@ -82,7 +84,7 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 		*/
 	
 		std::stringstream Debug;
-		Debug << "Got frame " << FrameTime << "(" << static_cast<uint32_t>(FrameTime) << ") (first=" << FirstFrameTime << ") Meta=" << MetaJson << std::endl;
+		Debug << "Got frame " << FrameTime << "(" << static_cast<uint32_t>(FrameTime) << ") (first=" << FirstFrameTime << ") Meta=" << MetaJson;
 		//	todo: verify pixels
 		DebugPrint(Debug.str());
 	}
@@ -113,7 +115,8 @@ int main()
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
-	TestDeviceInstance("Arkit Rear Depth", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("Arkit Rear Depth", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\",\"DepthConfidence\":true}", TestFrameCount);
+	TestDeviceInstance("Arkit Rear Depth", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	TestDeviceInstance("KinectAzure_000023201312", "{\"BodyTracking\":false,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	
 	
