@@ -753,6 +753,9 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 	auto* ColourStreamName = GetColourStreamName(Source);
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
+	
+	//std::Debug << "Arkit frame: Time=" << FrameTime << " Depth=" << CapDepthTime << " Delta=" << (FrameTime-mPreviousFrameTime) << " capdepth=" << (Frame.capturedDepthData?"true":"false") << std::endl;
+	
 	auto DepthIsValid = CapDepthTime.GetTime() != 0;
 	if ( CapDepthTime <= mPreviousDepthTime && DepthIsValid )
 	{
@@ -778,6 +781,7 @@ void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 		if ( ColourIsNew )
 			PushFrame( Frame.capturedImage, FrameTime, Meta, ColourStreamName );
 
+	//	captured depth is the truedepth camera
 	if ( Frame.capturedDepthData )
 		if ( DepthIsValid )
 			PushFrame( Frame.capturedDepthData, CapDepthTime, Meta, "CapturedDepthData" );
