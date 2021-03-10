@@ -17,7 +17,8 @@ namespace PopCameraDevice
 	//			Colour streams from Arkit now named RearColour/FrontColour/Colour
 	//			Arkit now skipping segmentation creation by default. Option to use smooth depth
 	//	2.2.15	Arkit smoothed scene depthmap wasn't being turned on. Now works & has SceneDepthSmoothed stream name
-	const Soy::TVersion	Version(2, 2, 15);
+	//	2.2.16	Visual studio project outputting kinect DLLs in NoKinect builds, just to keep PopEngine build happy
+	const Soy::TVersion	Version(2, 2, 16);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
