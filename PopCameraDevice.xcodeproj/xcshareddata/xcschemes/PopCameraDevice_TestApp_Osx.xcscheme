@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BF108A9522970C92003DDC5F"
-               BuildableName = "TestApp"
-               BlueprintName = "TestApp"
+               BuildableName = "PopCameraDevice_TestApp_Osx"
+               BlueprintName = "PopCameraDevice_TestApp_Osx"
                ReferencedContainer = "container:PopCameraDevice.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -31,8 +31,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF108A9522970C92003DDC5F"
-            BuildableName = "TestApp"
-            BlueprintName = "TestApp"
+            BuildableName = "PopCameraDevice_TestApp_Osx"
+            BlueprintName = "PopCameraDevice_TestApp_Osx"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -54,8 +54,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF108A9522970C92003DDC5F"
-            BuildableName = "TestApp"
-            BlueprintName = "TestApp"
+            BuildableName = "PopCameraDevice_TestApp_Osx"
+            BlueprintName = "PopCameraDevice_TestApp_Osx"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -71,8 +71,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BF108A9522970C92003DDC5F"
-            BuildableName = "TestApp"
-            BlueprintName = "TestApp"
+            BuildableName = "PopCameraDevice_TestApp_Osx"
+            BlueprintName = "PopCameraDevice_TestApp_Osx"
             ReferencedContainer = "container:PopCameraDevice.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

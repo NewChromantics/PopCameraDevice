@@ -68,6 +68,7 @@
 		BF108A9922970C92003DDC5F /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
 		BF108AE5229726CF003DDC5F /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = BF108AD8229726CE003DDC5F /* Readme.md */; };
 		BF108AF022972F29003DDC5F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AEE22972F23003DDC5F /* IOKit.framework */; };
+		BF13B0E125FA975800A02686 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
 		BF1520182384863900A70EBF /* Avf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B02226A047F003AEB55 /* Avf.mm */; };
 		BF1520192384863900A70EBF /* AvfCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012ACE2268DE24003AEB55 /* AvfCapture.mm */; };
 		BF15201A2384863900A70EBF /* AvfVideoCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */; };
@@ -121,8 +122,6 @@
 		BF39C0CD2401EE81000C7E56 /* PopCameraDevice.cs in Resources */ = {isa = PBXBuildFile; fileRef = BF39C0CA2401EE81000C7E56 /* PopCameraDevice.cs */; };
 		BF51B8E6256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */; };
 		BF51B8E7256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */; };
-		BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; };
-		BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		BF67C86524373BD700D7492E /* CoreMediaIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF67C86424373BD600D7492E /* CoreMediaIO.framework */; };
 		BF8534CE22B3FE370049C01B /* registration.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BB22B3FE360049C01B /* registration.c */; };
 		BF8534D222B3FE370049C01B /* audio.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534BD22B3FE360049C01B /* audio.c */; };
@@ -147,13 +146,6 @@
 			remoteGlobalIDString = BF15200F2384861D00A70EBF;
 			remoteInfo = PopCameraDevice_Ios;
 		};
-		BF5C4ACE23FB04D1007D6393 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BF4A6A0C1EA16D7C00613A64 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BF012AC42268DC95003AEB55;
-			remoteInfo = PopCameraDevice_Osx;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -164,17 +156,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				BF09A5F724FA752C002F56DB /* PopCameraDevice_Ios.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		BF5C4AD023FB04D1007D6393 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				BF5C4ACD23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -269,7 +250,7 @@
 		BF108A8B2296F4BE003DDC5F /* Kinect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Kinect2.cpp; path = Source/Kinect2.cpp; sourceTree = "<group>"; };
 		BF108A8C2296F4BE003DDC5F /* Kinect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kinect2.h; path = Source/Kinect2.h; sourceTree = "<group>"; };
 		BF108A912296F7D6003DDC5F /* LibFreenect2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LibFreenect2; sourceTree = "<group>"; };
-		BF108A9622970C92003DDC5F /* TestApp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TestApp; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF108A9622970C92003DDC5F /* PopCameraDevice_TestApp_Osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PopCameraDevice_TestApp_Osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PopCameraDevice_TestApp.cpp; sourceTree = "<group>"; };
 		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = lib/libfreenect2.a; sourceTree = "<group>"; };
 		BF108AA6229714F5003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.a"; sourceTree = "<group>"; };
@@ -384,7 +365,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF5C4ACC23FB04D1007D6393 /* PopCameraDevice_Osx.framework in Frameworks */,
+				BF13B0E125FA975800A02686 /* PopCameraDevice_Osx.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -599,7 +580,7 @@
 			isa = PBXGroup;
 			children = (
 				BF012AC52268DC95003AEB55 /* PopCameraDevice_Osx.framework */,
-				BF108A9622970C92003DDC5F /* TestApp */,
+				BF108A9622970C92003DDC5F /* PopCameraDevice_TestApp_Osx */,
 				BF1520102384861D00A70EBF /* PopCameraDevice_Ios.framework */,
 				BF09A5DE24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios.app */,
 			);
@@ -776,22 +757,20 @@
 			productReference = BF09A5DE24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios.app */;
 			productType = "com.apple.product-type.application";
 		};
-		BF108A9522970C92003DDC5F /* TestApp */ = {
+		BF108A9522970C92003DDC5F /* PopCameraDevice_TestApp_Osx */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BF108A9A22970C92003DDC5F /* Build configuration list for PBXNativeTarget "TestApp" */;
+			buildConfigurationList = BF108A9A22970C92003DDC5F /* Build configuration list for PBXNativeTarget "PopCameraDevice_TestApp_Osx" */;
 			buildPhases = (
 				BF108A9222970C92003DDC5F /* Sources */,
 				BF108A9322970C92003DDC5F /* Frameworks */,
-				BF5C4AD023FB04D1007D6393 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				BF5C4ACF23FB04D1007D6393 /* PBXTargetDependency */,
 			);
-			name = TestApp;
+			name = PopCameraDevice_TestApp_Osx;
 			productName = TestApp;
-			productReference = BF108A9622970C92003DDC5F /* TestApp */;
+			productReference = BF108A9622970C92003DDC5F /* PopCameraDevice_TestApp_Osx */;
 			productType = "com.apple.product-type.tool";
 		};
 		BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */ = {
@@ -868,7 +847,7 @@
 			projectRoot = "";
 			targets = (
 				BF012AC42268DC95003AEB55 /* PopCameraDevice_Osx */,
-				BF108A9522970C92003DDC5F /* TestApp */,
+				BF108A9522970C92003DDC5F /* PopCameraDevice_TestApp_Osx */,
 				BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */,
 				BFE462C124B3C9C100D04A4C /* PopCameraDevice_Linux */,
 				BF09A5DD24FA73EB002F56DB /* PopCameraDevice_TestApp_Ios */,
@@ -1066,11 +1045,6 @@
 			target = BF15200F2384861D00A70EBF /* PopCameraDevice_Ios */;
 			targetProxy = BF09A5F824FA752C002F56DB /* PBXContainerItemProxy */;
 		};
-		BF5C4ACF23FB04D1007D6393 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BF012AC42268DC95003AEB55 /* PopCameraDevice_Osx */;
-			targetProxy = BF5C4ACE23FB04D1007D6393 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1078,7 +1052,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
-				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1118,7 +1091,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
-				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1564,7 +1536,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BF108A9A22970C92003DDC5F /* Build configuration list for PBXNativeTarget "TestApp" */ = {
+		BF108A9A22970C92003DDC5F /* Build configuration list for PBXNativeTarget "PopCameraDevice_TestApp_Osx" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BF108A9B22970C92003DDC5F /* Debug */,
