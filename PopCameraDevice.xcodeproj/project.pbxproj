@@ -253,7 +253,6 @@
 		BF108A9622970C92003DDC5F /* PopCameraDevice_TestApp_Osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PopCameraDevice_TestApp_Osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PopCameraDevice_TestApp.cpp; sourceTree = "<group>"; };
 		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = lib/libfreenect2.a; sourceTree = "<group>"; };
-		BF108AA6229714F5003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libusb-1.0.a"; path = "../../../../../usr/local/Cellar/libusb/1.0.21/lib/libusb-1.0.a"; sourceTree = "<group>"; };
 		BF108ACF229718ED003DDC5F /* HeapArray.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HeapArray.hpp; sourceTree = "<group>"; };
 		BF108AD2229726CE003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
 		BF108AD8229726CE003DDC5F /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
@@ -509,7 +508,6 @@
 			isa = PBXGroup;
 			children = (
 				BF108AF322980C2C003DDC5F /* Build.sh */,
-				BF108AA6229714F5003DDC5F /* libusb-1.0.a */,
 				BF108A9E22971381003DDC5F /* libfreenect2.a */,
 			);
 			name = LibFreenect2;
@@ -1052,6 +1050,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
+				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1091,6 +1090,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
+				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1199,6 +1199,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
+				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1234,6 +1235,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
+				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;

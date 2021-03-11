@@ -1,7 +1,7 @@
 Built from homebrew.
 
-Libusb 1.0.21
-Libfreenect 0.5.6
+Libusb 1.0.24
+Libfreenect 0.6.1_1
 
 
 

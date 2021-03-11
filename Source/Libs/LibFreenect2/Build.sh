@@ -1,3 +1,5 @@
+# gr: if any brew lib changes, delete CMakeCache.txt
+
 brew install libusb
 brew install cmake
 cd $1
