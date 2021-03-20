@@ -21,3 +21,14 @@ OTHER_CFLAGS = -Wno-ambiguous-macro -fdeclspec
 
 // tsdk: Mirroring config from PopH264
 BUILD_LIBRARY_FOR_DISTRIBUTION = YES
+
+
+//	this sets the linker to compile with swift version X (default is blank, 0.0.0)
+//	this fixes "xyz" requires 1.0.0 and "this" is 0.0.0 error as apple cannot mix & match
+//	swift binaries any more from different frameworks
+DYLIB_COMPATIBILITY_VERSION = 1
+
+//EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
+
+//	gr: for now we aren't supporting arm as we need libusb (kinect) which we aren't building an arm version of
+ARCHS = x86_64
