@@ -19,7 +19,7 @@ namespace PopCameraDevice
 	//	2.2.15	Arkit smoothed scene depthmap wasn't being turned on. Now works & has SceneDepthSmoothed stream name
 	//	2.2.16	Visual studio project outputting kinect DLLs in NoKinect builds, just to keep PopEngine build happy
 	//	2.2.17	osx/ios set to use link compatibility version 1 so we don't get 1.0.0 can't use PopCameraDevice 0.0.0 errors
-	const Soy::TVersion	Version(2, 2, 17);
+	const Soy::TVersion	Version(2, 2, 18);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }

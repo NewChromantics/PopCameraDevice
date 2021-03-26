@@ -14,13 +14,13 @@ jobs:
     strategy:
       matrix:
         config:
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             type: linux
-            architecture: x86_64
+            arch: x86_64
 
           - os: Nvidia
             type: linux
-            architecture: arm64
+            arch: arm64
 
           # disabled pi whilst pi build machine is offline.
           #- os: Pi4
@@ -38,3 +38,4 @@ jobs:
         with:
           os: ${{ matrix.config.os }}
           project: ${{ env.project }}
+          arch: ${{ matrix.config.os }}
