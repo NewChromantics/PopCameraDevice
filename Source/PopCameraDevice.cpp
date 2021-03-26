@@ -468,8 +468,13 @@ __export int32_t PopCameraDevice_CreateCameraDevice(const char* Name,const char*
 {
 	try
 	{
+		if ( !OptionsJson )
+			OptionsJson = "{}";
+		if ( strlen(OptionsJson) == 0 )
+			OptionsJson = "{}";
+			
 		std::string ParseError;
-		json11::Json Options = json11::Json::parse( OptionsJson ? OptionsJson : "{}", ParseError );
+		json11::Json Options = json11::Json::parse( OptionsJson, ParseError );
 		if ( !ParseError.empty() )
 		{
 			ParseError = std::string("PopCameraDevice_CreateCameraDevice parse json error; ") + ParseError;
