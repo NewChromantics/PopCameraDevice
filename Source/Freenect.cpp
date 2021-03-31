@@ -1617,6 +1617,8 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	std::shared_ptr<TPixelBuffer> PixelBuffer( new TDumbPixelBuffer( Frame, Transform ) );
 	
 	json11::Json::object Meta;
+	json11::Json::object CameraMeta;
+	
 	
 	//	would like a more official source from libfreenect, but there isn't one :)
 	//	http://smeenk.com/kinect-field-of-view-comparison/
@@ -1625,25 +1627,47 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	float DepthVertFov = 46.6f;
 	float ColourHorzFov = 62;
 	float ColourVertFov = 48.6f;
+	
+	//	intrinsics from here
+	//	https://github.com/OpenKinect/libfreenect2/issues/41
+	auto Depth_fx = 368.096588f;	//	atan(this / res) should = fov ~58 above 
+	auto Depth_fy = 368.096588f;
+	auto Depth_cx = 261.696594f;
+	auto Depth_cy = 202.522202f;
+	auto Depth_zmin = 0.01f;
+	auto Depth_zmax = 1<<16;
+	json11::Json::array DepthIntrinsics(
+	{
+		Depth_fx,	0,			Depth_cx,
+		0,			Depth_fy,	Depth_cy,
+		//	z=1 in PopCameraMeta, forced to 1000 for viewport max for ios, this should probably be set here to
+		//	the unit max (1<<16)
+		0,			0,			0,		
+	});
+
 	if ( Frame.GetFormat() == SoyPixelsFormat::Depth16mm)
 	{
 		Meta["DepthMax"] = FREENECT_DEPTH_MM_MAX_VALUE;
 		Meta["DepthInvalid"] = FREENECT_DEPTH_MM_NO_VALUE;
-		Meta["HorizontalFov"] = DepthHorzFov;
-		Meta["VerticalFov"] = DepthVertFov;
+		CameraMeta["HorizontalFov"] = DepthHorzFov;
+		CameraMeta["VerticalFov"] = DepthVertFov;
+		CameraMeta["Intrinsics"] = DepthIntrinsics;
 	}
 	else if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepth10bit || Frame.GetFormat() == SoyPixelsFormat::FreenectDepth11bit )
 	{
 		Meta["DepthMax"] = FREENECT_DEPTH_RAW_MAX_VALUE;
 		Meta["DepthInvalid"] = FREENECT_DEPTH_RAW_NO_VALUE;
-		Meta["HorizontalFov"] = DepthHorzFov;
-		Meta["VerticalFov"] = DepthVertFov;
+		CameraMeta["HorizontalFov"] = DepthHorzFov;
+		CameraMeta["VerticalFov"] = DepthVertFov;
+		CameraMeta["Intrinsics"] = DepthIntrinsics;
 	}
 	else
 	{
-		Meta["HorizontalFov"] = ColourHorzFov;
-		Meta["VerticalFov"] = ColourVertFov;
+		CameraMeta["HorizontalFov"] = ColourHorzFov;
+		CameraMeta["VerticalFov"] = ColourVertFov;
 	}
+	
+	Meta["Camera"] = CameraMeta;
 	
 	this->PushFrame( PixelBuffer, Timestamp, Meta );
 }
