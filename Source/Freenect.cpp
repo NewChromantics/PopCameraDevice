@@ -313,7 +313,7 @@ void Freenect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 	
 	std::function<void(const std::string&)> EnumDeviceSerial = [&](const std::string& Serial)
 	{
-		Enum( Serial );
+		Enum( DeviceName_Prefix+Serial );
 	};
 	
 	Freenect.EnumDevices( EnumDeviceSerial );
