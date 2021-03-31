@@ -54,15 +54,8 @@ namespace Freenect
 	const std::string			DeviceName_Prefix = "Freenect:";
 	auto 						DefaultColourFormat = SoyPixelsFormat::uyvy_8888;
 	auto 						DefaultDepthFormat = SoyPixelsFormat::Depth16mm;
-	
-	namespace TStream
-	{
-		enum TYPE
-		{
-			Depth,
-			Colour,
-		};
-	}
+	auto 						DepthStreamName = "Depth";
+	auto 						ColourStreamName = "Colour";
 }
 
 
@@ -320,17 +313,7 @@ void Freenect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
 	
 	std::function<void(const std::string&)> EnumDeviceSerial = [&](const std::string& Serial)
 	{
-		//	would be good to know what capabilities it has...
-		{
-			std::stringstream Name;
-			Name << DeviceName_Prefix << Serial << TStream::Depth;
-			Enum( Name.str() );
-		}
-		{
-			std::stringstream Name;
-			Name << DeviceName_Prefix << Serial << TStream::Colour;
-			Enum( Name.str() );
-		}
+		Enum( Serial );
 	};
 	
 	Freenect.EnumDevices( EnumDeviceSerial );
@@ -1668,6 +1651,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 
 	if ( Frame.GetFormat() == SoyPixelsFormat::Depth16mm)
 	{
+		Meta["StreamName"] = DepthStreamName;
 		Meta["DepthMax"] = FREENECT_DEPTH_MM_MAX_VALUE;
 		Meta["DepthInvalid"] = FREENECT_DEPTH_MM_NO_VALUE;
 		CameraMeta["HorizontalFov"] = DepthHorzFov;
@@ -1676,6 +1660,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	}
 	else if ( Frame.GetFormat() == SoyPixelsFormat::FreenectDepth10bit || Frame.GetFormat() == SoyPixelsFormat::FreenectDepth11bit )
 	{
+		Meta["StreamName"] = DepthStreamName;
 		Meta["DepthMax"] = FREENECT_DEPTH_RAW_MAX_VALUE;
 		Meta["DepthInvalid"] = FREENECT_DEPTH_RAW_NO_VALUE;
 		CameraMeta["HorizontalFov"] = DepthHorzFov;
@@ -1684,6 +1669,7 @@ void Freenect::TSource::OnFrame(const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	}
 	else
 	{
+		Meta["StreamName"] = ColourStreamName;
 		CameraMeta["HorizontalFov"] = ColourHorzFov;
 		CameraMeta["VerticalFov"] = ColourVertFov;
 	}
