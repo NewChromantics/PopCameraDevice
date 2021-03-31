@@ -441,6 +441,7 @@ void Freenect::TDevice::Close()
 	mDepthMode.is_valid = false;
 	
 	Result = freenect_stop_video( mDevice );
+	mColourMode.is_valid = false;
 
 	Result = freenect_close_device( mDevice );
 	IsOkay( Result, "freenect_close_device" );
@@ -517,6 +518,7 @@ void Freenect::TDevice::EnableDepthStream(SoyPixelsMeta Meta)
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_depth( mDevice );
 	Freenect::IsOkay( Result, "freenect_start_depth" );
+	std::Debug << __PRETTY_FUNCTION__ << " Started depth stream" << std::endl;
 
 	mDepthFormat = Meta;
 }
@@ -545,7 +547,8 @@ void Freenect::TDevice::EnableColourStream(SoyPixelsMeta Meta)
 	//freenect_stop_depth( &Device );
 	Result = freenect_start_video( mDevice );
 	Freenect::IsOkay( Result, "freenect_start_color" );
-
+	std::Debug << __PRETTY_FUNCTION__ << " Started colour stream" << std::endl;
+	
 	mColourFormat = Meta;
 }
 
