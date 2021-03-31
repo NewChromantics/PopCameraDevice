@@ -14,6 +14,7 @@
 namespace Freenect
 {
 	class TSource;
+	class TCaptureParams;
 	class TFrameListener;
 	
 	void			EnumDeviceNames(std::function<void(const std::string&)> Enum);
@@ -21,11 +22,19 @@ namespace Freenect
 }
 
 
+class Freenect::TCaptureParams : public PopCameraDevice::TCaptureParams
+{
+public:
+	TCaptureParams(json11::Json& Options);
+
+	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
+	SoyPixelsFormat::Type	mDepthFormat = SoyPixelsFormat::Invalid;
+};
 
 class Freenect::TSource : public PopCameraDevice::TDevice
 {
 public:
-	TSource(const std::string& Serial);
+	TSource(std::string Serial,json11::Json& Params);
 	~TSource();
 	
 	virtual void	EnableFeature(PopCameraDevice::TFeature::Type Feature,bool Enable) override;

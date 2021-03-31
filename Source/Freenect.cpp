@@ -1,7 +1,7 @@
 #include "Freenect.h"
 #include "libusb.h"
 #include "libfreenect.h"
-
+#include "PopCameraDevice.h"	//	params keys
 
 #if defined(TARGET_WINDOWS)
 //	libusb uses some stdio functions which are now inlined. This library provides a function to link to
@@ -52,9 +52,8 @@ namespace Freenect
 	std::shared_ptr<TContext>	gContext;
 	
 	const std::string			DeviceName_Prefix = "Freenect:";
-	const std::string			DeviceName_Colour_Suffix = "_Colour";
-	const std::string			DeviceName_Depth_Suffix = "_Depth";
-	
+	auto 						DefaultColourFormat = SoyPixelsFormat::uyvy_8888;
+	auto 						DefaultDepthFormat = SoyPixelsFormat::Depth16mm;
 	
 	namespace TStream
 	{
@@ -67,19 +66,57 @@ namespace Freenect
 }
 
 
-std::ostream &operator<<(std::ostream &out,const Freenect::TStream::TYPE& Type)
+Freenect::TCaptureParams::TCaptureParams(json11::Json& Options)
 {
-	switch ( Type )
+	auto SetInt = [&](const char* Name,size_t& ValueUnsigned)
 	{
-		case Freenect::TStream::Depth:	out << Freenect::DeviceName_Depth_Suffix;	break;
-		case Freenect::TStream::Colour:	out << Freenect::DeviceName_Colour_Suffix;	break;
-		default:
-			out << "<?" << static_cast<int>(Type) << ">";
-			break;
-	}
-	return out;
-}
+		auto& Handle = Options[Name];
+		if ( !Handle.is_number() )
+			return false;
+		auto Value = Handle.int_value();
+		if ( Value < 0 )
+		{
+			std::stringstream Error;
+			Error << "Value for " << Name << " is " << Value << ", not expecting negative";
+			throw Soy::AssertException(Error);
+		}
+		ValueUnsigned = Value;
+		return true;
+	};
+	auto SetBool = [&](const char* Name,bool& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_bool() )
+			return false;
+		Value = Handle.bool_value();
+		return true;
+	};
+	auto SetString = [&](const char* Name,std::string& Value)
+	{
+		auto& Handle = Options[Name];
+		if ( !Handle.is_string() )
+			return false;
+		Value = Handle.string_value();
+		return true;
+	};
 
+	auto SetPixelFormat = [&](const char* Name,SoyPixelsFormat::Type& Value)
+	{
+		std::string EnumString;
+		if ( !SetString(Name,EnumString) )
+			return false;
+		
+		Value = SoyPixelsFormat::Validate(EnumString);
+		return true;
+	};
+
+	SetPixelFormat( POPCAMERADEVICE_KEY_DEPTHFORMAT, mDepthFormat );
+	SetPixelFormat( POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
+	
+	//	temp force colour format as its not a usual format
+	if ( mColourFormat != SoyPixelsFormat::Invalid )
+		mColourFormat = DefaultColourFormat;
+}
 
 //	NOT RAII atm
 class Freenect::TDevice
@@ -139,7 +176,6 @@ class Freenect::TFrameListener
 {
 public:
 	std::string		mSerial;
-	TStream::TYPE	mStream;
 	std::function<void(const SoyPixelsImpl&,SoyTime)>	mOnFrame;
 };
 
@@ -180,15 +216,16 @@ class Freenect::TContext
 public:
 	TFreenect&						GetFreenect();
 	
-	std::shared_ptr<TFrameListener>	CreateListener(const std::string& Serial,SoyPixelsMeta Format);
+	std::shared_ptr<TFrameListener>	CreateListener(const std::string& Serial,SoyPixelsMeta ColourFormat,SoyPixelsMeta DepthFormat);
 	
 	void							FailRunningThreads();	//	for process exit, threads have gone, but we are unaware
 
 private:
-	void							OnFrame(TDevice& Device,TStream::TYPE Stream,const SoyPixelsImpl& Pixels,SoyTime Timestamp);
+	void							OnFrame(TDevice& Device,const SoyPixelsImpl& Pixels,SoyTime Timestamp);
 
 public:
 	//	 lock this!
+	std::mutex						mListenersLock;
 	Array<std::shared_ptr<TFrameListener>>	mListeners;
 	
 	std::shared_ptr<TFreenect>	mFreenect;	//	library
@@ -380,35 +417,32 @@ Freenect::TFreenect& Freenect::TContext::GetFreenect()
 	if ( !mFreenect )
 	{
 		mFreenect.reset( new TFreenect() );
-		mFreenect->mOnDepthFrame = std::bind( &TContext::OnFrame, this, std::placeholders::_1, TStream::Depth, std::placeholders::_2, std::placeholders::_3 );
-		mFreenect->mOnColourFrame = std::bind( &TContext::OnFrame, this, std::placeholders::_1, TStream::Colour, std::placeholders::_2, std::placeholders::_3 );
+		mFreenect->mOnDepthFrame = std::bind( &TContext::OnFrame, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 );
+		mFreenect->mOnColourFrame = std::bind( &TContext::OnFrame, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 );
 	}
 	return *mFreenect;
 }
 
 
-std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(const std::string& Serial,SoyPixelsMeta Format)
+std::shared_ptr<Freenect::TFrameListener> Freenect::TContext::CreateListener(const std::string& Serial,SoyPixelsMeta ColourFormat,SoyPixelsMeta DepthFormat)
 {
 	//	try and open the device first, so this will fail the caller
 	auto& Freenect = GetFreenect();
 	auto& Device = Freenect.OpenDevice( Serial );
 
-	TStream::TYPE Stream;
-	if ( IsDepthFormat( Format.GetFormat() ) )
+	if ( ColourFormat.GetFormat() != SoyPixelsFormat::Invalid )
 	{
-		Device.EnableDepthStream( Format );
-		Stream = TStream::Depth;
+		Device.EnableColourStream( ColourFormat );
 	}
-	else
+	
+	if ( DepthFormat.GetFormat() != SoyPixelsFormat::Invalid )
 	{
-		Device.EnableColourStream( Format );
-		Stream = TStream::Colour;
+		Device.EnableDepthStream( DepthFormat );
 	}
 
 	//	create the listener
 	std::shared_ptr<TFrameListener> Listener( new TFrameListener );
 	Listener->mSerial = Serial;
-	Listener->mStream = Stream;
 	
 	mListeners.PushBack( Listener );
 	return Listener;
@@ -808,7 +842,7 @@ void Freenect::TFreenect::OnColourFrame(freenect_device& DevicePtr,const uint8_t
 }
 
 
-void Freenect::TContext::OnFrame(TDevice& Device,TStream::TYPE Stream,const SoyPixelsImpl& Pixels,SoyTime Timestamp)
+void Freenect::TContext::OnFrame(TDevice& Device,const SoyPixelsImpl& Pixels,SoyTime Timestamp)
 {
 	//	call all listeners
 	//	todo: replace with enum which locks internally
@@ -816,8 +850,6 @@ void Freenect::TContext::OnFrame(TDevice& Device,TStream::TYPE Stream,const SoyP
 	{
 		auto& Listener = *mListeners[i];
 		if ( Device != Listener.mSerial )
-			continue;
-		if ( Listener.mStream != Stream )
 			continue;
 		
 		if ( !Listener.mOnFrame )
@@ -1568,30 +1600,19 @@ void Freenect::TDepthPixelBuffer::Unlock()
 */
 
 
-Freenect::TSource::TSource(const std::string& DeviceName)
+Freenect::TSource::TSource(std::string Serial,json11::Json& Params)
 {
-	std::string Serial = DeviceName;
 	if ( !Soy::StringTrimLeft( Serial, Freenect::DeviceName_Prefix, true ) )
 		throw PopCameraDevice::TInvalidNameException();
 
+	TCaptureParams CaptureParams(Params);
+
 	auto& Context = GetContext();
 
-	if ( Soy::StringTrimRight( Serial, DeviceName_Colour_Suffix, true ) )
-	{
-		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::uyvy_8888 );
-		mListener = Context.CreateListener( Serial, Meta );
-	}
-	else if ( Soy::StringTrimRight( Serial, DeviceName_Depth_Suffix, true ) )
-	{
-		SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::Depth16mm);
-		mListener = Context.CreateListener( Serial, Meta );
-	}
-	else
-	{
-		std::stringstream Error;
-		Error << "Device name (" << DeviceName << ") doesn't end with " << DeviceName_Colour_Suffix << " or " << DeviceName_Depth_Suffix;
-		throw Soy_AssertException(Error);
-	}
+	//SoyPixelsMeta Meta( 640, 480, SoyPixelsFormat::uyvy_8888 );
+	SoyPixelsMeta ColourFormat( 640, 480, CaptureParams.mColourFormat );
+	SoyPixelsMeta DepthFormat( 640, 480, CaptureParams.mDepthFormat );
+	mListener = Context.CreateListener( Serial, ColourFormat, DepthFormat );
 	
 	mListener->mOnFrame = [&](const SoyPixelsImpl& Frame,SoyTime Timestamp)
 	{

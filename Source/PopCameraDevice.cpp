@@ -380,7 +380,7 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,json11::Jso
 #if defined(ENABLE_FREENECT)
 	try
 	{
-		std::shared_ptr<TDevice> Device(new Freenect::TSource(Name));
+		std::shared_ptr<TDevice> Device(new Freenect::TSource(Name,Options));
 		if ( Device )
 			return PopCameraDevice::CreateInstance(Device);
 	}

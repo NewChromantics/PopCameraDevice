@@ -112,7 +112,7 @@ int main()
 	TestDeviceInstance("Test", "{\"SphereZ\":2}", 1);
 		
 	auto TestFrameCount = 20000;
-	TestDeviceInstance("Freenect:A22595W00862214A_Depth", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
+	TestDeviceInstance("Freenect:A22595W00862214A", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front TrueDepth Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
 	//TestDeviceInstance("Front Camera", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", TestFrameCount);
