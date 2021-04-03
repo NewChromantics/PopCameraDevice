@@ -198,9 +198,9 @@ public:
 	std::function<void(TDevice&,const SoyPixelsImpl&,SoyTime)>	mOnColourFrame;
 
 private:
-	std::mutex			mDeviceLock;
-	Array<TDevice>		mDevices;	//	devices we've opened
-	freenect_context*	mContext = nullptr;
+	std::recursive_mutex	mDeviceLock;	//	we were getting deadlock from depthcallback, whilst opening a device, so set to recursive
+	Array<TDevice>			mDevices;		//	devices we've opened
+	freenect_context*		mContext = nullptr;
 };
 
 
@@ -626,7 +626,7 @@ Freenect::TFreenect::~TFreenect()
 
 	try
 	{
-		std::lock_guard<std::mutex> Lock(mDeviceLock);
+		std::lock_guard<std::recursive_mutex> Lock(mDeviceLock);
 
 		//	close all devices
 		for ( auto d=0;	d<mDevices.GetSize();	d++ )
@@ -709,7 +709,7 @@ bool Freenect::TFreenect::ThreadIteration()
 
 void Freenect::TFreenect::ReacquireDevices()
 {
-	std::lock_guard<std::mutex> Lock(mDeviceLock);
+	std::lock_guard<std::recursive_mutex> Lock(mDeviceLock);
 
 	//	don't delete devices, but close them... make thread try and re-open
 	for (auto d = 0; d < mDevices.GetSize(); d++)
@@ -721,7 +721,7 @@ void Freenect::TFreenect::ReacquireDevices()
 
 Freenect::TDevice& Freenect::TFreenect::GetDevice(freenect_device& DeviceRef)
 {
-	std::lock_guard<std::mutex> Lock(mDeviceLock);
+	std::lock_guard<std::recursive_mutex> Lock(mDeviceLock);
 
 	for ( auto d=0;	d<mDevices.GetSize();	d++ )
 	{
@@ -765,7 +765,7 @@ void Freenect::TFreenect::EnumDevices(std::function<void (const std::string &)>&
 //		switch to RAII TDevice as soon as this goes wrong
 Freenect::TDevice& Freenect::TFreenect::OpenDevice(const std::string& Serial)
 {
-	std::lock_guard<std::mutex> Lock(mDeviceLock);
+	std::lock_guard<std::recursive_mutex> Lock(mDeviceLock);
 	
 	//	return existing
 	for ( auto d=0;	d<mDevices.GetSize();	d++ )
