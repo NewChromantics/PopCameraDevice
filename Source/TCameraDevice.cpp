@@ -188,6 +188,7 @@ void PopCameraDevice::TDevice::GetDeviceMeta(json11::Json::object& Meta)
 {
 	if (mCulledFrames > 0)
 		Meta["CulledFrames"] = static_cast<int>(mCulledFrames);
+	Meta["PendingFrames"] = static_cast<int>(this->mFrames.GetSize());
 }
 
 
@@ -202,7 +203,6 @@ bool PopCameraDevice::TDevice::GetNextFrame(TFrame& Frame,bool DeleteFrame)
 	auto Meta = Frame0.mMeta;
 	auto FrameTime = Frame0.mFrameTime;
 	auto PixelBuffer = Frame0.mPixelBuffer;
-	Frame.mMeta = "Test";
 	Frame.mMeta = Meta;
 	Frame.mFrameTime = FrameTime;
 	Frame.mPixelBuffer = PixelBuffer;
