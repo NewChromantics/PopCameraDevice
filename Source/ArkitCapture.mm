@@ -197,6 +197,7 @@ Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetBool( POPCAMERADEVICE_KEY_RESETTRACKING, mResetTracking );
 	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
 	SetBool( POPCAMERADEVICE_KEY_FEATURES, mOutputFeatures );
+	SetBool( POPCAMERADEVICE_KEY_ANCHORS, mOutputAnchors );	
 	SetBool( POPCAMERADEVICE_KEY_DEPTHCONFIDENCE, mOutputSceneDepthConfidence );
 	SetBool( POPCAMERADEVICE_KEY_DEPTHSMOOTH, mOutputSceneDepthSmooth );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
@@ -601,6 +602,7 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParam
 	}
 	
 	//	get anchors
+	if ( Params.mOutputAnchors )
 	{
 		json11::Json::array Anchors;
 		auto EnumAnchor = [&](ARAnchor* Anchor)
