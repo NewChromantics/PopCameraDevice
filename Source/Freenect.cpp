@@ -499,7 +499,11 @@ void Freenect::TDevice::EnableDepthStream(SoyPixelsMeta Meta)
 {
 	//	if already open, see if we can reconfigure, or doesn't need it
 	if ( mDepthMode.is_valid )
-		throw Soy::AssertException("Depth stream already open on device; todo: reopen/skip etc");
+	{
+		//throw Soy::AssertException("Depth stream already open on device; todo: reopen/skip etc");
+		std::Debug << "Depth stream already open on device" << std::endl;
+		return;
+	}
 	
 	auto Format = Freenect::GetDepthFormat( Meta.GetFormat() );
 	//	high for depth will fail!
@@ -528,7 +532,11 @@ void Freenect::TDevice::EnableColourStream(SoyPixelsMeta Meta)
 {
 	//	if already open, see if we can reconfigure, or doesn't need it
 	if ( mColourMode.is_valid )
-		throw Soy::AssertException("Colour stream already open on device; todo: reopen/skip etc");
+	{
+		std::Debug << "Colour stream already open on device;" << std::endl;
+		//throw Soy::AssertException("Colour stream already open on device; todo: reopen/skip etc");
+		return;
+	}
 	
 	auto Format = Freenect::GetColourFormat( Meta.GetFormat() );
 	//	high for depth will fail!
