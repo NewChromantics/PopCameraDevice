@@ -614,12 +614,16 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParam
 			json11::Json::object AnchorObject =
 			{
 				{"Uuid",Uuid},
-				{"Name",Name},
 #if ENABLE_IOS14
 				{"SessionUuid",SessionUuid},
 #endif
 				{"LocalToWorld",LocalToWorld},
 			};
+			//	omit name if its null
+			if ( Anchor.name )
+			{
+				AnchorObject["Name"] = Name;
+			}
 			Anchors.push_back(AnchorObject);
 		};
 		Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);
