@@ -588,6 +588,89 @@ json11::Json::object Avf::GetSkeleton(ARSkeleton2D* Skeleton)
 
 	return SkeletonJson;
 }
+
+
+std::string GetClassName(NSObject* Object)
+{
+	auto* Class = [Object class];
+	auto ClassNameNs = NSStringFromClass(Class);
+	auto ClassName = Soy::NSStringToString(ClassNameNs);
+	return ClassName;
+}
+
+
+void GetAnchorMeta(ARPlaneGeometry* Geometry,json11::Json::array& Points)
+{
+	for ( int i=0;	i<Geometry.vertexCount;	i++ )
+	{
+		const simd_float3& Vertex = Geometry.vertices[i];
+		Points.push_back( Vertex.x );
+		Points.push_back( Vertex.y );
+		Points.push_back( Vertex.z );
+	}
+}
+
+
+void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta)
+{
+	/*	gr: center + extent is just bounds, actual plane is dictated by the transform
+	//	always add center & extent as a 4 float plane
+	json11::Json::array Plane4;
+	Plane4.push_back( Anchor.center.x );
+	Plane4.push_back( Anchor.center.y );
+	Plane4.push_back( Anchor.center.z );
+	Plane4.push_back( Anchor.extent.x );
+	Plane4.push_back( Anchor.extent.y );	//	always 0
+	Plane4.push_back( Anchor.extent.z );
+	Meta["Plane"] = Plane4;
+	*/
+	
+	if ( Anchor.geometry )
+	{
+		json11::Json::array GeometryPoints;
+		GetAnchorMeta( Anchor.geometry, GeometryPoints );
+		Meta["Geometry"] = GeometryPoints;
+	}
+	
+}
+
+//	return false to not report this anchor
+bool GetAnchorMeta(ARAnchor* Anchor, json11::Json::object& Meta)
+{
+	if ( [Anchor isKindOfClass:[ARPlaneAnchor class]] )
+	{
+		GetAnchorMeta( (ARPlaneAnchor*)Anchor, Meta );
+	}
+	else
+	{
+		//	todo: ARObjectAnchor	https://developer.apple.com/documentation/arkit/arobjectanchor?language=objc
+		//	todo: ARImageAnchor	https://developer.apple.com/documentation/arkit/arimageanchor?language=objc
+		//	todo: ARFaceAnchor	https://developer.apple.com/documentation/arkit/arfaceanchor?language=objc
+		//	skip
+		return false;
+	}
+	
+	auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
+	auto Name = Soy::NSStringToString(Anchor.name);
+	auto Type = GetClassName(Anchor);//[Anchor isKindOfClass:[ARPlaneAnchor class]]
+#if ENABLE_IOS14
+	auto SessionUuid = Soy::NSStringToString(Anchor.sessionIdentifier.UUIDString);
+#endif
+	auto LocalToWorld = GetJsonArray(Anchor.transform);
+
+	Meta["Uuid"] = Uuid;
+#if ENABLE_IOS14
+	Meta["SessionUuid"] = SessionUuid;
+#endif
+	Meta["LocalToWorld"] = LocalToWorld;
+	//	omit name if its null
+	if ( Anchor.name )
+	{
+		Meta["Name"] = Name;
+	}
+	return true;
+}
+
 	
 void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParams& Params)
 {
@@ -607,26 +690,9 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParam
 		json11::Json::array Anchors;
 		auto EnumAnchor = [&](ARAnchor* Anchor)
 		{
-			auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
-			auto Name = Soy::NSStringToString(Anchor.name);
-#if ENABLE_IOS14
-			auto SessionUuid = Soy::NSStringToString(Anchor.sessionIdentifier.UUIDString);
-#endif
-			auto LocalToWorld = GetJsonArray(Anchor.transform);
-			json11::Json::object AnchorObject =
-			{
-				{"Uuid",Uuid},
-#if ENABLE_IOS14
-				{"SessionUuid",SessionUuid},
-#endif
-				{"LocalToWorld",LocalToWorld},
-			};
-			//	omit name if its null
-			if ( Anchor.name )
-			{
-				AnchorObject["Name"] = Name;
-			}
-			Anchors.push_back(AnchorObject);
+			json11::Json::object AnchorObject;
+			if ( GetAnchorMeta( Anchor, AnchorObject) )
+				Anchors.push_back(AnchorObject);
 		};
 		Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);
 		if ( Anchors.size() )
