@@ -27,6 +27,7 @@
 
 namespace Arkit
 {
+	const char*	GeometryStreamName = "Geometry";
 	const char*	GetColourStreamName(ArFrameSource::Type Source);
 };
 
@@ -646,8 +647,8 @@ void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta,bool Includ
 			json11::Json::array GeometryPositions;
 			GetAnchorTriangles( Anchor.geometry, GeometryPositions );
 			Meta["Triangles"] = GeometryPositions;
+		}
 	}
-}
 }
 
 //	return false to not report this anchor
@@ -692,6 +693,21 @@ bool GetAnchorMeta(ARAnchor* Anchor, json11::Json::object& Meta,bool IncludeGeom
 	return true;
 }
 
+void EnumGeometryAnchors(ARFrame* Frame,std::function<void(ARPlaneAnchor* PlaneAnchor,ARMeshAnchor* MeshAnchor)> Enum)
+{
+	auto EnumAnchor = [&](ARAnchor* Anchor)
+	{
+		if ( [Anchor isKindOfClass:[ARPlaneAnchor class]] )
+		{
+			Enum( (ARPlaneAnchor*)Anchor, nullptr );
+		}
+		if ( [Anchor isKindOfClass:[ARMeshAnchor class]] )
+		{
+			Enum( nullptr, (ARMeshAnchor*)Anchor );
+		}
+	};
+	Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);
+}
 	
 void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParams& Params)
 {
@@ -842,9 +858,54 @@ Arkit::TFrameDevice::TFrameDevice(json11::Json& Options) :
 	//	todo; get capabilities and reject params here
 }
 
+bool UpdateGeomtetry(ARPlaneAnchor* Anchor,Arkit::TGeometryCache& Geometry)
+{
+	Geometry.mBoundsCenter = vec3f( Anchor.center.x, Anchor.center.y, Anchor.center.z );
+	Geometry.mBoundsSize = vec3f( Anchor.extent.x, Anchor.extent.y, Anchor.extent.z );
+	
+	if ( Anchor.geometry )
+	{
+		auto TriangleCount = Anchor.geometry.triangleCount;
+		Geometry.mPositionCount = TriangleCount * 3;
+		
+	}
+	
+}
+
+bool UpdateGeomtetry(ARMeshAnchor* Anchor,Arkit::TGeometryCache& Geometry)
+{
+	return false;
+}
 
 void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 {
+	auto OnAnchor = [&](ARPlaneAnchor* PlaneAnchor,ARMeshAnchor* MeshAnchor)
+	{
+		auto* Anchor = PlaneAnchor ? PlaneAnchor : MeshAnchor;
+		if ( !Anchor )
+			return;
+		
+		auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
+		if ( PlaneAnchor )
+		{
+			auto Update = [&](TGeometryCache& Geometry)
+			{
+				return UpdateGeomtetry( PlaneAnchor, Geometry );
+			};
+			this->UpdateGeometry( Uuid, Update );
+		}
+		
+		if ( MeshAnchor )
+		{
+			auto Update = [&](TGeometryCache& Geometry)
+			{
+				return UpdateGeomtetry( MeshAnchor, Geometry );
+			};
+			this->UpdateGeometry( Uuid, Update );
+		}
+	};
+	EnumGeometryAnchors(Frame);
+
 	auto* ColourStreamName = GetColourStreamName(Source);
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
@@ -946,6 +1007,24 @@ void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timesta
 	{
 		PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, Meta );
 	}
+}
+
+
+void Arkit::TFrameDevice::PushGeometryFrame(const TGeometryCache& Geometry)
+{
+	Soy::TScopeTimerPrint Timer(__PRETTY_FUNCTION__,5);
+
+	float3x3 Transform;
+	auto StreamName = GeometryStreamName;
+	std::shared_ptr<TPixelBuffer> Buffer( new TDumbSharedPixelBuffer( Geometry.mTrianglePositionsPixels, Transform ) );
+
+	json11::Json::object Meta;
+	Meta["StreamName"] = StreamName;
+	Meta["AnchorUuid"] = Geometry.mUuid;
+	Meta["PositionCount"] = Geometry.mPositionCount;
+	Meta["LocalToWorld"] = GetJsonArray(Geometry.mLocalToWorld);
+	
+	PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, Meta );
 }
 
 

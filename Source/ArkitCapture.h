@@ -17,6 +17,8 @@ namespace Arkit
 	class TSessionCamera;		//	arkit session which reads a certain source
 	class TCaptureParams;
 	
+	class TGeometryCache;
+	
 	namespace ArFrameSource
 	{
 		enum Type
@@ -70,9 +72,23 @@ public:
 	bool	mOutputSceneDepthSmooth = false;
 	bool	mVerboseDebug = false;
 	//	todo: colour format
+	bool	mOutputAnchorGeometryStream = false;	//	output anchor geometry triangles as a float-image stream
 };
 
 
+
+class Arkit::TGeometryCache
+{
+public:
+	std::string				mUuid;
+	vec3f					mBoundsCenter;
+	vec3f					mBoundsSize;
+	size_t					mPositionCount = 0;
+	SoyTime					mTimestamp;
+	std::shared_ptr<SoyPixelsImpl>	mTrianglePositionsPixels;	//	floats stored in a pixel buffer. done early to avoid a copy/alloc later
+	//Array<float>			mTrianglePositions;
+	BufferArray<float,4*4>	mLocalToWorld;
+};
 
 class Arkit::TFrameDevice : public PopCameraDevice::TDevice
 {
@@ -84,9 +100,15 @@ public:
 	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
 	
+	void			PushGeometryFrame(const TGeometryCache& Geometry);
+	void			UpdateGeometry(const std::string& Uuid,std::function<bool(TGeometryCache&)> UpdateGeometry);	//	callback return true if data changed
+	
 	SoyTime			mPreviousDepthTime;
 	SoyTime			mPreviousFrameTime;
 	TCaptureParams	mParams;
+	
+	//	we keep old geometry, so we can detect is if it's changed
+	Array<std::shared_ptr<TGeometryCache>>	mGeometryCache;
 };
 
 
