@@ -599,19 +599,33 @@ std::string GetClassName(NSObject* Object)
 }
 
 
-void GetAnchorMeta(ARPlaneGeometry* Geometry,json11::Json::array& Points)
+void GetAnchorTriangles(ARPlaneGeometry* Geometry,json11::Json::array& Positions)
 {
-	for ( int i=0;	i<Geometry.vertexCount;	i++ )
+	for ( int t=0;	t<Geometry.triangleCount;	t++ )
 	{
-		const simd_float3& Vertex = Geometry.vertices[i];
-		Points.push_back( Vertex.x );
-		Points.push_back( Vertex.y );
-		Points.push_back( Vertex.z );
+		auto ti = t * 3;
+		int16_t i0 = Geometry.triangleIndices[ti+0];
+		int16_t i1 = Geometry.triangleIndices[ti+1];
+		int16_t i2 = Geometry.triangleIndices[ti+2];
+		auto& v0 = Geometry.vertices[i0];
+		auto& v1 = Geometry.vertices[i1];
+		auto& v2 = Geometry.vertices[i2];
+		
+		Positions.push_back( v0.x );
+		Positions.push_back( v0.y );
+		Positions.push_back( v0.z );
+		Positions.push_back( v1.x );
+		Positions.push_back( v1.y );
+		Positions.push_back( v1.z );
+		Positions.push_back( v2.x );
+		Positions.push_back( v2.y );
+		Positions.push_back( v2.z );
 	}
+
 }
 
 
-void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta)
+void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta,bool IncludeGeometry)
 {
 	/*	gr: center + extent is just bounds, actual plane is dictated by the transform
 	//	always add center & extent as a 4 float plane
@@ -627,19 +641,26 @@ void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta)
 	
 	if ( Anchor.geometry )
 	{
-		json11::Json::array GeometryPoints;
-		GetAnchorMeta( Anchor.geometry, GeometryPoints );
-		Meta["Geometry"] = GeometryPoints;
+		if ( IncludeGeometry )
+		{
+			json11::Json::array GeometryPositions;
+			GetAnchorTriangles( Anchor.geometry, GeometryPositions );
+			Meta["Triangles"] = GeometryPositions;
 	}
-	
+}
 }
 
 //	return false to not report this anchor
-bool GetAnchorMeta(ARAnchor* Anchor, json11::Json::object& Meta)
+bool GetAnchorMeta(ARAnchor* Anchor, json11::Json::object& Meta,bool IncludeGeometry)
 {
 	if ( [Anchor isKindOfClass:[ARPlaneAnchor class]] )
 	{
-		GetAnchorMeta( (ARPlaneAnchor*)Anchor, Meta );
+		GetAnchorMeta( (ARPlaneAnchor*)Anchor, Meta, IncludeGeometry );
+	}
+	else if ( [Anchor isKindOfClass:[ARMeshAnchor class]] )
+	{
+		//GetAnchorMeta( (ARMeshAnchor*)Anchor, Meta );
+		return false;
 	}
 	else
 	{
@@ -691,7 +712,7 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParam
 		auto EnumAnchor = [&](ARAnchor* Anchor)
 		{
 			json11::Json::object AnchorObject;
-			if ( GetAnchorMeta( Anchor, AnchorObject) )
+			if ( GetAnchorMeta( Anchor, AnchorObject, Params.mOutputAnchorGeometry ) )
 				Anchors.push_back(AnchorObject);
 		};
 		Platform::NSArray_ForEach<ARAnchor*>(Frame.anchors,EnumAnchor);

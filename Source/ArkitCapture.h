@@ -64,7 +64,8 @@ public:
 	bool	mResetAnchors = false;	//	on start
 	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
 	bool	mOutputFeatures = false;	//	these get huge in quantity, so explicitly enable
-	bool	mOutputAnchors = true;		//	these can also get quite large, but on by default
+	bool	mOutputAnchors = true;		//	these can also get quite large, but on by default (use to get planes from localtoworld transforms)
+	bool	mOutputAnchorGeometry = false;		//	these get large, use image streams!
 	bool	mOutputSceneDepthConfidence = false;
 	bool	mOutputSceneDepthSmooth = false;
 	bool	mVerboseDebug = false;
