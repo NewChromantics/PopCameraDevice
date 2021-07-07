@@ -17,7 +17,7 @@ namespace Arkit
 	class TSessionCamera;		//	arkit session which reads a certain source
 	class TCaptureParams;
 	
-	class TGeometryCache;
+	class TAnchorGeometry;
 	
 	namespace ArFrameSource
 	{
@@ -43,6 +43,16 @@ namespace Arkit
 		DECLARE_SOYENUM(ArFrameSource);
 	}
 	
+	namespace AnchorChange
+	{
+		enum Type
+		{
+			Added,
+			Updated,
+			Removed
+		};
+	};
+	
 	//	return device names for arkit-specific accessors to ARFrame images
 	void	EnumDevices(std::function<void(const std::string&,ArrayBridge<std::string>&&)> EnumName);
 }
@@ -67,27 +77,32 @@ public:
 	SoyPixelsFormat::Type	mColourFormat = SoyPixelsFormat::Invalid;
 	bool	mOutputFeatures = false;	//	these get huge in quantity, so explicitly enable
 	bool	mOutputAnchors = true;		//	these can also get quite large, but on by default (use to get planes from localtoworld transforms)
-	bool	mOutputAnchorGeometry = false;		//	these get large, use image streams!
+	bool	mOutputAnchorGeometry = false;		//	these get large, use image streams! left in for legacy
 	bool	mOutputSceneDepthConfidence = false;
 	bool	mOutputSceneDepthSmooth = false;
 	bool	mVerboseDebug = false;
 	//	todo: colour format
-	bool	mOutputAnchorGeometryStream = false;	//	output anchor geometry triangles as a float-image stream
+	bool	mEnableAnchorGeometryStream = false;	//	output anchor geometry triangles as a float-image stream (with meta describing contents)
 };
 
 
 
-class Arkit::TGeometryCache
+class Arkit::TAnchorGeometry
 {
 public:
+	FixedRemoteArray<float>	AllocatePositions(size_t PositionCount,size_t PositionComponentCount);	//	allocates pixels, resizes image etc and returns the underlying float array
+
+public:
 	std::string				mUuid;
+	std::string				mName;	//	some anchors are named
+	std::string				mType;	//	ARAnchor type
 	vec3f					mBoundsCenter;
 	vec3f					mBoundsSize;
 	size_t					mPositionCount = 0;
 	SoyTime					mTimestamp;
 	std::shared_ptr<SoyPixelsImpl>	mTrianglePositionsPixels;	//	floats stored in a pixel buffer. done early to avoid a copy/alloc later
 	//Array<float>			mTrianglePositions;
-	BufferArray<float,4*4>	mLocalToWorld;
+	float4x4				mLocalToWorld;
 };
 
 class Arkit::TFrameDevice : public PopCameraDevice::TDevice
@@ -100,15 +115,11 @@ public:
 	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
 	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
 	
-	void			PushGeometryFrame(const TGeometryCache& Geometry);
-	void			UpdateGeometry(const std::string& Uuid,std::function<bool(TGeometryCache&)> UpdateGeometry);	//	callback return true if data changed
+	void			PushGeometryFrame(const TAnchorGeometry& Geometry);
 	
 	SoyTime			mPreviousDepthTime;
 	SoyTime			mPreviousFrameTime;
 	TCaptureParams	mParams;
-	
-	//	we keep old geometry, so we can detect is if it's changed
-	Array<std::shared_ptr<TGeometryCache>>	mGeometryCache;
 };
 
 
@@ -126,6 +137,7 @@ public:
 
 private:
 	void			OnFrame(ARFrame* Frame);
+	void			OnAnchorChange(ARAnchor* Frame,AnchorChange::Type Change);
 	
 	std::shared_ptr<TSession>	mSession;
 	ArFrameSource::Type			mSource = ArFrameSource::Invalid;

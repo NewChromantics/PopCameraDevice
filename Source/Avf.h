@@ -16,11 +16,13 @@
 @class ARFrame;
 @class ARSession;
 @class ARDepthData;
+@class ARAnchor;
 #else
 class AVDepthData;
 class ARFrame;
 class ARSession;
 class ARDepthData;
+class ARAnchor;
 #endif
 
 

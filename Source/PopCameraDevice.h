@@ -47,6 +47,7 @@
 #define POPCAMERADEVICE_KEY_ANCHORS					"Anchors"
 #define POPCAMERADEVICE_KEY_DEPTHCONFIDENCE			"DepthConfidence"
 #define POPCAMERADEVICE_KEY_DEPTHSMOOTH				"DepthSmooth"	//	use ARFrame.smoothedscenedepth if availible
+#define POPCAMERADEVICE_KEY_ANCHORGEOMETRYSTREAM	"AnchorGeometryStream"	//	output geometry triangles as float-images in their own stream
 
 //	kinect azure
 #define POPCAMERADEVICE_KEY_SYNCPRIMARY				"SyncPrimary"

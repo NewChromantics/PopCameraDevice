@@ -29,9 +29,23 @@ namespace Arkit
 {
 	const char*	GeometryStreamName = "Geometry";
 	const char*	GetColourStreamName(ArFrameSource::Type Source);
+	
+	
+
+	float4x4			SimdToFloat4x4(simd_float4x4 simd);
 };
 
 
+float4x4 Arkit::SimdToFloat4x4(simd_float4x4 simd)
+{
+	float4x4 Matrix(
+		simd.columns[0][0],	simd.columns[1][0],	simd.columns[2][0],	simd.columns[3][0],	
+		simd.columns[0][1],	simd.columns[1][1],	simd.columns[2][1],	simd.columns[3][1],	
+		simd.columns[0][2],	simd.columns[1][2],	simd.columns[2][2],	simd.columns[3][2],	
+		simd.columns[0][3],	simd.columns[1][3],	simd.columns[2][3],	simd.columns[3][3]	
+	);
+	return Matrix;	
+}
 
 @interface ARSessionProxy : NSObject<ARSessionObserver,ARSCNViewDelegate,ARSessionDelegate>
 {
@@ -50,6 +64,9 @@ namespace Arkit
 - (void)session:(ARSession *)session didOutputCollaborationData:(ARCollaborationData *)data API_AVAILABLE(ios(13.0));
 - (void)session:(ARSession *)session didChangeGeoTrackingStatus:(ARGeoTrackingStatus*)geoTrackingStatus API_AVAILABLE(ios(14.0));
 
+- (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors;
+- (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors;
+- (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors;
 
 @end
 
@@ -61,8 +78,10 @@ public:
 	~TSession();
 	
 	void				OnFrame(ARFrame* Frame);
+	void				OnAnchorChange(ARAnchor* Anchor,AnchorChange::Type Change);
 	
 	std::function<void(ARFrame*)>	mOnFrame;
+	std::function<void(ARAnchor*,AnchorChange::Type)>	mOnAnchorChange;
 	ObjcPtr<ARSessionProxy>			mSessionProxy;
 	ObjcPtr<ARSession>				mSession;
 
@@ -140,6 +159,50 @@ public:
 }
 
 
+- (void)session:(ARSession *)session didAddAnchors:(NSArray<__kindof ARAnchor*>*)anchors
+{
+	try
+	{
+		for (ARAnchor* Anchor in anchors)
+		{
+			mParent->OnAnchorChange(Anchor,Arkit::AnchorChange::Added);
+		}
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << " exception: " << e.what() << std::endl;
+	}
+}
+
+- (void)session:(ARSession *)session didUpdateAnchors:(NSArray<__kindof ARAnchor*>*)anchors
+{
+	try
+	{
+		for (ARAnchor* Anchor in anchors)
+		{
+			mParent->OnAnchorChange(Anchor,Arkit::AnchorChange::Updated);
+		}
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << " exception: " << e.what() << std::endl;
+	}
+}
+
+- (void)session:(ARSession *)session didRemoveAnchors:(NSArray<__kindof ARAnchor*>*)anchors
+{
+	try
+	{
+		for (ARAnchor* Anchor in anchors)
+		{
+			mParent->OnAnchorChange(Anchor,Arkit::AnchorChange::Removed);
+		}
+	}
+	catch(std::exception& e)
+	{
+		std::Debug << __PRETTY_FUNCTION__ << " exception: " << e.what() << std::endl;
+	}
+}
 
 @end
 
@@ -199,6 +262,7 @@ Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
 	SetBool( POPCAMERADEVICE_KEY_FEATURES, mOutputFeatures );
 	SetBool( POPCAMERADEVICE_KEY_ANCHORS, mOutputAnchors );	
+	SetBool( POPCAMERADEVICE_KEY_ANCHORGEOMETRYSTREAM, mEnableAnchorGeometryStream );	
 	SetBool( POPCAMERADEVICE_KEY_DEPTHCONFIDENCE, mOutputSceneDepthConfidence );
 	SetBool( POPCAMERADEVICE_KEY_DEPTHSMOOTH, mOutputSceneDepthSmooth );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
@@ -387,6 +451,17 @@ void Arkit::TSession::OnFrame(ARFrame* Frame)
 		std::Debug << "New ARkit frame" << std::endl;
 	if ( mOnFrame )
 		mOnFrame( Frame );
+}
+
+void Arkit::TSession::OnAnchorChange(ARAnchor* Anchor,AnchorChange::Type Change)
+{
+	if ( mParams.mVerboseDebug )
+	{
+		auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
+		std::Debug << "Anchor change " << Uuid << " (" << magic_enum::enum_name(Change) << ")" << std::endl;
+	}
+	if ( mOnAnchorChange )
+		mOnAnchorChange( Anchor, Change );
 }
 
 
@@ -600,7 +675,7 @@ std::string GetClassName(NSObject* Object)
 }
 
 
-void GetAnchorTriangles(ARPlaneGeometry* Geometry,json11::Json::array& Positions)
+void GetAnchorTriangles(ARPlaneGeometry* Geometry,ArrayBridge<float>&& PositionFloats,size_t PositionSize)
 {
 	for ( int t=0;	t<Geometry.triangleCount;	t++ )
 	{
@@ -611,16 +686,25 @@ void GetAnchorTriangles(ARPlaneGeometry* Geometry,json11::Json::array& Positions
 		auto& v0 = Geometry.vertices[i0];
 		auto& v1 = Geometry.vertices[i1];
 		auto& v2 = Geometry.vertices[i2];
+		auto w = 1.0f;
 		
-		Positions.push_back( v0.x );
-		Positions.push_back( v0.y );
-		Positions.push_back( v0.z );
-		Positions.push_back( v1.x );
-		Positions.push_back( v1.y );
-		Positions.push_back( v1.z );
-		Positions.push_back( v2.x );
-		Positions.push_back( v2.y );
-		Positions.push_back( v2.z );
+		PositionFloats.PushBack( v0.x );
+		PositionFloats.PushBack( v0.y );
+		PositionFloats.PushBack( v0.z );
+		if ( PositionSize == 4 )	
+			PositionFloats.PushBack(w);
+			
+		PositionFloats.PushBack( v1.x );
+		PositionFloats.PushBack( v1.y );
+		PositionFloats.PushBack( v1.z );
+		if ( PositionSize == 4 )	
+			PositionFloats.PushBack(w);
+
+		PositionFloats.PushBack( v2.x );
+		PositionFloats.PushBack( v2.y );
+		PositionFloats.PushBack( v2.z );
+		if ( PositionSize == 4 )	
+			PositionFloats.PushBack(w);
 	}
 
 }
@@ -628,6 +712,9 @@ void GetAnchorTriangles(ARPlaneGeometry* Geometry,json11::Json::array& Positions
 
 void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta,bool IncludeGeometry)
 {
+	//	gr: geometry gets big, so really should only use the geometry stream now
+	//		and maybe for convinence, still output normal and bounds?
+
 	/*	gr: center + extent is just bounds, actual plane is dictated by the transform
 	//	always add center & extent as a 4 float plane
 	json11::Json::array Plane4;
@@ -644,9 +731,9 @@ void GetAnchorMeta(ARPlaneAnchor* Anchor, json11::Json::object& Meta,bool Includ
 	{
 		if ( IncludeGeometry )
 		{
-			json11::Json::array GeometryPositions;
-			GetAnchorTriangles( Anchor.geometry, GeometryPositions );
-			Meta["Triangles"] = GeometryPositions;
+			Array<float> TrianglePositions;
+			GetAnchorTriangles( Anchor.geometry, GetArrayBridge(TrianglePositions), 3 );
+			Meta["Triangles"] = GetJsonArray(GetArrayBridge(TrianglePositions));
 		}
 	}
 }
@@ -794,7 +881,7 @@ void Avf::GetMeta(ARFrame* Frame,json11::Json::object& Meta,Arkit::TCaptureParam
 #endif
 	
 	auto WorldMappingStatus = magic_enum::enum_name(Frame.worldMappingStatus);
-	Meta["WorldMappingStatus"] = WorldMappingStatus;
+	Meta["WorldMappingStatus"] = std::string(WorldMappingStatus);
 }
 
 
@@ -858,7 +945,7 @@ Arkit::TFrameDevice::TFrameDevice(json11::Json& Options) :
 	//	todo; get capabilities and reject params here
 }
 
-bool UpdateGeomtetry(ARPlaneAnchor* Anchor,Arkit::TGeometryCache& Geometry)
+void GetGeometry(ARPlaneAnchor* Anchor,Arkit::TAnchorGeometry& Geometry)
 {
 	Geometry.mBoundsCenter = vec3f( Anchor.center.x, Anchor.center.y, Anchor.center.z );
 	Geometry.mBoundsSize = vec3f( Anchor.extent.x, Anchor.extent.y, Anchor.extent.z );
@@ -866,46 +953,123 @@ bool UpdateGeomtetry(ARPlaneAnchor* Anchor,Arkit::TGeometryCache& Geometry)
 	if ( Anchor.geometry )
 	{
 		auto TriangleCount = Anchor.geometry.triangleCount;
-		Geometry.mPositionCount = TriangleCount * 3;
-		
+		//	allocate the data to write to
+		auto ComponentCount = 4;
+		auto FloatsFixedArray = Geometry.AllocatePositions(TriangleCount*3,ComponentCount);
+		//	convert to a growable array
+		size_t FloatCount = 0;
+		auto FloatsArray = GetRemoteArray( FloatsFixedArray.GetArray(), FloatsFixedArray.GetSize(), FloatCount );
+		GetAnchorTriangles( Anchor.geometry, GetArrayBridge(FloatsArray), ComponentCount );
 	}
-	
 }
 
-bool UpdateGeomtetry(ARMeshAnchor* Anchor,Arkit::TGeometryCache& Geometry)
+template<typename INDEXTYPE>
+void GetTriangles(ArrayBridge<float>& TrianglePositionFloats,int PositionComponentCount,ARGeometrySource* PositionsSource,const INDEXTYPE* Indexes,int TriangleCount)
 {
-	return false;
+	uint8_t* PositionsBytes = reinterpret_cast<uint8_t*>(PositionsSource.buffer.contents);
+	//	apply offsets
+	//	check size
+	auto PositionFormat = PositionsSource.format;
+	auto Offset = PositionsSource.offset;
+	auto ByteStride = PositionsSource.stride;
+	
+	PositionsBytes += Offset;
+	float* Positions = reinterpret_cast<float*>(PositionsBytes);
+	std::Debug << "GetTriangles() PositionFormat=" << PositionFormat << " Offset=" << Offset << " ByteStride=" << ByteStride << std::endl;  
+
+	for ( int t=0;	t<TriangleCount;	t++ )
+	{
+		auto i = t*3;
+		auto vi0 = i+0;
+		auto vi1 = i+1;
+		auto vi2 = i+2;
+		auto* xyz0 = &Positions[ vi0*3 ];
+		auto* xyz1 = &Positions[ vi1*3 ];
+		auto* xyz2 = &Positions[ vi2*3 ];
+		auto w = 1.0f;
+		TrianglePositionFloats.PushBack( xyz0[0] );
+		TrianglePositionFloats.PushBack( xyz0[1] );
+		TrianglePositionFloats.PushBack( xyz0[2] );
+		if ( PositionComponentCount == 4 )
+			TrianglePositionFloats.PushBack( w );
+			
+		TrianglePositionFloats.PushBack( xyz1[0] );
+		TrianglePositionFloats.PushBack( xyz1[1] );
+		TrianglePositionFloats.PushBack( xyz1[2] );
+		if ( PositionComponentCount == 4 )
+			TrianglePositionFloats.PushBack( w );
+			
+		TrianglePositionFloats.PushBack( xyz2[0] );
+		TrianglePositionFloats.PushBack( xyz2[1] );
+		TrianglePositionFloats.PushBack( xyz2[2] );
+		if ( PositionComponentCount == 4 )
+			TrianglePositionFloats.PushBack( w );
+	}
 }
+
+void GetTriangles(ArrayBridge<float>&& TrianglePositionFloats,int PositionComponentCount,ARGeometrySource* Positions,ARGeometryElement* Faces)
+{
+	void* Indexes = Faces.buffer.contents;
+	auto TriangleCount = Faces.count; 
+	if ( Faces.bytesPerIndex == sizeof(uint32_t) )
+	{
+		auto* Indexes32 = reinterpret_cast<uint32_t*>(Indexes);
+		GetTriangles( TrianglePositionFloats, PositionComponentCount, Positions, Indexes32, TriangleCount );
+	}
+	else if ( Faces.bytesPerIndex == sizeof(uint16_t) )
+	{
+		auto* Indexes16 = reinterpret_cast<uint16_t*>(Indexes);
+		GetTriangles( TrianglePositionFloats, PositionComponentCount, Positions, Indexes16, TriangleCount );
+	}
+	else
+	{
+		throw Soy::AssertException("Faces.bytesPerIndex unhandled");
+	}
+}
+
+size_t GetTriangleCount(ARGeometryElement* Faces)
+{
+	//	ignore lines
+	//	todo: detect something other than lines
+	if ( Faces.primitiveType == ARGeometryPrimitiveTypeLine )
+		return 0;
+		
+	if ( Faces.primitiveType != ARGeometryPrimitiveTypeTriangle )
+	{
+		std::Debug << "Anchor has faces which aren't lines or triangles: " << magic_enum::enum_name(Faces.primitiveType) << std::endl;
+		return 0;
+	}
+
+	return Faces.count;
+}
+
+
+void GetGeometry(ARMeshAnchor* Anchor,Arkit::TAnchorGeometry& Geometry)
+{
+	//	mesh anchor doesnt have bounds or transform
+	//Geometry.mBoundsCenter = vec3f( Anchor.center.x, Anchor.center.y, Anchor.center.z );
+	//Geometry.mBoundsSize = vec3f( Anchor.extent.x, Anchor.extent.y, Anchor.extent.z );
+	
+	if ( Anchor.geometry )
+	{
+		auto* Faces = Anchor.geometry.faces;
+		auto TriangleCount = GetTriangleCount(Faces);
+		if ( TriangleCount > 0 )
+		{
+			//	allocate the data to write to
+			auto ComponentCount = 4;
+			auto FloatsFixedArray = Geometry.AllocatePositions(TriangleCount*3,ComponentCount);
+			//	convert to a growable array
+			size_t FloatCount = 0;
+			auto FloatsArray = GetRemoteArray( FloatsFixedArray.GetArray(), FloatsFixedArray.GetSize(), FloatCount );
+			GetTriangles( GetArrayBridge(FloatsArray), ComponentCount, Anchor.geometry.vertices, Anchor.geometry.faces );
+		}
+	}
+}
+
 
 void Arkit::TFrameDevice::PushFrame(ARFrame* Frame,ArFrameSource::Type Source)
 {
-	auto OnAnchor = [&](ARPlaneAnchor* PlaneAnchor,ARMeshAnchor* MeshAnchor)
-	{
-		auto* Anchor = PlaneAnchor ? PlaneAnchor : MeshAnchor;
-		if ( !Anchor )
-			return;
-		
-		auto Uuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
-		if ( PlaneAnchor )
-		{
-			auto Update = [&](TGeometryCache& Geometry)
-			{
-				return UpdateGeomtetry( PlaneAnchor, Geometry );
-			};
-			this->UpdateGeometry( Uuid, Update );
-		}
-		
-		if ( MeshAnchor )
-		{
-			auto Update = [&](TGeometryCache& Geometry)
-			{
-				return UpdateGeomtetry( MeshAnchor, Geometry );
-			};
-			this->UpdateGeometry( Uuid, Update );
-		}
-	};
-	EnumGeometryAnchors(Frame);
-
 	auto* ColourStreamName = GetColourStreamName(Source);
 	auto FrameTime = Soy::Platform::GetTime( Frame.timestamp );
 	auto CapDepthTime = Soy::Platform::GetTime( Frame.capturedDepthDataTimestamp );
@@ -1010,19 +1174,23 @@ void Arkit::TFrameDevice::PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timesta
 }
 
 
-void Arkit::TFrameDevice::PushGeometryFrame(const TGeometryCache& Geometry)
+void Arkit::TFrameDevice::PushGeometryFrame(const TAnchorGeometry& Geometry)
 {
 	Soy::TScopeTimerPrint Timer(__PRETTY_FUNCTION__,5);
 
 	float3x3 Transform;
 	auto StreamName = GeometryStreamName;
-	std::shared_ptr<TPixelBuffer> Buffer( new TDumbSharedPixelBuffer( Geometry.mTrianglePositionsPixels, Transform ) );
+	std::shared_ptr<SoyPixelsImpl> Pixels = std::dynamic_pointer_cast<SoyPixelsImpl>( Geometry.mTrianglePositionsPixels );
+	std::shared_ptr<TPixelBuffer> Buffer( new TDumbSharedPixelBuffer( Pixels, Transform ) );
 
 	json11::Json::object Meta;
 	Meta["StreamName"] = StreamName;
 	Meta["AnchorUuid"] = Geometry.mUuid;
-	Meta["PositionCount"] = Geometry.mPositionCount;
+	Meta["AnchorName"] = Geometry.mName;
+	Meta["AnchorType"] = Geometry.mType;
+	Meta["PositionCount"] = static_cast<int>(Geometry.mPositionCount);
 	Meta["LocalToWorld"] = GetJsonArray(Geometry.mLocalToWorld);
+	SoyTime Timestamp(false);
 	
 	PopCameraDevice::TDevice::PushFrame( Buffer, Timestamp, Meta );
 }
@@ -1056,9 +1224,15 @@ Arkit::TSessionCamera::TSessionCamera(const std::string& DeviceName,json11::Json
 		Debug << "NSException " << Soy::NSErrorToString( e );
 		throw Soy::AssertException(Debug);
 	}
+
 	mSession->mOnFrame = [this](ARFrame* Frame)	
 	{	
 		this->OnFrame(Frame);	
+	};
+
+	mSession->mOnAnchorChange = [this](ARAnchor* Anchor,AnchorChange::Type Change)	
+	{	
+		this->OnAnchorChange( Anchor, Change );	
 	};
 }
 
@@ -1070,5 +1244,67 @@ void Arkit::TSessionCamera::EnableFeature(PopCameraDevice::TFeature::Type Featur
 void Arkit::TSessionCamera::OnFrame(ARFrame* Frame)
 {
 	PushFrame( Frame, mSource );
+}
+
+void Arkit::TSessionCamera::OnAnchorChange(ARAnchor* Anchor,AnchorChange::Type Change)
+{
+	if ( !mParams.mEnableAnchorGeometryStream )
+		return;
+		
+	Arkit::TAnchorGeometry Geometry;
+	Geometry.mUuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
+	Geometry.mName = Soy::NSStringToString(Anchor.name);
+	Geometry.mType = GetClassName(Anchor);
+	Geometry.mTimestamp = SoyTime(true);
+	Geometry.mLocalToWorld = SimdToFloat4x4(Anchor.transform);
+	
+	if ( [Anchor isKindOfClass:[ARPlaneAnchor class]] )
+	{
+		auto* PlaneAnchor = (ARPlaneAnchor*)Anchor;
+		GetGeometry( PlaneAnchor, Geometry );
+	}
+	else if ( [Anchor isKindOfClass:[ARMeshAnchor class]] )
+	{
+		auto* MeshAnchor = (ARMeshAnchor*)Anchor;
+		GetGeometry( MeshAnchor, Geometry );
+	}
+	else
+	{
+		//	non geometry anchor
+		return;
+	}
+	
+	PushGeometryFrame(Geometry);
+}
+
+
+SoyPixelsFormat::Type GetFloatPixelFormat(size_t ComponentCount)
+{
+	switch(ComponentCount)
+	{
+		case 1:	return SoyPixelsFormat::Float1;
+		case 2:	return SoyPixelsFormat::Float2;
+		case 3:	return SoyPixelsFormat::Float3;
+		case 4:	return SoyPixelsFormat::Float4;
+		default:break;
+	}
+	std::stringstream Error;
+	Error << "GetFloatPixelFormat() unhandled float component count " << ComponentCount;
+	throw Soy::AssertException(Error);
+}
+
+FixedRemoteArray<float> Arkit::TAnchorGeometry::AllocatePositions(size_t PositionCount,size_t PositionComponentCount)
+{
+	//	gr: make a square image? maybe dont need to... it's just data
+	auto Width = PositionCount;
+	auto Height = 1;
+	auto PixelFormat = GetFloatPixelFormat(PositionComponentCount);
+	SoyPixelsMeta PixelsMeta( Width, Height, PixelFormat );
+	
+	mTrianglePositionsPixels.reset( new SoyPixels(PixelsMeta) );
+	
+	auto& PixelsArray8 = mTrianglePositionsPixels->GetPixelsArray();
+	auto PixelsArrayFloat = GetArrayBridge(PixelsArray8).GetSubArray<float>( 0, PositionCount*Height*PositionComponentCount );
+	return PixelsArrayFloat;
 }
 

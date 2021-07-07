@@ -3,6 +3,7 @@
 #include "Json11/json11.hpp"
 
 #include <SoyVector.h>
+#include <Array.hpp>
 #if defined(TARGET_IOS)|| defined(TARGET_OSX)
 #include <simd/simd.h>
 #import <CoreGraphics/CoreGraphics.h>
@@ -10,6 +11,8 @@
 
 
 json11::Json::array GetJsonArray(vec3f Values);
+json11::Json::array GetJsonArray(const float4x4& Values);
+json11::Json::array GetJsonArray(const ArrayBridge<float>&& Values);
 
 #if defined(TARGET_IOS)|| defined(TARGET_OSX)
 json11::Json::array GetJsonArray(simd_float2 Values);

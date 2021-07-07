@@ -107,6 +107,10 @@ int main()
 	DebugPrint("Devices and formats:");
 	DebugPrint(EnumJson);
 
+	//	test geometry streams (planes, anchors) from arkit
+	TestDeviceInstance("Arkit Rear Depth", "{\"AnchorGeometryStream\":true}", 999999990);
+	
+
 	//	test device currently only pumps out one frame
 	//ReadFrameToPng("Test", "{\"Format\":\"RGBA\"}", "Test.png");
 	TestDeviceInstance("Test", "{\"SphereZ\":2}", 1);

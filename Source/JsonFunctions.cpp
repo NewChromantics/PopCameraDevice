@@ -22,6 +22,27 @@ json11::Json::array GetJsonArray(vec3f Values)
 	return Array;
 }
 
+json11::Json::array GetJsonArray(const float4x4& Values)
+{
+	json11::Json::array Array;
+	auto ValuesArray = Values.GetArray();
+	for ( auto i=0;	i<ValuesArray.GetSize();	i++ )
+	{
+		Array.push_back( ValuesArray[i] );
+	}
+	return Array;
+}
+
+json11::Json::array GetJsonArray(const ArrayBridge<float>&& Values)
+{
+	json11::Json::array Array;
+	for ( auto i=0;	i<Values.GetSize();	i++ )
+	{
+		Array.push_back( Values[i] );
+	}
+	return Array;
+}
+
 #if defined(TARGET_IOS)|| defined(TARGET_OSX)
 json11::Json::array GetJsonArray(simd_float2 Values)
 {
