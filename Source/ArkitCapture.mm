@@ -338,7 +338,6 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 	auto BodyTrackingSupported = [ARBodyTrackingConfiguration isSupported];
 	
 	NSArray<ARVideoFormat *>* WorldVideoFormats = ARWorldTrackingConfiguration.supportedVideoFormats;
-
 	
 	std::Debug << "Rear supported=" << WorldSupported << std::endl;
 	std::Debug << "Rear SupportsMeshing=" << WorldSupportsMeshing << std::endl;
@@ -407,7 +406,16 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 		WorldConfig.worldAlignment = ARWorldAlignmentGravity;
 		
 		//	todo: use colour format
-		WorldConfig.videoFormat = WorldVideoFormats[2];
+		if ( [WorldVideoFormats count] == 0 )
+		{
+			//throw Soy::AssertException("Zero camera world-video-formats - can we continue with no format?");
+		}
+		else
+		{
+			//	gr: this was 2 (for ipad), but only 2 formats on iphone SE
+			//	todo: pick the right one
+			WorldConfig.videoFormat = WorldVideoFormats[0];
+		}
 	}
 	else
 	{
