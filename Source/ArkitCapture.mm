@@ -997,9 +997,9 @@ void GetTriangles(ArrayBridge<float>& TrianglePositionFloats,int PositionCompone
 	for ( int t=0;	t<TriangleCount;	t++ )
 	{
 		auto i = t*3;
-		auto vi0 = i+0;
-		auto vi1 = i+1;
-		auto vi2 = i+2;
+		auto vi0 = Indexes[i+0];
+		auto vi1 = Indexes[i+1];
+		auto vi2 = Indexes[i+2];
 		auto* xyz0 = &Positions[ vi0*3 ];
 		auto* xyz1 = &Positions[ vi1*3 ];
 		auto* xyz2 = &Positions[ vi2*3 ];
