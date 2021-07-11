@@ -108,6 +108,7 @@ int main()
 	DebugPrint(EnumJson);
 
 	//	test geometry streams (planes, anchors) from arkit
+	TestDeviceInstance("Arkit Rear Depth", "{\"WorldGeometryStream\":true}", 999999990);
 	TestDeviceInstance("Arkit Rear Depth", "{\"AnchorGeometryStream\":true}", 999999990);
 	
 

@@ -82,7 +82,8 @@ public:
 	bool	mOutputSceneDepthSmooth = false;
 	bool	mVerboseDebug = false;
 	//	todo: colour format
-	bool	mEnableAnchorGeometryStream = false;	//	output anchor geometry triangles as a float-image stream (with meta describing contents)
+	bool	mEnableAnchorGeometry = false;	//	output anchor geometry triangles as a float-image stream (with meta describing contents)
+	bool	mEnableWorldGeometry = false;	//	output world (scene reconstruction) geometry as a float image stream
 };
 
 

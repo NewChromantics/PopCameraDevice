@@ -262,13 +262,15 @@ Arkit::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetBool( POPCAMERADEVICE_KEY_RESETANCHORS, mResetAnchors );
 	SetBool( POPCAMERADEVICE_KEY_FEATURES, mOutputFeatures );
 	SetBool( POPCAMERADEVICE_KEY_ANCHORS, mOutputAnchors );	
-	SetBool( POPCAMERADEVICE_KEY_ANCHORGEOMETRYSTREAM, mEnableAnchorGeometryStream );	
+	SetBool( POPCAMERADEVICE_KEY_ANCHORGEOMETRYSTREAM, mEnableAnchorGeometry );	
+	SetBool( POPCAMERADEVICE_KEY_WORLDGEOMETRYSTREAM, mEnableWorldGeometry );	
 	SetBool( POPCAMERADEVICE_KEY_DEPTHCONFIDENCE, mOutputSceneDepthConfidence );
 	SetBool( POPCAMERADEVICE_KEY_DEPTHSMOOTH, mOutputSceneDepthSmooth );
 	SetBool( POPCAMERADEVICE_KEY_DEBUG, mVerboseDebug );
 
 	//	probably don't need this to be seperate
 	mEnablePlanesVert = mEnablePlanesHorz;
+	
 
 	//	any format = enable	
 	auto DepthFormat = SoyPixelsFormat::Invalid;
@@ -379,9 +381,15 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 		
 		//	enable various options
 		WorldConfig.planeDetection = ARPlaneDetectionNone;
-		if ( Params.mEnablePlanesHorz )
+		
+		//	gr: forced this on as I didnt seem to get any world geo... 
+		//		but it still did take a while, so not sure if needed or not
+		//		docs say enabling just improves the mesh (flatter planes) 
+		auto ForceEnablePlaneTracking = Params.mEnableWorldGeometry;
+		
+		if ( Params.mEnablePlanesHorz || ForceEnablePlaneTracking )
 			WorldConfig.planeDetection |= ARPlaneDetectionHorizontal;
-		if ( Params.mEnablePlanesVert )
+		if ( Params.mEnablePlanesVert || ForceEnablePlaneTracking )
 			WorldConfig.planeDetection |= ARPlaneDetectionVertical;
 			
 		// NSSet<ARReferenceImage *> *detectionImages API_AVAILABLE(ios(11.3));
@@ -390,6 +398,7 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 		WorldConfig.userFaceTrackingEnabled = Params.mEnableFaceTracking && WorldSupportsFaceTracking;
 	
 		WorldConfig.lightEstimationEnabled = Params.mEnableLightEstimation;
+		WorldConfig.sceneReconstruction = Params.mEnableWorldGeometry ? ARSceneReconstructionMesh : ARSceneReconstructionNone;
 		
 		WorldConfig.frameSemantics = ARFrameSemanticNone;
 		if ( Params.mEnableBodyDetection )
@@ -1256,31 +1265,35 @@ void Arkit::TSessionCamera::OnFrame(ARFrame* Frame)
 
 void Arkit::TSessionCamera::OnAnchorChange(ARAnchor* Anchor,AnchorChange::Type Change)
 {
-	if ( !mParams.mEnableAnchorGeometryStream )
-		return;
-		
 	Arkit::TAnchorGeometry Geometry;
-	Geometry.mUuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
-	Geometry.mName = Soy::NSStringToString(Anchor.name);
-	Geometry.mType = GetClassName(Anchor);
-	Geometry.mTimestamp = SoyTime(true);
-	Geometry.mLocalToWorld = SimdToFloat4x4(Anchor.transform);
 	
 	if ( [Anchor isKindOfClass:[ARPlaneAnchor class]] )
 	{
+		if ( !mParams.mEnableAnchorGeometry )
+			return;
 		auto* PlaneAnchor = (ARPlaneAnchor*)Anchor;
 		GetGeometry( PlaneAnchor, Geometry );
 	}
 	else if ( [Anchor isKindOfClass:[ARMeshAnchor class]] )
 	{
+		if ( !mParams.mEnableWorldGeometry )
+			return;
 		auto* MeshAnchor = (ARMeshAnchor*)Anchor;
 		GetGeometry( MeshAnchor, Geometry );
 	}
 	else
 	{
 		//	non geometry anchor
+		if ( mParams.mVerboseDebug )
+			std::Debug << "Skipping non-geometry anchor type " << GetClassName(Anchor) << std::endl;
 		return;
 	}
+	
+	Geometry.mUuid = Soy::NSStringToString(Anchor.identifier.UUIDString);
+	Geometry.mName = Soy::NSStringToString(Anchor.name);
+	Geometry.mType = GetClassName(Anchor);
+	Geometry.mTimestamp = SoyTime(true);
+	Geometry.mLocalToWorld = SimdToFloat4x4(Anchor.transform);
 	
 	PushGeometryFrame(Geometry);
 }
