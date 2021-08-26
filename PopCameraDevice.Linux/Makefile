@@ -9,12 +9,19 @@ CC = ${compiler}
 # tsdk: the naming of the build folders are handled by the github actions
 # osTarget is still used for if statements in the make file
 osTarget ?= Linux
-BUILD_DIR = ../Build
 
-PROJECT_PATH = ..
-SRC_PATH = $(PROJECT_PATH)/Source
+# ../ causes problems, but we also can't execute make in the root dir :/
+# so expand it, so we end up putting temp stuff in build/temp/home/graham/code/popengine/src/...
+PROJECT_PATH = $(realpath ..)/
+
+CONFIGURATION ?= Release
+
+BUILD_DIR = $(PROJECT_PATH)Build/$(osTarget)_$(CONFIGURATION)
+BUILD_TEMP_DIR = $(PROJECT_PATH)/Build/Temp/$(osTarget)_$(CONFIGURATION)/
+
+SRC_PATH = $(PROJECT_PATH)/src
+SOY_PATH = $(PROJECT_PATH)/src/SoyLib
 SRCTESTAPP_PATH = $(PROJECT_PATH)/Source_TestApp
-SOY_PATH = $(PROJECT_PATH)/Source/SoyLib
 
 LIB_INCLUDES = \
 -I$(SRC_PATH)	\
@@ -22,7 +29,7 @@ LIB_INCLUDES = \
 -I$(SOY_PATH)/src	\
 
 
-LIB_SRC_FILES  = \
+LIB_CPP_FILES  = \
 $(SRC_PATH)/PopCameraDevice.cpp \
 $(SRC_PATH)/TestDevice.cpp \
 $(SRC_PATH)/TCameraDevice.cpp \
@@ -30,7 +37,7 @@ $(SRC_PATH)/Json11/json11.cpp	\
 $(SRC_PATH)/JsonFunctions.cpp	\
 
 # soy lib files
-LIB_SRC_FILES  += \
+LIB_CPP_FILES  += \
 $(SOY_PATH)/src/SoyTypes.cpp \
 $(SOY_PATH)/src/SoyAssert.cpp \
 $(SOY_PATH)/src/SoyDebug.cpp \
@@ -53,7 +60,7 @@ $(SOY_PATH)/src/SoyFilesystem.cpp \
 $(SOY_PATH)/src/SoyPlatform.cpp \
 
 
-APP_SRC_FILES =	\
+APP_CPP_FILES =	\
 $(SRCTESTAPP_PATH)/PopCameraDevice_TestApp.cpp 
 
 
@@ -64,7 +71,7 @@ ifeq ($(osTarget),Nvidia)
 	LIB_INCLUDES += \
 	-I$(SRC_PATH)/Libs/KinectAzure/build/native/include
 
-	LIB_SRC_FILES  += \
+	LIB_CPP_FILES  += \
 	$(SRC_PATH)/KinectAzure.cpp \
 
 	LIB_LINK_LIBS = \
@@ -88,10 +95,24 @@ else
 	NON_KINECT_LINK_LIBS = -ldl
 endif
 
+
+ifeq ($(CONFIGURATION),Release)
+$(info Building Release)
+CONFIGURATION_FLAGS = -O3
+else
+$(info Building Debug)
+CONFIGURATION_FLAGS = -g
+endif
+
+
 # -g stops symbol stripping
 # -f[lag] PIC position independent code (for dyanmically loaded code)
 # -rpath $ORIGIN makes the shared object runtimepath be same place as executable
-CFLAGS = -c $(LIB_DEFINES) $(LIB_INCLUDES) -std=c++17 -fPIC -g
+CFLAGS = -c $(CONFIGURATION_FLAGS) $(LIB_DEFINES) $(LIB_INCLUDES) -std=c++17 -fPIC -g
+
+# Make a depdencny file (.d) so header changes can be detected
+CFLAGS += -MD
+
 LDFLAGS = -pthread
 LDFLAGS += '-Wl,-rpath,$$ORIGIN'
 LDFLAGS += '-Wl,-rpath-link=$(BUILD_DIR)'
@@ -101,15 +122,23 @@ LDFLAGS += '-Wl,-Bsymbolic'
 LIB_LINK_FLAGS = $(LDFLAGS) -shared
 APP_LINK_FLAGS = $(LDFLAGS) 
 
-LIB_OBJECTS=$(LIB_SRC_FILES:.cpp=.o)
-APP_OBJECTS=$(APP_SRC_FILES:.cpp=.o)
-
-OUT_LIB=$(BUILD_DIR)/lib${LIB_NAME}.so
-OUT_APP=$(BUILD_DIR)/${APP_NAME}
 
 # These files (without directory structure) get copied to build dir
 OUT_FILE_SOURCES = \
 $(SRC_PATH)/PopCameraDevice.h	\
+
+
+# macro to turn input files into output files
+# add Prefix BUILD_TEMP_DIR <- add suffix .o <- remove ../ <-- get filename without extension
+InputFilesToOutputFiles = $(addprefix $(BUILD_TEMP_DIR),$(addsuffix .o,$(basename $(1))))
+
+APP_OBJECTS = $(call InputFilesToOutputFiles,$(APP_CPP_FILES))
+LIB_OBJECTS = $(call InputFilesToOutputFiles,$(LIB_CPP_FILES))
+
+
+OUT_LIB=$(BUILD_DIR)/lib${LIB_NAME}.so
+OUT_APP=$(BUILD_DIR)/${APP_NAME}
+
 
 # convert to Build/xxx target files
 OUT_FILES = $(addprefix ${BUILD_DIR}/,$(notdir ${OUT_FILE_SOURCES}))
@@ -151,7 +180,10 @@ $(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
 
 clean:
 	# clean build files, anything .o
-	$(info Cleaning files)
+	$(info Cleaning files...)
+	find $(PROJECT_PATH) -name "*.o" -type f -delete
+	find $(PROJECT_PATH) -name "*.d" -type f -delete
+
 	rm -f $(APP_OBJECTS)
 	rm -f $(LIB_OBJECTS)
 	rm -f $(OUT_LIB)
@@ -173,3 +205,7 @@ $(K4A_LIB):
 	# at runtime the code(maybe depth engine?) tries to load libk4a.1.4 instead of 1.4.1
 	ln ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4.1 ../Source/Libs/KinectAzure/linux/lib/native/arm64/release/libk4a.so.1.4
 
+
+# for every .o file, include a .d file, which has makefile rules to detect headers
+-include $(LIB_OBJECTS:.o=.d)
+-include $(APP_OBJECTS:.o=.d)
