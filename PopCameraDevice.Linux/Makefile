@@ -12,15 +12,15 @@ osTarget ?= Linux
 
 # ../ causes problems, but we also can't execute make in the root dir :/
 # so expand it, so we end up putting temp stuff in build/temp/home/graham/code/popengine/src/...
-PROJECT_PATH = $(realpath ..)/
+PROJECT_PATH = $(realpath ..)
 
 CONFIGURATION ?= Release
 
-BUILD_DIR = $(PROJECT_PATH)Build/$(osTarget)_$(CONFIGURATION)
+BUILD_DIR = $(PROJECT_PATH)/Build/$(osTarget)_$(CONFIGURATION)
 BUILD_TEMP_DIR = $(PROJECT_PATH)/Build/Temp/$(osTarget)_$(CONFIGURATION)/
 
-SRC_PATH = $(PROJECT_PATH)/src
-SOY_PATH = $(PROJECT_PATH)/src/SoyLib
+SRC_PATH = $(PROJECT_PATH)/Source
+SOY_PATH = $(PROJECT_PATH)/Source/SoyLib
 SRCTESTAPP_PATH = $(PROJECT_PATH)/Source_TestApp
 
 LIB_INCLUDES = \
@@ -129,12 +129,12 @@ $(SRC_PATH)/PopCameraDevice.h	\
 
 
 # macro to turn input files into output files
-# add Prefix BUILD_TEMP_DIR <- add suffix .o <- remove ../ <-- get filename without extension
+# add Prefix BUILD_TEMP_DIR <- add suffix .o <- get filename without extension
 InputFilesToOutputFiles = $(addprefix $(BUILD_TEMP_DIR),$(addsuffix .o,$(basename $(1))))
 
 APP_OBJECTS = $(call InputFilesToOutputFiles,$(APP_CPP_FILES))
 LIB_OBJECTS = $(call InputFilesToOutputFiles,$(LIB_CPP_FILES))
-
+$(info LIB_OBJECTS=$(LIB_OBJECTS))
 
 OUT_LIB=$(BUILD_DIR)/lib${LIB_NAME}.so
 OUT_APP=$(BUILD_DIR)/${APP_NAME}
@@ -175,7 +175,10 @@ $(OUT_LIB): $(LIB_OBJECTS) $(OUT_FILES)
 	$(info Listing dependencies of $(OUT_LIB))
 	ldd $(OUT_LIB)
 
-.cpp.o:
+
+$(BUILD_TEMP_DIR)%.o: %.cpp
+	$(info Building cpp file $<)
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(APP_INCLUDES) $(LIB_INCLUDES) $< -o $@
 
 clean:

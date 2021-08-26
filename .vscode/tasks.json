@@ -4,13 +4,22 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build",
+			"label": "Build Nvidia Debug",
 			"type": "shell",
-			"command": "(cd PopCameraDevice.Linux && make osTarget=Nvidia)",
+			"command": "(cd PopCameraDevice.Linux && make osTarget=Nvidia CONFIGURATION=Debug)",
 			"problemMatcher": [],
 			"group": {
 				"kind": "build",
 				"isDefault": true
+			}
+		},
+		{
+			"label": "Build Nvidia Release",
+			"type": "shell",
+			"command": "(cd PopCameraDevice.Linux && make osTarget=Nvidia CONFIGURATION=Release)",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build"
 			}
 		}
 	]
