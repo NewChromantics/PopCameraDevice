@@ -32,7 +32,6 @@
 #error Expected ENABLE_KINECTAZURE to be defined
 #endif
 
-static bool VerboseDebug = false;
 
 class k4a_colour_mode_t
 {
@@ -97,7 +96,7 @@ class KinectAzure::TFrameReader : public SoyThread
 public:
 	//	gr: because of the current use of the API, we have an option to keep alive here
 	//		todo: pure RAII, but need to fix PopEngine first
-	TFrameReader(size_t DeviceIndex,bool KeepAlive);
+	TFrameReader(size_t DeviceIndex,bool KeepAlive,bool VerboseDebug);
 	~TFrameReader();
 
 protected:
@@ -124,6 +123,7 @@ private:
 protected:
 	std::mutex								mDeviceLock;	//	to prevent nulling mDevice whilst in use
 	std::shared_ptr<KinectAzure::TDevice>	mDevice;
+	bool				mVerboseDebug = false;
 
 private:
 	bool				mKeepAlive = false;
@@ -451,8 +451,8 @@ k4a_image_format_t KinectAzure::GetColourFormat(SoyPixelsFormat::Type Format)
 class KinectAzure::TPixelReader : public TFrameReader
 {
 public:
-	TPixelReader(size_t DeviceIndex, bool KeepAlive, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate, k4a_wired_sync_mode_t SyncMode) :
-		TFrameReader	(DeviceIndex, KeepAlive),
+	TPixelReader(size_t DeviceIndex, bool KeepAlive, bool VerboseDebug, std::function<void(std::shared_ptr<TPixelBuffer>&,SoyTime, json11::Json::object&)> OnFrame, k4a_depth_mode_t DepthMode, k4a_colour_mode_t ColourMode,k4a_fps_t FrameRate, k4a_wired_sync_mode_t SyncMode) :
+		TFrameReader	(DeviceIndex, KeepAlive, VerboseDebug),
 		mOnNewFrame		(OnFrame),
 		mDepthMode		( DepthMode ),
 		mColourMode		( ColourMode ),
@@ -804,7 +804,7 @@ KinectAzure::TCameraDevice::TCameraDevice(const std::string& Serial,json11::Json
 		PushFrame(FramePixelBuffer, FrameTime, FrameMeta);
 	};
 
-	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, OnNewFrame, DepthMode, ColourMode, Fps, SyncMode) );
+	mReader.reset( new TPixelReader(DeviceIndex, KeepAlive, Params.mVerboseDebug, OnNewFrame, DepthMode, ColourMode, Fps, SyncMode) );
 }
 
 KinectAzure::TCameraDevice::~TCameraDevice()
@@ -853,10 +853,11 @@ void KinectAzure::IsOkay(k4a_buffer_result_t Error, const char* Context)
 
 static int FrameReaderThreadCount = 0;
 
-KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive) :
+KinectAzure::TFrameReader::TFrameReader(size_t DeviceIndex,bool KeepAlive,bool VerboseDebug) :
 	SoyThread		( std::string("TFrameReader ") + std::to_string(FrameReaderThreadCount++) ),
 	mDeviceIndex	( DeviceIndex ),
-	mKeepAlive		( KeepAlive )
+	mKeepAlive		( KeepAlive ),
+	mVerboseDebug	( VerboseDebug )
 {
 	//	gr: problem here for non-keep alive as we may have params that have not yet been set, but stop it from booting
 		//	try to open once to try and throw at construction (needed for non-keepalive anyway)
@@ -923,7 +924,7 @@ bool KinectAzure::TFrameReader::ThreadIteration()
 		{
 			//	quick fix for shutdown syncing (funcs in here refer to mDevice)
 			std::lock_guard<std::mutex> DeviceLock(mDeviceLock);
-			//if ( VerboseDebug )
+			if ( mVerboseDebug )
 				std::Debug << "Reader clear mdevice" << std::endl;
 			//	close device and let next iteration reopen
 			mDevice.reset();
@@ -1003,7 +1004,7 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		* streaming data, and caller should stop the stream using k4a_device_stop_cameras().
 		*/
 	auto WaitError = k4a_device_get_capture(Device, &Capture, TimeoutMs);
-	if ( VerboseDebug )
+	if ( mVerboseDebug )
 		std::Debug << "Got capture" << std::endl;
 	/*	gr: if we disconnect the device, we just get timeout, so we can't tell the difference
 	//		if timeout is high then we can assume its dead. so throw and let the system try and reconnect
@@ -1015,7 +1016,7 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 	*/
 	auto FreeCapture = [&]()
 	{
-		if (VerboseDebug)
+		if (mVerboseDebug)
 			std::Debug << "Free capture" << std::endl;
 		if (Capture)
 			k4a_capture_release(Capture);
@@ -1089,7 +1090,7 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 		}
 	
 		//	extract skeletons
-		if ( VerboseDebug )
+		if ( mVerboseDebug )
 			std::Debug << "OnFrame start" << std::endl;
 		TCaptureFrame CaptureFrame;
 		CaptureFrame.mCalibration = Calibration;
@@ -1122,7 +1123,7 @@ void KinectAzure::TFrameReader::Iteration(int32_t TimeoutMs)
 			std::Debug << "Skipping Capture frame callback as thread is stopping" << std::endl;
 		}
 
-		if ( VerboseDebug )
+		if ( mVerboseDebug )
 			std::Debug << "OnFrame finished" << std::endl;
 
 		//	cleanup
@@ -1159,7 +1160,7 @@ SoyPixelsRemote KinectAzure::GetPixels(k4a_image_t Image)
 
 KinectAzure::TPixelReader::~TPixelReader()
 {
-	if ( VerboseDebug )
+	if ( mVerboseDebug )
 		std::Debug << "~TPixelReader" << std::endl;
 	//	we need to stop the thread here (before FrameReader destructor)
 	//	because as this class is destroyed, so is the virtual OnFrame func
