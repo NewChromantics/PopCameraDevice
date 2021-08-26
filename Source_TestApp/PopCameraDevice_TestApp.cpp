@@ -52,6 +52,7 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 
 	//	we assume the test device instantly creates a first frame
 	int32_t FirstFrameTime = -1;
+	uint32_t FirstFrameTime32 = 0;
 	if (Name == "Test")
 	{
 		DebugPrint("Peek first frame");
@@ -68,7 +69,7 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 	{
 		//DebugPrint("Pop Frame:");
 		uint8_t Plane0[100 * 100 * 4];
-		char MetaJson[1024*10];
+		char MetaJson[1024*10] = {0};
 		auto FrameTime = PopCameraDevice_PopNextFrame(Instance, MetaJson, std::size(MetaJson), Plane0, std::size(Plane0), nullptr, 0, nullptr, 0);
 		if (FrameTime == -1)
 		{
@@ -83,9 +84,26 @@ void TestDeviceInstance(const std::string& Name,const std::string& OptionsJson,s
 				throw std::runtime_error("Frame time doesn't match first frame time");
 		*/
 	
+		if ( FirstFrameTime == -1 )
+		{
+			FirstFrameTime = FrameTime;
+			FirstFrameTime32 = static_cast<uint32_t>(FirstFrameTime);
+		}
+
 		std::stringstream Debug;
-		Debug << "Got frame " << FrameTime << "(" << static_cast<uint32_t>(FrameTime) << ") (first=" << FirstFrameTime << ") Meta=" << MetaJson;
+		auto FrameTime32 = static_cast<uint32_t>(FrameTime) - FirstFrameTime32;
+		//Debug << "Got frame " << FrameTime << "(" << FrameTime32 << ") (first=" << FirstFrameTime << ")";
+		Debug << "Got frame " << FrameTime32;
+		
+		//	extract format from meta
+		std::string MetaJsonString(MetaJson);
+		auto FormatIndex = MetaJsonString.find("\"Format\":");
+		if ( FormatIndex >= 0 )
+			Debug << MetaJsonString.substr( FormatIndex, 9+15 );
+
+		//Debug << " Meta=" << MetaJson;
 		//	todo: verify pixels
+		//	todo: print frame rate
 		DebugPrint(Debug.str());
 	}
 
@@ -106,6 +124,10 @@ int main()
 	//	at least one of these should be the test device
 	DebugPrint("Devices and formats:");
 	DebugPrint(EnumJson);
+
+	//TestDeviceInstance("KinectAzure_000388201512", "{\"Debug\":true,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 999999990);
+	TestDeviceInstance("KinectAzure_000388201512", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 999999990);
+	//TestDeviceInstance("KinectAzure_000388201512", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 999999990);
 
 	//	test geometry streams (planes, anchors) from arkit
 	TestDeviceInstance("Arkit Rear Depth", "{\"WorldGeometryStream\":true}", 999999990);
