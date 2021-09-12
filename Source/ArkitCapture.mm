@@ -1027,7 +1027,15 @@ void GetTriangles(ArrayBridge<float>& TrianglePositionFloats,int PositionCompone
 void GetTriangles(ArrayBridge<float>&& TrianglePositionFloats,int PositionComponentCount,ARGeometrySource* Positions,ARGeometryElement* Faces)
 {
 	void* Indexes = Faces.buffer.contents;
-	auto TriangleCount = Faces.count; 
+	auto TriangleCount = Faces.count;
+	auto IndexesPerTriangle = Faces.indexCountPerPrimitive;
+	if ( IndexesPerTriangle != 3 )
+	{
+		std::stringstream Error;
+		Error << "Anchor mesh geometry has IndexesPerTriangle=" << IndexesPerTriangle << ", expected 3";
+		throw Soy::AssertException(Error);
+	}
+	 
 	if ( Faces.bytesPerIndex == sizeof(uint32_t) )
 	{
 		auto* Indexes32 = reinterpret_cast<uint32_t*>(Indexes);
