@@ -131,6 +131,9 @@
 		BF8534E022B3FE370049C01B /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C322B3FE370049C01B /* core.c */; };
 		BF8534E322B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
 		BF8534EA22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
+		BFC30C8226EE27310012EF3D /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFC30C8126EE27310012EF3D /* HomeKit.framework */; };
+		BFC30CBF26EE299C0012EF3D /* Homekit.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFC30CBD26EE299C0012EF3D /* Homekit.mm */; };
+		BFC30CC226EE922D0012EF3D /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFC30C8126EE27310012EF3D /* HomeKit.framework */; };
 		BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */; };
 		BFE73A3924FA7B33005D34D8 /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
@@ -309,6 +312,10 @@
 		BFB2EE362487B36F00EB634F /* SoyFourcc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoyFourcc.cpp; sourceTree = "<group>"; };
 		BFB2EE372487B37000EB634F /* SoyFourcc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyFourcc.h; sourceTree = "<group>"; };
 		BFBD322024B7B1A40029951F /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
+		BFC30C8126EE27310012EF3D /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.2.sdk/System/Library/Frameworks/HomeKit.framework; sourceTree = DEVELOPER_DIR; };
+		BFC30CBD26EE299C0012EF3D /* Homekit.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Homekit.mm; path = Source/Homekit.mm; sourceTree = "<group>"; };
+		BFC30CBE26EE299C0012EF3D /* Homekit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Homekit.h; path = Source/Homekit.h; sourceTree = "<group>"; };
+		BFC30CC326EE95C20012EF3D /* PopCameraDevice_TestApp_Ios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PopCameraDevice_TestApp_Ios.entitlements; sourceTree = "<group>"; };
 		BFD607741EA16F0A0035C814 /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = Source/Unity/IUnityGraphics.h; sourceTree = "<group>"; };
 		BFD607751EA16F0A0035C814 /* IUnityGraphicsD3D9.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D9.h; path = Source/Unity/IUnityGraphicsD3D9.h; sourceTree = "<group>"; };
 		BFD607761EA16F0A0035C814 /* IUnityGraphicsD3D11.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D11.h; path = Source/Unity/IUnityGraphicsD3D11.h; sourceTree = "<group>"; };
@@ -355,6 +362,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFC30CC226EE922D0012EF3D /* HomeKit.framework in Frameworks */,
 				BF22BD2224FA7D11002B9AC0 /* UIKit.framework in Frameworks */,
 				BF09A5F624FA752C002F56DB /* PopCameraDevice_Ios.framework in Frameworks */,
 			);
@@ -375,6 +383,7 @@
 				BF09A5D924F80059002F56DB /* ARKit.framework in Frameworks */,
 				BF15205323855F1F00A70EBF /* UIKit.framework in Frameworks */,
 				BF15205123855D8300A70EBF /* CoreGraphics.framework in Frameworks */,
+				BFC30C8226EE27310012EF3D /* HomeKit.framework in Frameworks */,
 				BF15204A23855BAB00A70EBF /* CoreVideo.framework in Frameworks */,
 				BF15204823855B9900A70EBF /* OpenGLES.framework in Frameworks */,
 				BF1520252385594900A70EBF /* AVFoundation.framework in Frameworks */,
@@ -458,6 +467,7 @@
 		BF012B05226A09EC003AEB55 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BFC30C8126EE27310012EF3D /* HomeKit.framework */,
 				BFBD322024B7B1A40029951F /* ARKit.framework */,
 				BF216E9B24C99989003FD00B /* ARKit.framework */,
 				BF67C86424373BD600D7492E /* CoreMediaIO.framework */,
@@ -485,6 +495,7 @@
 			isa = PBXGroup;
 			children = (
 				BF09A5E924FA73F3002F56DB /* Assets.xcassets */,
+				BFC30CC326EE95C20012EF3D /* PopCameraDevice_TestApp_Ios.entitlements */,
 				BF09A5EE24FA73F3002F56DB /* PopCameraDevice_TestAppIos_Info.plist */,
 				BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */,
 				BF2E7CAF22E4EB26008B905F /* PopCameraDevice_TestAppOsx_Info.plist */,
@@ -633,6 +644,8 @@
 				BF012B12226A1D7F003AEB55 /* AvfVideoCapture.h */,
 				BF012B11226A1D7F003AEB55 /* AvfVideoCapture.mm */,
 				BF67C85F24373ABD00D7492E /* CoreMediaOutputDevice.h */,
+				BFC30CBE26EE299C0012EF3D /* Homekit.h */,
+				BFC30CBD26EE299C0012EF3D /* Homekit.mm */,
 				BF67C85E24373ABD00D7492E /* CoreMediaOutputDevice.mm */,
 				BF51B8EB256AD9A3004DE4C7 /* JsonFunctions.h */,
 				BF51B8E5256AD94F004DE4C7 /* JsonFunctions.cpp */,
@@ -998,6 +1011,7 @@
 				BF152035238559A200A70EBF /* SoyPixels.cpp in Sources */,
 				BF15202F238559A200A70EBF /* SoyH264.cpp in Sources */,
 				BF152032238559A200A70EBF /* SoyMediaFormat.cpp in Sources */,
+				BFC30CBF26EE299C0012EF3D /* Homekit.mm in Sources */,
 				BF216EA124CA1B82003FD00B /* json11.cpp in Sources */,
 				BF152037238559A200A70EBF /* SoyShader.cpp in Sources */,
 				BF15203C238559A200A70EBF /* SoyTime.mm in Sources */,
@@ -1139,6 +1153,7 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Source_TestApp/PopCameraDevice_TestApp_Ios.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -1174,6 +1189,7 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = Source_TestApp/PopCameraDevice_TestApp_Ios.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X52DR36JY2;

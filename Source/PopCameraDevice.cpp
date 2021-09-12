@@ -34,6 +34,13 @@ __export int32_t PopCameraDevice_GetVersion()
 	return PopCameraDevice::Version.GetMillion();
 }
 
+#if defined(TARGET_IOS)
+#define ENABLE_HOMEKIT
+#endif
+
+#if defined(ENABLE_HOMEKIT)
+#include "Homekit.h"
+#endif
 
 #if defined(ENABLE_KINECT2)
 #include "Kinect2.h"
@@ -304,6 +311,11 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 #if defined(ENABLE_KINECTAZURE)
 	KinectAzure::EnumDeviceNameAndFormats(EnumDeviceAndFormats);
 #endif
+
+#if defined(ENABLE_HOMEKIT)
+	Homekit::EnumDevices(EnumDevice);
+#endif
+
 }
 
 
