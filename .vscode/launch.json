@@ -8,23 +8,11 @@
 			"type": "vgdb",
 			"request": "launch",
 			"name": "Debug vgdb",
-			"program": "Build/PopCameraDeviceTestApp",
+			"program": "Build/Nvidia_Debug/PopCameraDeviceTestApp",
 			"args": [],
 			"cwd": "${workspaceRoot}",
 			"useAbsoluteFilePaths":true,
-			"preLaunchTask": "Build"
-		},
-		{
-			"name": "Debug gdb",
-			"type": "gdb",
-			"request": "launch",
-			"target": "Build/PopCameraDeviceTestApp",
-			"program": "Build/PopCameraDeviceTestApp",
-			"cwd": "${workspaceRoot}",
-			"valuesFormatting": "parseText",
-			"printCalls": true,
-			"showDevDebugOutput": true,
-			"preLaunchTask": "Build"
+			"preLaunchTask": "Build Nvidia Debug"
 		}
 	]
 }
