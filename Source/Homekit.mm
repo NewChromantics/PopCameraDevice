@@ -212,7 +212,7 @@ void Homekit::TPlatformCamera::CaptureFrame(HMCameraStream* Stream)
 	
 	UIView* ViewToRender = mView.mObject;
 	auto* Window = [[UIApplication sharedApplication] keyWindow];
-	ViewToRender = Window;
+	//ViewToRender = Window;
 	
 	static int test = 0;
 	test++;
