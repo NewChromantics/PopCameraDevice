@@ -218,3 +218,10 @@ void PopCameraDevice::TDevice::ReadNativeHandle(void* Handle)
 {
 	throw Soy::AssertException("This device doesn't support ReadNativeHandle");
 }
+
+void PopCameraDevice::TDevice::EnableFeature(TFeature::Type Feature,bool Enable)
+{
+	//	gr: barely any interfaces support this, so no longer pure virtual 
+	throw Soy::AssertException("EnableFeature not supported");
+}
+

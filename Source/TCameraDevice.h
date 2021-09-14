@@ -75,7 +75,7 @@ public:
 	
 	bool							GetNextFrame(TFrame& Frame,bool DeleteFrame);
 
-	virtual void					EnableFeature(TFeature::Type Feature,bool Enable)=0;	//	throws if unsupported
+	virtual void					EnableFeature(TFeature::Type Feature,bool Enable);	//	throws if unsupported
 	virtual void					ReadNativeHandle(void* Handle);
 	
 	//	get additional meta for output (debug mostly?)

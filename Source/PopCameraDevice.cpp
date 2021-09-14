@@ -419,6 +419,20 @@ uint32_t PopCameraDevice::CreateCameraDevice(const std::string& Name,json11::Jso
 	}
 #endif
 
+#if defined(ENABLE_HOMEKIT)
+	try
+	{
+		std::shared_ptr<TDevice> Device(new Homekit::TCamera(Name,Options));
+		if (Device)
+			return PopCameraDevice::CreateInstance(Device);
+	}
+	catch (TInvalidNameException& e)
+	{
+		//std::Debug << e.what() << std::endl;
+	}
+#endif
+
+
 #if defined(TARGET_IOS)
 	if ( Name == Arkit::TFrameProxyDevice::DeviceName )
 	{

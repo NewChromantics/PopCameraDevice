@@ -16,27 +16,16 @@
 namespace Homekit
 {
 	class TCamera;
+	class TPlatformCamera;	//	objc object in .mm source
 
 	void	EnumDevices(std::function<void(const std::string&)> EnumName);
 }
 
-/*
-class Arkit::TFrameDevice : public PopCameraDevice::TDevice
+
+class Homekit::TCamera : public PopCameraDevice::TDevice
 {
 public:
-	TFrameDevice(json11::Json& Options);
-	
-	void			PushFrame(CVPixelBufferRef PixelBuffer,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
-	void			PushFrame(AVDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
-	void			PushFrame(ARDepthData* DepthData,SoyTime Timestamp,json11::Json::object& Meta,const char* StreamName);
-	void			PushFrame(ARFrame* Frame,ArFrameSource::Type Source);
-	
-	void			PushGeometryFrame(const TAnchorGeometry& Geometry);
-	
-	SoyTime			mPreviousDepthTime;
-	SoyTime			mPreviousFrameTime;
-	TCaptureParams	mParams;
+	TCamera(const std::string& Name,json11::Json& Options);
+
+	std::shared_ptr<TPlatformCamera>	mPlatfomCamera;
 };
-
-*/
-
