@@ -398,15 +398,21 @@ Arkit::TSession::TSession(bool RearCamera,TCaptureParams& Params) :
 		WorldConfig.userFaceTrackingEnabled = Params.mEnableFaceTracking && WorldSupportsFaceTracking;
 	
 		WorldConfig.lightEstimationEnabled = Params.mEnableLightEstimation;
-		WorldConfig.sceneReconstruction = Params.mEnableWorldGeometry ? ARSceneReconstructionMesh : ARSceneReconstructionNone;
+		if ( @available(iOS 13.4, *) ) 
+		{
+			WorldConfig.sceneReconstruction = Params.mEnableWorldGeometry && WorldSupportsMeshing ? ARSceneReconstructionMesh : ARSceneReconstructionNone;
+		}
 		
 		WorldConfig.frameSemantics = ARFrameSemanticNone;
 		if ( Params.mEnableBodyDetection )
 			WorldConfig.frameSemantics |= ARFrameSemanticBodyDetection;
-		if ( Params.mEnableSceneDepth )
-			WorldConfig.frameSemantics |= ARFrameSemanticSceneDepth;
-		if ( Params.mOutputSceneDepthSmooth )
-			WorldConfig.frameSemantics |= ARFrameSemanticSmoothedSceneDepth;
+		if ( @available(iOS 14.0, *) )
+		{
+			if ( Params.mEnableSceneDepth )
+				WorldConfig.frameSemantics |= ARFrameSemanticSceneDepth;
+			if ( Params.mOutputSceneDepthSmooth )
+				WorldConfig.frameSemantics |= ARFrameSemanticSmoothedSceneDepth;
+		}
 		if ( Params.mEnablePersonSegmentation )
 			WorldConfig.frameSemantics |= ARFrameSemanticPersonSegmentation;
 		
@@ -575,7 +581,7 @@ namespace Avf
 			Localizing = ARGeoTrackingStateLocalizing,
 			Localized = ARGeoTrackingStateLocalized
 #endif
-        };
+		};
 		DECLARE_SOYENUM(GeoTrackingState);
 	}
 
@@ -609,7 +615,7 @@ namespace Avf
 			DevicePointedTooLow = ARGeoTrackingStateReasonDevicePointedTooLow,
 			VisualLocalizationFailed = ARGeoTrackingStateReasonVisualLocalizationFailed,
 #endif
-        };
+		};
 		DECLARE_SOYENUM(GeoTrackingStateReason);
 	}
 }
