@@ -137,7 +137,6 @@
 		BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */; };
 		BFE73A3924FA7B33005D34D8 /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
-		BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF108AD2229726CE003DDC5F /* libusb-1.0.a */; };
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 /* End PBXBuildFile section */
 
@@ -257,7 +256,6 @@
 		BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PopCameraDevice_TestApp.cpp; sourceTree = "<group>"; };
 		BF108A9E22971381003DDC5F /* libfreenect2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreenect2.a; path = lib/libfreenect2.a; sourceTree = "<group>"; };
 		BF108ACF229718ED003DDC5F /* HeapArray.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HeapArray.hpp; sourceTree = "<group>"; };
-		BF108AD2229726CE003DDC5F /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
 		BF108AD8229726CE003DDC5F /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		BF108AE922972877003DDC5F /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libusb.h; sourceTree = "<group>"; };
 		BF108AEE22972F23003DDC5F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -322,6 +320,8 @@
 		BFD607771EA16F0A0035C814 /* IUnityGraphicsD3D12.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsD3D12.h; path = Source/Unity/IUnityGraphicsD3D12.h; sourceTree = "<group>"; };
 		BFD607781EA16F0A0035C814 /* IUnityGraphicsMetal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphicsMetal.h; path = Source/Unity/IUnityGraphicsMetal.h; sourceTree = "<group>"; };
 		BFD607791EA16F0A0035C814 /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityInterface.h; path = Source/Unity/IUnityInterface.h; sourceTree = "<group>"; };
+		BFD785AA286895F100D1B45B /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
+		BFD785AC286895F100D1B45B /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
 		BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ArkitCapture.h; path = Source/ArkitCapture.h; sourceTree = "<group>"; };
 		BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ArkitCapture.mm; path = Source/ArkitCapture.mm; sourceTree = "<group>"; };
 		BFE462BC24B1D89000D04A4C /* SoyEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyEnum.h; sourceTree = "<group>"; };
@@ -354,7 +354,6 @@
 				BF012B31226A2665003AEB55 /* VideoToolbox.framework in Frameworks */,
 				BF012B2F226A263E003AEB55 /* CoreMedia.framework in Frameworks */,
 				BF012B07226A09EC003AEB55 /* AVFoundation.framework in Frameworks */,
-				BFEE8DF922B013AD00F89A39 /* libusb-1.0.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,10 +527,11 @@
 		BF108AD0229726B9003DDC5F /* LibFreenect */ = {
 			isa = PBXGroup;
 			children = (
+				BFD785AB286895F100D1B45B /* libusb_macos_arm64 */,
+				BFD785A9286895F100D1B45B /* libusb_macos_x86_64 */,
 				BF8534EF22B402600049C01B /* include */,
 				BF8534B822B3FE250049C01B /* src */,
 				BF108AE922972877003DDC5F /* libusb.h */,
-				BF108AD2229726CE003DDC5F /* libusb-1.0.a */,
 				BF108AD8229726CE003DDC5F /* Readme.md */,
 			);
 			path = LibFreenect;
@@ -687,6 +687,22 @@
 				BFD607791EA16F0A0035C814 /* IUnityInterface.h */,
 			);
 			name = Unity;
+			sourceTree = "<group>";
+		};
+		BFD785A9286895F100D1B45B /* libusb_macos_x86_64 */ = {
+			isa = PBXGroup;
+			children = (
+				BFD785AA286895F100D1B45B /* libusb-1.0.a */,
+			);
+			path = libusb_macos_x86_64;
+			sourceTree = "<group>";
+		};
+		BFD785AB286895F100D1B45B /* libusb_macos_arm64 */ = {
+			isa = PBXGroup;
+			children = (
+				BFD785AC286895F100D1B45B /* libusb-1.0.a */,
+			);
+			path = libusb_macos_arm64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1209,7 +1225,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
-				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1244,7 +1259,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BF012ABE2268DC5C003AEB55 /* PopCameraDevice_Osx.xcconfig */;
 			buildSettings = {
-				ARCHS = x86_64;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;

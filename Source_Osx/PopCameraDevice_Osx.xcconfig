@@ -13,8 +13,14 @@ LIBFREENECT2_BUILD_PATH = $(LIBFREENECT2_PATH)/Build
 KINECTAZURE_PATH = $(SRCROOT)/Source/Libs/Microsoft.Azure.Kinect.Sensor.1.4.1
 SOYLIB_PATH = $(SRCROOT)/Source/SoyLib/src
 
+LIBUSB_PATH[arch=x86_64] = $(SRCROOT)/Source/Libs/LibFreenect/libusb_macos_x86_64
+LIBUSB_PATH[arch=arm64] = $(SRCROOT)/Source/Libs/LibFreenect/libusb_macos_x86_64
+
 HEADER_SEARCH_PATHS = $(HEADER_SEARCH_PATHS) $(inherited) $(SOYLIB_PATH) $(BROADWAY_PATH)/inc $(LIBFREENECT2_PATH)/LibFreenect2/include/ $(LIBFREENECT2_BUILD_PATH)/ $(LIBFREENECT_PATH)/ $(KINECTAZURE_PATH)/build/native/include/
-LIBRARY_SEARCH_PATHS = $(LIBRARY_SEARCH_PATHS) $(inherited) $(LIBFREENECT2_BUILD_PATH)/lib/ $(LIBFREENECT_PATH)/
+LIBRARY_SEARCH_PATHS = $(LIBRARY_SEARCH_PATHS) $(inherited) $(LIBFREENECT2_BUILD_PATH)/lib/ $(LIBFREENECT_PATH)/ $(LIBUSB_PATH)
+
+// link to lib usb
+OTHER_LDFLAGS = $(inherited) -lusb-1.0.a
 
 //	-fdeclspec just as we're testing kinectazure headers on osx
 OTHER_CFLAGS = -Wno-ambiguous-macro -fdeclspec
@@ -29,6 +35,3 @@ BUILD_LIBRARY_FOR_DISTRIBUTION = YES
 DYLIB_COMPATIBILITY_VERSION = 1
 
 //EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
-
-//	gr: for now we aren't supporting arm as we need libusb (kinect) which we aren't building an arm version of
-ARCHS = x86_64
