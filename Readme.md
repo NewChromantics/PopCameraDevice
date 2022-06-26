@@ -31,3 +31,12 @@ Kinect Azure
  
 - Windows
 	- We should be able to add packages.config to the project...
+
+
+LibUsb (for Kinect 1/LibFreenect)
+==========================
+- On Macos we now build the lib from source, but not actually building a libusb lib, just include the (small!) amount of source files directly from the libusb repository
+	- Easier to build for arm & x86
+	- No more pre-built out of date/mismatched libs
+- Todo: do same for windows.
+

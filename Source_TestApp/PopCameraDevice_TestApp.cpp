@@ -125,6 +125,9 @@ int main()
 	DebugPrint("Devices and formats:");
 	DebugPrint(EnumJson);
 
+	TestDeviceInstance("Freenect:A00364A03915112A", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 100);
+	
+	
 	//TestDeviceInstance("KinectAzure_000388201512", "{\"Debug\":true,\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 999999990);
 	TestDeviceInstance("KinectAzure_000388201512", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 999999990);
 	//TestDeviceInstance("KinectAzure_000388201512", "{\"Format\":\"Yuv_8_88\",\"DepthFormat\":\"Depth16mm\"}", 999999990);

@@ -136,6 +136,26 @@
 		BFC30CC226EE922D0012EF3D /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFC30C8126EE27310012EF3D /* HomeKit.framework */; };
 		BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */; };
 		BFE73A3924FA7B33005D34D8 /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
+		BFE8D7DD2868A8D100249E8B /* darwin_usb.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7DA2868A8D100249E8B /* darwin_usb.c */; };
+		BFE8D7DE2868A8D100249E8B /* darwin_usb.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7DA2868A8D100249E8B /* darwin_usb.c */; };
+		BFE8D7DF2868A8D100249E8B /* threads_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7DB2868A8D100249E8B /* threads_posix.c */; };
+		BFE8D7E02868A8D100249E8B /* threads_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7DB2868A8D100249E8B /* threads_posix.c */; };
+		BFE8D7E12868A8D100249E8B /* events_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7DC2868A8D100249E8B /* events_posix.c */; };
+		BFE8D7E22868A8D100249E8B /* events_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7DC2868A8D100249E8B /* events_posix.c */; };
+		BFE8D7EA2868A8EF00249E8B /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E32868A8EF00249E8B /* core.c */; };
+		BFE8D7EB2868A8EF00249E8B /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E32868A8EF00249E8B /* core.c */; };
+		BFE8D7EC2868A8EF00249E8B /* io.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E42868A8EF00249E8B /* io.c */; };
+		BFE8D7ED2868A8EF00249E8B /* io.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E42868A8EF00249E8B /* io.c */; };
+		BFE8D7EE2868A8EF00249E8B /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BFE8D7E52868A8EF00249E8B /* version.h */; };
+		BFE8D7EF2868A8EF00249E8B /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = BFE8D7E52868A8EF00249E8B /* version.h */; };
+		BFE8D7F02868A8EF00249E8B /* descriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E62868A8EF00249E8B /* descriptor.c */; };
+		BFE8D7F12868A8EF00249E8B /* descriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E62868A8EF00249E8B /* descriptor.c */; };
+		BFE8D7F22868A8EF00249E8B /* hotplug.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E72868A8EF00249E8B /* hotplug.c */; };
+		BFE8D7F32868A8EF00249E8B /* hotplug.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E72868A8EF00249E8B /* hotplug.c */; };
+		BFE8D7F42868A8EF00249E8B /* sync.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E82868A8EF00249E8B /* sync.c */; };
+		BFE8D7F52868A8EF00249E8B /* sync.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E82868A8EF00249E8B /* sync.c */; };
+		BFE8D7F62868A8EF00249E8B /* strerror.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E92868A8EF00249E8B /* strerror.c */; };
+		BFE8D7F72868A8EF00249E8B /* strerror.c in Sources */ = {isa = PBXBuildFile; fileRef = BFE8D7E92868A8EF00249E8B /* strerror.c */; };
 		BFEE8DF022B0097B00F89A39 /* Freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A872296F476003DDC5F /* Freenect.cpp */; };
 		BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 /* End PBXBuildFile section */
@@ -327,6 +347,19 @@
 		BFE462BC24B1D89000D04A4C /* SoyEnum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyEnum.h; sourceTree = "<group>"; };
 		BFE462BD24B1D92E00D04A4C /* magic_enum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = magic_enum.hpp; path = magic_enum/include/magic_enum.hpp; sourceTree = "<group>"; };
 		BFE462C024B3C99D00D04A4C /* PopCameraDevice.Linux */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PopCameraDevice.Linux; sourceTree = "<group>"; };
+		BFE8D7DA2868A8D100249E8B /* darwin_usb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = darwin_usb.c; path = Source/LibUsb/libusb/os/darwin_usb.c; sourceTree = "<group>"; };
+		BFE8D7DB2868A8D100249E8B /* threads_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = threads_posix.c; path = Source/LibUsb/libusb/os/threads_posix.c; sourceTree = "<group>"; };
+		BFE8D7DC2868A8D100249E8B /* events_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = events_posix.c; path = Source/LibUsb/libusb/os/events_posix.c; sourceTree = "<group>"; };
+		BFE8D7E32868A8EF00249E8B /* core.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = core.c; path = Source/LibUsb/libusb/core.c; sourceTree = "<group>"; };
+		BFE8D7E42868A8EF00249E8B /* io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = io.c; path = Source/LibUsb/libusb/io.c; sourceTree = "<group>"; };
+		BFE8D7E52868A8EF00249E8B /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = Source/LibUsb/libusb/version.h; sourceTree = "<group>"; };
+		BFE8D7E62868A8EF00249E8B /* descriptor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = descriptor.c; path = Source/LibUsb/libusb/descriptor.c; sourceTree = "<group>"; };
+		BFE8D7E72868A8EF00249E8B /* hotplug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hotplug.c; path = Source/LibUsb/libusb/hotplug.c; sourceTree = "<group>"; };
+		BFE8D7E82868A8EF00249E8B /* sync.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sync.c; path = Source/LibUsb/libusb/sync.c; sourceTree = "<group>"; };
+		BFE8D7E92868A8EF00249E8B /* strerror.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = strerror.c; path = Source/LibUsb/libusb/strerror.c; sourceTree = "<group>"; };
+		BFE8D7F82868A90700249E8B /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libusb.h; path = Source/LibUsb/libusb/libusb.h; sourceTree = "<group>"; };
+		BFE8D7F92868A93300249E8B /* libusbi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libusbi.h; path = Source/LibUsb/libusb/libusbi.h; sourceTree = "<group>"; };
+		BFE8D7FB2868AAF600249E8B /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = config.h; path = Source/LibUsb/Xcode/config.h; sourceTree = "<group>"; };
 		BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Freenect2.cpp; path = Source/Freenect2.cpp; sourceTree = "<group>"; };
 		BFEE8DE922B006CE00F89A39 /* Freenect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Freenect2.h; path = Source/Freenect2.h; sourceTree = "<group>"; };
 		BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyAutoReleasePtr.h; sourceTree = "<group>"; };
@@ -634,6 +667,7 @@
 		BFD6076D1EA16ED20035C814 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				BFE8D7D92868A88300249E8B /* LibUsb */,
 				BF216E9D24CA1B5F003FD00B /* Json11 */,
 				BFDBAB8224B9C64F00E8BCE1 /* ArkitCapture.h */,
 				BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */,
@@ -705,6 +739,26 @@
 			path = libusb_macos_arm64;
 			sourceTree = "<group>";
 		};
+		BFE8D7D92868A88300249E8B /* LibUsb */ = {
+			isa = PBXGroup;
+			children = (
+				BFE8D7FB2868AAF600249E8B /* config.h */,
+				BFE8D7F92868A93300249E8B /* libusbi.h */,
+				BFE8D7F82868A90700249E8B /* libusb.h */,
+				BFE8D7E32868A8EF00249E8B /* core.c */,
+				BFE8D7E62868A8EF00249E8B /* descriptor.c */,
+				BFE8D7E72868A8EF00249E8B /* hotplug.c */,
+				BFE8D7E42868A8EF00249E8B /* io.c */,
+				BFE8D7E92868A8EF00249E8B /* strerror.c */,
+				BFE8D7E82868A8EF00249E8B /* sync.c */,
+				BFE8D7E52868A8EF00249E8B /* version.h */,
+				BFE8D7DA2868A8D100249E8B /* darwin_usb.c */,
+				BFE8D7DC2868A8D100249E8B /* events_posix.c */,
+				BFE8D7DB2868A8D100249E8B /* threads_posix.c */,
+			);
+			name = LibUsb;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -713,6 +767,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF012B0A226A0B05003AEB55 /* PopCameraDevice.h in Headers */,
+				BFE8D7EE2868A8EF00249E8B /* version.h in Headers */,
 				BF21AEA624D483240046A434 /* PopCameraDeviceFramework.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -722,6 +777,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF21AEA724D483250046A434 /* PopCameraDeviceFramework.h in Headers */,
+				BFE8D7EF2868A8EF00249E8B /* version.h in Headers */,
 				BF21AEA524D4831E0046A434 /* PopCameraDevice.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -927,7 +983,7 @@
 				"$(LIBFREENECT2_BUILD_PATH)/lib/libfreenect2.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/bin/sh $(LIBFREENECT2_PATH)/Build.sh $(LIBFREENECT2_PATH)";
+			shellPath = "#echo /bin/sh $(LIBFREENECT2_PATH)/Build.sh $(LIBFREENECT2_PATH)";
 			shellScript = "
 ";
 		};
@@ -958,24 +1014,31 @@
 			files = (
 				BF012AF42269FE13003AEB55 /* SoyDebug.cpp in Sources */,
 				BF012B22226A218F003AEB55 /* SoyScope.cpp in Sources */,
+				BFE8D7F02868A8EF00249E8B /* descriptor.c in Sources */,
 				BF8534CE22B3FE370049C01B /* registration.c in Sources */,
 				BF012AE62269FCA4003AEB55 /* SoyString.cpp in Sources */,
 				BF012B1E226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */,
 				BFEE8DFF22B125AA00F89A39 /* SoyJson.cpp in Sources */,
+				BFE8D7E12868A8D100249E8B /* events_posix.c in Sources */,
 				BF012B4F226A2726003AEB55 /* SoyGraphics.cpp in Sources */,
 				BF8534EA22B3FE370049C01B /* loader.c in Sources */,
 				BF012B69226A3176003AEB55 /* SoyFilesystem.cpp in Sources */,
 				BF8534DD22B3FE370049C01B /* cameras.c in Sources */,
 				BF012B76226A3296003AEB55 /* SoyTime.mm in Sources */,
+				BFE8D7DF2868A8D100249E8B /* threads_posix.c in Sources */,
 				BF8534D722B3FE370049C01B /* flags.c in Sources */,
 				BF012B17226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */,
+				BFE8D7EC2868A8EF00249E8B /* io.c in Sources */,
 				BF012B45226A26FB003AEB55 /* SoyThread.cpp in Sources */,
 				BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
+				BFE8D7EA2868A8EF00249E8B /* core.c in Sources */,
 				BF012B64226A30C7003AEB55 /* SoyShader.cpp in Sources */,
+				BFE8D7F22868A8EF00249E8B /* hotplug.c in Sources */,
 				BF012AD22269FAE2003AEB55 /* PopCameraDevice.cpp in Sources */,
 				BF012ADF2269FC83003AEB55 /* SoyAssert.cpp in Sources */,
 				BF012B59226A2FE0003AEB55 /* SoyWave.cpp in Sources */,
 				BF012ADD2269FC83003AEB55 /* SoyPixels.cpp in Sources */,
+				BFE8D7F62868A8EF00249E8B /* strerror.c in Sources */,
 				BF012B04226A047F003AEB55 /* Avf.mm in Sources */,
 				BF8534E322B3FE370049C01B /* tilt.c in Sources */,
 				BF012AFA2269FE3F003AEB55 /* SoyTypes.cpp in Sources */,
@@ -998,7 +1061,9 @@
 				BF012AF12269FE13003AEB55 /* SoyDebug.mm in Sources */,
 				BF012B5E226A30A6003AEB55 /* SoyVector.cpp in Sources */,
 				BF012AE42269FCA4003AEB55 /* SoyString.mm in Sources */,
+				BFE8D7F42868A8EF00249E8B /* sync.c in Sources */,
 				BF012AEC2269FCBF003AEB55 /* memheap.cpp in Sources */,
+				BFE8D7DD2868A8D100249E8B /* darwin_usb.c in Sources */,
 				BF012B6C226A3176003AEB55 /* SoyFilesystem.mm in Sources */,
 				BF012B29226A21C0003AEB55 /* SoyAvf.mm in Sources */,
 			);
@@ -1026,14 +1091,17 @@
 			files = (
 				BF152035238559A200A70EBF /* SoyPixels.cpp in Sources */,
 				BF15202F238559A200A70EBF /* SoyH264.cpp in Sources */,
+				BFE8D7F52868A8EF00249E8B /* sync.c in Sources */,
 				BF152032238559A200A70EBF /* SoyMediaFormat.cpp in Sources */,
 				BFC30CBF26EE299C0012EF3D /* Homekit.mm in Sources */,
 				BF216EA124CA1B82003FD00B /* json11.cpp in Sources */,
 				BF152037238559A200A70EBF /* SoyShader.cpp in Sources */,
 				BF15203C238559A200A70EBF /* SoyTime.mm in Sources */,
 				BF152030238559A200A70EBF /* SoyJson.cpp in Sources */,
+				BFE8D7DE2868A8D100249E8B /* darwin_usb.c in Sources */,
 				BF15203D238559A200A70EBF /* SoyTypes.cpp in Sources */,
 				BF15202B238559A200A70EBF /* SoyDebug.mm in Sources */,
+				BFE8D7F72868A8EF00249E8B /* strerror.c in Sources */,
 				BF15201E2384863900A70EBF /* TestDevice.cpp in Sources */,
 				BF15202E238559A200A70EBF /* SoyGraphics.cpp in Sources */,
 				BF152034238559A200A70EBF /* SoyOpenglContext.cpp in Sources */,
@@ -1049,9 +1117,14 @@
 				BF15203F238559A200A70EBF /* SoyWave.cpp in Sources */,
 				BF152039238559A200A70EBF /* SoyString.mm in Sources */,
 				BF152038238559A200A70EBF /* SoyString.cpp in Sources */,
+				BFE8D7ED2868A8EF00249E8B /* io.c in Sources */,
 				BF1520182384863900A70EBF /* Avf.mm in Sources */,
+				BFE8D7F32868A8EF00249E8B /* hotplug.c in Sources */,
+				BFE8D7E22868A8D100249E8B /* events_posix.c in Sources */,
 				BF15203A238559A200A70EBF /* SoyThread.cpp in Sources */,
 				BF15201A2384863900A70EBF /* AvfVideoCapture.mm in Sources */,
+				BFE8D7E02868A8D100249E8B /* threads_posix.c in Sources */,
+				BFE8D7F12868A8EF00249E8B /* descriptor.c in Sources */,
 				BF15203B238559A200A70EBF /* SoyTime.cpp in Sources */,
 				BF152033238559A200A70EBF /* SoyOpengl.cpp in Sources */,
 				BF152036238559A200A70EBF /* SoyScope.cpp in Sources */,
@@ -1059,6 +1132,7 @@
 				BF15203E238559A200A70EBF /* SoyVector.cpp in Sources */,
 				BF152029238559A200A70EBF /* SoyAssert.cpp in Sources */,
 				BF15201C2384863900A70EBF /* PopCameraDevice.cpp in Sources */,
+				BFE8D7EB2868A8EF00249E8B /* core.c in Sources */,
 				BF15202A238559A200A70EBF /* SoyAvf.mm in Sources */,
 				BF51B8E7256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */,
 				BF15204F23855BDD00A70EBF /* SoyArray.cpp in Sources */,
@@ -1101,10 +1175,6 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Source_Osx/PopCameraDevice_Framework_Osx_Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Source/Libs/LibFreenect",
-				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -1139,10 +1209,6 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Source_Osx/PopCameraDevice_Framework_Osx_Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Source/Libs/LibFreenect",
-				);
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
