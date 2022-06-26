@@ -360,6 +360,7 @@
 		BFE8D7F82868A90700249E8B /* libusb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libusb.h; path = Source/LibUsb/libusb/libusb.h; sourceTree = "<group>"; };
 		BFE8D7F92868A93300249E8B /* libusbi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = libusbi.h; path = Source/LibUsb/libusb/libusbi.h; sourceTree = "<group>"; };
 		BFE8D7FB2868AAF600249E8B /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = config.h; path = Source/LibUsb/Xcode/config.h; sourceTree = "<group>"; };
+		BFE8D8012868E28A00249E8B /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		BFEE8DE822B006CE00F89A39 /* Freenect2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Freenect2.cpp; path = Source/Freenect2.cpp; sourceTree = "<group>"; };
 		BFEE8DE922B006CE00F89A39 /* Freenect2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Freenect2.h; path = Source/Freenect2.h; sourceTree = "<group>"; };
 		BFEE8DEE22B0081F00F89A39 /* SoyAutoReleasePtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SoyAutoReleasePtr.h; sourceTree = "<group>"; };
@@ -606,6 +607,7 @@
 				BF22BD2424FA840B002B9AC0 /* PopCameraDevice.Package */,
 				BFE462C024B3C99D00D04A4C /* PopCameraDevice.Linux */,
 				BFFAE1FC24AFE4E8006C999C /* Readme.md */,
+				BFE8D8012868E28A00249E8B /* Package.swift */,
 				BF108A902296F7BD003DDC5F /* Libs */,
 				BFFAE1FB24AFE4C7006C999C /* Libs */,
 				BF0A19C21EA428F4007EBC95 /* Unity */,
