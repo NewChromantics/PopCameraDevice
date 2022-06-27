@@ -16,7 +16,6 @@ jobs:
 
     steps:
       - name: "Import Apple-Distriubution NewChromantics Signing Certificate"
-        if: matrix.config.os == 'macos-latest'
         uses: devbotsxyz/xcode-import-certificate@master
         with:
           certificate-data: ${{ secrets.APPLE_DIST_NEWCHROMANTICS_P12 }}
@@ -24,7 +23,6 @@ jobs:
           keychain-password: "Hello"
 
       - name: "Import MacApp-Distriubution NewChromantics Signing Certificate"
-        if: matrix.config.os == 'macos-latest'
         uses: devbotsxyz/xcode-import-certificate@master
         with:
           certificate-data: ${{ secrets.MACAPP_DIST_NEWCHROMANTICS_P12 }}
@@ -32,7 +30,6 @@ jobs:
           keychain-password: "Hello"
 
       - name: "Import ios-Distriubution NewChromantics Signing Certificate"
-        if: matrix.config.os == 'macos-latest'
         uses: devbotsxyz/xcode-import-certificate@master
         with:
           certificate-data: ${{ secrets.IOS_DIST_NEWCHROMANTICS_P12 }}
