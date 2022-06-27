@@ -4,7 +4,7 @@
 #include "../Source/Version.xcconfig"
 
 
-GCC_PREPROCESSOR_DEFINITIONS = $(inherited) TARGET_IOS
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) TARGET_IOS GLES_SILENCE_DEPRECATION 
 INFOPLIST_FILE = $(SRCROOT)/Info.plist
 
 BROADWAY_PATH = $(SRCROOT)/Source/Broadway/Decoder
