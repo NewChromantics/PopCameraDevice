@@ -1,8 +1,11 @@
 # Type a script or drag a script file from your workspace to insert its path.
 PROJECT_NAME=$1
-BUILDPATH_IOS="./build/${PROJECT_NAME}_Ios"
-#BUILDPATH_SIM="./build/${PROJECT_NAME}_IosSimulator"
-BUILDPATH_OSX="./build/${PROJECT_NAME}_Osx"
+BUILDPATH_IOS="${BUILT_PRODUCTS_DIR}/${PROJECT_NAME}_Ios"
+#BUILDPATH_SIM="${BUILT_PRODUCTS_DIR}/${PROJECT_NAME}_IosSimulator"
+BUILDPATH_OSX="${BUILT_PRODUCTS_DIR}/${PROJECT_NAME}_Osx"
+echo "BUILDPATH_IOS=${BUILDPATH_IOS}"
+#echo "BUILDPATH_SIM=${BUILDPATH_SIM}"
+echo "BUILDPATH_OSX=${BUILDPATH_OSX}"
 xcodebuild archive -scheme ${PROJECT_NAME}_Ios -archivePath $BUILDPATH_IOS SKIP_INSTALL=NO -sdk iphoneos
 #xcodebuild archive -scheme ${PROJECT_NAME}_Ios -archivePath $BUILDPATH_SIM SKIP_INSTALL=NO -sdk iphonesimulator
 xcodebuild archive -scheme ${PROJECT_NAME}_Osx -archivePath $BUILDPATH_OSX SKIP_INSTALL=NO
