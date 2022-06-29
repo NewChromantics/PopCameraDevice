@@ -1,4 +1,6 @@
-# Type a script or drag a script file from your workspace to insert its path.
+# exit when any command fails
+set -e
+
 PROJECT_NAME=$1
 BUILDPATH_IOS="${BUILT_PRODUCTS_DIR}/${PROJECT_NAME}_Ios"
 #BUILDPATH_SIM="${BUILT_PRODUCTS_DIR}/${PROJECT_NAME}_IosSimulator"
