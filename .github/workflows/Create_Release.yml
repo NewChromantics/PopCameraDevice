@@ -101,7 +101,7 @@ jobs:
       # Download artifacts into Packaging dir
       - uses: actions/checkout@v2
       - name: Download build artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4.1.7
         with:
           path: ${{ env.project }}.Package/
 
