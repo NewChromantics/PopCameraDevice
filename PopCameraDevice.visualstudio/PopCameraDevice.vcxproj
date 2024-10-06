@@ -306,7 +306,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PopCameraDevice.props" />
     <Import Project="Release.props" />
-    <Import Project="Kinect2.props" />
     <Import Project="Libfreenect.props" />
     <Import Project="KinectAzure.props" />
   </ImportGroup>
