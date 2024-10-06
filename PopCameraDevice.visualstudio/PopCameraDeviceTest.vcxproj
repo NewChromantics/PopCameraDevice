@@ -14,7 +14,7 @@
     <ProjectGuid>{639D3EB7-0BFB-404F-949B-1645E25679A7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>PopCameraDeviceTest</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
