@@ -34,7 +34,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(OutDir);$(ProjectDir)..\Build\Release_NoKinect_x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(OutDir);$(ProjectDir)..\Build\Release_x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\Build\$(Configuration)_$(Platform)\</OutDir>
     <IncludePath>$(OutDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
