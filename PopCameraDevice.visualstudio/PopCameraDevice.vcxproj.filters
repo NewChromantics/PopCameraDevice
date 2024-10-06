@@ -346,6 +346,7 @@
     <None Include="..\Source\SoyLib\src\SoyAvf.mm">
       <Filter>SoyLib</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\Source\Libs\LibFreenect2\Build\lib\freenect2.lib">
