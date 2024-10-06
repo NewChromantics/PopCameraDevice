@@ -31,7 +31,3 @@ BITCODE_GENERATION_MODE = bitcode
 // tsdk: Mirroring config from PopH264
 BUILD_LIBRARY_FOR_DISTRIBUTION = YES
 
-//CODE_SIGN_IDENTITY = "Apple Distribution: New Chromantics LTD (X52DR36JY2)"
-CODE_SIGN_IDENTITY = Apple Distribution
-CODE_SIGN_STYLE = Manual
-DEVELOPMENT_TEAM = X52DR36JY2
