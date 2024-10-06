@@ -35,7 +35,7 @@ public:
 protected:
 	virtual void		AllocSourceReader(const std::string& Filename) override;
 	virtual bool		CanSeek() override				{	return false;	}
-	virtual void		FilterStreams(ArrayBridge<TStreamMeta>& Streams) override;
+	virtual void		FilterStreams(ArrayBridge<TStreamMeta>&& Streams) override;
 	virtual void		CorrectIncomingTimecode(TMediaPacket& Timecode) override;
 
 public:

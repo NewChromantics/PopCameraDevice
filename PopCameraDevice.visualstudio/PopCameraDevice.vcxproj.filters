@@ -153,6 +153,9 @@
     <ClCompile Include="..\Source\JsonFunctions.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\SoyLib\src\TBitReader.cpp">
+      <Filter>SoyLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\SoyLib\src\Array.hpp">
@@ -310,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\JsonFunctions.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\SoyLib\src\TBitReader.hpp">
+      <Filter>SoyLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

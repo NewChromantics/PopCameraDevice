@@ -4,7 +4,7 @@
 #include <SoyH264.h>
 #include <Propvarutil.h>
 #include <SoyMath.h>
-#include <magic_enum/include/magic_enum.hpp>
+#include <magic_enum/include/magic_enum/magic_enum.hpp>
 
 GUID GUID_Invalid = {0};
 
@@ -35,7 +35,7 @@ public:
 
 namespace MediaFoundation
 {
-	void							EnumStreams(ArrayBridge<TStreamMeta>& Streams,IMFSourceReader& Reader,bool VerboseDebug);
+	void							EnumStreams(ArrayBridge<TStreamMeta>&& Streams,IMFSourceReader& Reader,bool VerboseDebug);
 	void							GetSupportedFormats(ArrayBridge<SoyPixelsFormat::Type>&& Formats);
 
 	TStreamMeta						GetStreamMeta(IMFSample& Sample,bool VerboseDebug);
@@ -104,7 +104,8 @@ void MediaFoundation::GetSampleData(ArrayBridge<uint8>&& Data,IMFSample& Sample)
 	IMFMediaBuffer* pBuffer = nullptr;
 	auto Result = Sample.ConvertToContiguousBuffer( &pBuffer );
 	MediaFoundation::IsOkay(Result, "ConvertToContiguousBuffer" );
-	Soy::Assert( pBuffer!=nullptr, "Missing Media buffer object" );
+	if ( !pBuffer )
+		throw std::runtime_error("Missing Media buffer object" );
 
 	//	ConvertToContiguousBuffer automatically retains
 	Soy::AutoReleasePtr<IMFMediaBuffer> BufferRet;
@@ -119,8 +120,10 @@ void MediaFoundation::GetSampleData(ArrayBridge<uint8>&& Data,IMFSample& Sample)
 	Result = Buffer.Lock( &Bytes, nullptr, &ByteSize );
 	MediaFoundation::IsOkay( Result, "MediaBuffer::Lock" );
 
-	Soy::Assert( Bytes!=nullptr, "MediaBuffer::Lock returned null" );
-	Soy::Assert( ByteSize>0, "MediaBuffer::GetCurrentLength returned 0 bytes" );
+	if ( !Bytes )
+		throw std::runtime_error("MediaBuffer::Lock returned null" );
+	if ( ByteSize<=0 )
+		throw std::runtime_error("MediaBuffer::GetCurrentLength returned 0 bytes" );
 
 	auto LockedArray = GetRemoteArray( Bytes, ByteSize );
 	Data.Copy( LockedArray );
@@ -448,7 +451,8 @@ TStreamMeta MediaFoundation::GetStreamMeta(IMFMediaType& MediaType,size_t Stream
 		{
 			MediaFoundation::IsOkay(Result, ErrorPrefix + " MF_PD_DURATION");
 			auto Duration100Ns = Prop.uhVal.QuadPart;
-			Meta.mDuration.SetNanoSeconds( Duration100Ns * 100 );
+			std::chrono::nanoseconds Nanos( Duration100Ns * 100 );
+			Meta.mDuration = std::chrono::duration_cast<std::chrono::milliseconds>(Nanos);
 		}
 		catch(std::exception& e)
 		{
@@ -490,7 +494,7 @@ TStreamMeta MediaFoundation::GetStreamMeta(IMFMediaType& MediaType,size_t Stream
 }
 
 
-void MediaFoundation::EnumStreams(ArrayBridge<TStreamMeta>& Streams,IMFSourceReader& Reader,bool VerboseDebug)
+void MediaFoundation::EnumStreams(ArrayBridge<TStreamMeta>&& Streams,IMFSourceReader& Reader,bool VerboseDebug)
 {
 	//	https://msdn.microsoft.com/en-us/library/dd389281(VS.85).aspx
 	DWORD StreamIndex = 0;
@@ -503,7 +507,7 @@ void MediaFoundation::EnumStreams(ArrayBridge<TStreamMeta>& Streams,IMFSourceRea
 	while ( StreamIndex < MaxStreamIndex && MediaTypeIndex < MaxMediaType )
 	{
 		Soy::AutoReleasePtr<IMFMediaType> MediaType;
-        auto Result = Reader.GetNativeMediaType( StreamIndex, MediaTypeIndex, &MediaType.mObject );
+		auto Result = Reader.GetNativeMediaType( StreamIndex, MediaTypeIndex, &MediaType.mObject );
 
 		//	no more streams
 		if ( Result == MF_E_INVALIDSTREAMNUMBER )
@@ -563,7 +567,8 @@ MfExtractor::MfExtractor(const TMediaExtractorParams& Params) :
 	mFilename				( Params.mFilename ),
 	mAsyncReadSampleRequests	( 0 )
 {
-	Soy::Assert( mMediaFoundationContext != nullptr, "Missing Media foundation context");
+	if ( !mMediaFoundationContext )
+		throw std::runtime_error("Missing Media foundation context");
 }
 
 void MfExtractor::Init()
@@ -634,7 +639,8 @@ bool MfExtractor::OnSeek()
 		return false;
 
 	static bool DebugSeek = false;
-	Soy::Assert( mSourceReader!=nullptr, "Source reader missing");
+	if ( !mSourceReader )
+		throw std::runtime_error("Source reader missing");
 
 	//	this may need to be at least KeyFrameDifference ms
 	static int MinSeekDiffForwardMs = 1000;
@@ -694,7 +700,8 @@ void MfExtractor::CreateSourceReader(const std::string& Filename)
 	}
 
 	AllocSourceReader( Filename );
-	Soy::Assert( mSourceReader != nullptr, "Failed to allocate source reader" );
+	if ( !mSourceReader )
+		throw std::runtime_error("Failed to allocate source reader" );
 
 	//	enum the streams so we try and convert the right one
 	Array<TStreamMeta> Streams;
@@ -780,7 +787,8 @@ void MfExtractor::ConfigureVideoStream(TStreamMeta& Stream)
 	{
 		std::stringstream Error;
 		Error << "Trying to use video stream with invalid dimensions: " << Stream.mPixelMeta;
-		Soy::Assert( Stream.mPixelMeta.IsValidDimensions(), Error.str() );
+		if ( !Stream.mPixelMeta.IsValidDimensions() )
+			throw std::runtime_error( Error.str() );
 	}
 
 	//	https://msdn.microsoft.com/en-us/library/dd389281(VS.85).aspx
@@ -858,7 +866,8 @@ void MfExtractor::ConfigureVideoStream(TStreamMeta& Stream)
 		Stream.mPixelMeta.DumbSetFormat( FinalFormat );
 	}
 
-	Soy::Assert( Stream.mPixelMeta.IsValid(), "Failed to find pixel format decoder accepts" );
+	if ( !Stream.mPixelMeta.IsValid() )
+		throw std::runtime_error("Failed to find pixel format decoder accepts" );
 
 	//	on success, save the meta we've used
 	mStreams[Stream.mStreamIndex] = Stream;
@@ -996,7 +1005,8 @@ void MfExtractor::ConfigureAudioStream(TStreamMeta& Stream)
 		Stream.mCodec = FinalFormat;
 	}
 
-	Soy::Assert( Stream.mCodec != SoyMediaFormat::Invalid, "Failed to find audio format decoder accepts" );
+	if ( Stream.mCodec == SoyMediaFormat::Invalid )
+		throw std::runtime_error("Failed to find audio format decoder accepts" );
 
 	//	on success, save the meta we've used
 	mStreams[Stream.mStreamIndex] = Stream;
@@ -1010,7 +1020,8 @@ void MfExtractor::ConfigureOtherStream(TStreamMeta& Stream)
 
 void MfExtractor::PushPacket(std::shared_ptr<TMediaPacket>& Sample)
 {
-	Soy::Assert( Sample != nullptr, "MfExtractor::PushPacket Expected non-null sample");
+	if ( !Sample )
+		throw std::runtime_error("MfExtractor::PushPacket Expected non-null sample");
 
 	{
 		std::lock_guard<std::mutex> Lock( mPacketQueueLock );
@@ -1301,7 +1312,8 @@ MfPixelBuffer::MfPixelBuffer(Soy::AutoReleasePtr<IMFSample>& Sample,const TStrea
 	mApplyHeightPadding	( ApplyHeightPadding ),
 	mWin7Emulation		( Win7Emulation )
 {
-	Soy::Assert( mSample, "Sample expected" );
+	if ( !mSample )
+		throw std::runtime_error("Sample expected" );
 }
 
 MfPixelBuffer::~MfPixelBuffer()
@@ -1318,13 +1330,15 @@ MfPixelBuffer::~MfPixelBuffer()
 
 void MfPixelBuffer::GetMediaBuffer(Soy::AutoReleasePtr<IMFMediaBuffer>& Buffer)
 {
-	Soy::Assert( mSample, "Sample expected" );
+	if ( !mSample )
+		throw std::runtime_error("Sample expected" );
 
 	//	get buffer as contigious. if this ever fails, revert back to multiple buffer stitching (locally?)
 	IMFMediaBuffer* pBuffer = nullptr;
 	auto Result = mSample->ConvertToContiguousBuffer( &pBuffer );
 	MediaFoundation::IsOkay(Result, "ConvertToContiguousBuffer" );
-	Soy::Assert(pBuffer!=nullptr, "Missing Media buffer object");
+	if ( !pBuffer )
+		throw std::runtime_error("Missing Media buffer object");
 
 	//	ConvertToContiguousBuffer automatically retains
 	Buffer.Set( pBuffer, false );
@@ -1484,12 +1498,14 @@ void MfPixelBuffer::ApplyPadding(SoyPixelsMeta& Meta,float3x3& Transform,size_t 
 
 void MfPixelBuffer::LockPixelsMediaBuffer2D(ArrayBridge<SoyPixelsImpl*>& Textures,Soy::AutoReleasePtr<IMFMediaBuffer>& MediaBuffer,float3x3& Transform)
 {
-	Soy::Assert( MediaBuffer!=nullptr, "Expected media buffer" );
+	if ( !MediaBuffer )
+		throw std::runtime_error("Expected media buffer" );
 
 	Soy::AutoReleasePtr<IMF2DBuffer> Buffer2D;
 	auto Result = MediaBuffer->QueryInterface(&Buffer2D.mObject);
 	MediaFoundation::IsOkay( Result, "Get IMF2DBuffer interface" );
-	Soy::Assert( Buffer2D, "Successfull QueryInterface(IMF2DBuffer) but missing object");
+	if ( !Buffer2D )
+		throw std::runtime_error("Successfull QueryInterface(IMF2DBuffer) but missing object");
 
 	//	gr: docs suggest I need to retain this buffer2D, but seems I dont, but it definitely needs releasing or we leak
 	static bool RetainBuffer2D = false;
@@ -1516,11 +1532,13 @@ void MfPixelBuffer::LockPixelsMediaBuffer2D(ArrayBridge<SoyPixelsImpl*>& Texture
 	DWORD ByteSize = 0;
 	Result = MediaBuffer->GetCurrentLength(&ByteSize);
 	MediaFoundation::IsOkay( Result, "IMF2DBuffer::GetCurrentLength" );
-	Soy::Assert( ByteSize>0, "IMF2DBuffer::GetCurrentLength returned 0 bytes" );
+	if ( ByteSize <= 0 )
+		throw std::runtime_error("IMF2DBuffer::GetCurrentLength returned 0 bytes" );
 	
 	Result = Buffer2D->Lock2D( &Bytes, &Pitch );
 	MediaFoundation::IsOkay( Result, "IMF2DBuffer::Lock2D" );
-	Soy::Assert( Bytes!=nullptr, "IMF2DBuffer::Lock2D returned null" );
+	if ( !Bytes )
+		throw std::runtime_error("IMF2DBuffer::Lock2D returned null" );
 	mLockedBuffer2D = Buffer2D;
 	mLockedMediaBuffer = MediaBuffer;
 
@@ -1569,7 +1587,8 @@ void MfPixelBuffer::LockPixelsMediaBuffer2D(ArrayBridge<SoyPixelsImpl*>& Texture
 
 void MfPixelBuffer::LockPixelsMediaBuffer(ArrayBridge<SoyPixelsImpl*>& Textures,Soy::AutoReleasePtr<IMFMediaBuffer>& MediaBuffer,float3x3& Transform)
 {
-	Soy::Assert( MediaBuffer!=nullptr, "Expected media buffer" );
+	if ( !MediaBuffer )
+		throw std::runtime_error("Expected media buffer" );
 	auto& Buffer = *MediaBuffer.mObject;
 
 	//	lock
@@ -1582,8 +1601,10 @@ void MfPixelBuffer::LockPixelsMediaBuffer(ArrayBridge<SoyPixelsImpl*>& Textures,
 
 	mLockedMediaBuffer.Set( MediaBuffer.mObject, true );
 
-	Soy::Assert( Bytes!=nullptr, "MediaBuffer::Lock returned null" );
-	Soy::Assert( ByteSize>0, "MediaBuffer::GetCurrentLength returned 0 bytes" );
+	if ( !Bytes )
+		throw std::runtime_error("MediaBuffer::Lock returned null" );
+	if ( ByteSize <= 0 )
+		throw std::runtime_error("MediaBuffer::GetCurrentLength returned 0 bytes" );
 
 	//	pitch info should have been pulled out into the meta earlier (we cannot get it any other way)
 	auto Meta = mMeta.mPixelMeta;

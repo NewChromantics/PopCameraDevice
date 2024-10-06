@@ -96,7 +96,8 @@ void EnumCaptureDevices(std::function<void(IMFActivate&)> OnFoundDevice,GUID Dev
 			Cleanup();
 			return;
 		}
-		Soy::Assert( ppDevices != nullptr, "MFEnumDeviceSources returned null" );
+		if ( !ppDevices )
+			throw std::runtime_error("MFEnumDeviceSources returned null" );
 
 		for ( int i=0;	i<DeviceCount;	i++ )
 		{
@@ -277,7 +278,8 @@ Soy::AutoReleasePtr<IMFMediaSource> MediaFoundation::FindCaptureDevice(IMFActiva
 
 SoyPixelsFormat::Type GetMeta(IMFStreamDescriptor* Stream,bool VerboseDebug)
 {
-	Soy::Assert( Stream !=nullptr, "Stream descriptor expected");
+	if ( !Stream )
+		throw std::runtime_error("Stream descriptor expected");
 
 	Soy::AutoReleasePtr<IMFMediaTypeHandler> MediaHandler;
 	auto Result = Stream->GetMediaTypeHandler( &MediaHandler.mObject );
@@ -454,7 +456,7 @@ MediaFoundation::TCaptureExtractor::~TCaptureExtractor()
 }
 
 
-void MediaFoundation::TCaptureExtractor::FilterStreams(ArrayBridge<TStreamMeta>& Streams)
+void MediaFoundation::TCaptureExtractor::FilterStreams(ArrayBridge<TStreamMeta>&& Streams)
 {
 	//	camera capture sometimes reports multiple video stream indexes (eg. apple isight), as well as the 400 streams of different formats
 	//	if I enable 0 and 1, it gives me a few frames and stops... so work around that

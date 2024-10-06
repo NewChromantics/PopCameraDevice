@@ -72,7 +72,7 @@ public:
 	
 protected:
 	virtual void		AllocSourceReader(const std::string& Filename)=0;
-	virtual void		FilterStreams(ArrayBridge<TStreamMeta>& Streams)	{}
+	virtual void		FilterStreams(ArrayBridge<TStreamMeta>&& Streams)	{}
 	virtual void		CorrectIncomingTimecode(TMediaPacket& Timecode)		{}
 
 	void				Init();		//	call this from constructor!
