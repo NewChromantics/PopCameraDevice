@@ -58,6 +58,7 @@ $(SOY_PATH)/src/SoyRuntimeLibrary.cpp \
 $(SOY_PATH)/src/SoyThread.cpp \
 $(SOY_PATH)/src/SoyFilesystem.cpp \
 $(SOY_PATH)/src/SoyPlatform.cpp \
+$(SOY_PATH)/src/TBitReader.cpp \
 
 
 APP_CPP_FILES =	\
