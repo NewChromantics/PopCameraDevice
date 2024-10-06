@@ -108,7 +108,7 @@ endif
 # -g stops symbol stripping
 # -f[lag] PIC position independent code (for dyanmically loaded code)
 # -rpath $ORIGIN makes the shared object runtimepath be same place as executable
-CFLAGS = -c $(CONFIGURATION_FLAGS) $(LIB_DEFINES) $(LIB_INCLUDES) -std=c++17 -fPIC -g
+CFLAGS = -c $(CONFIGURATION_FLAGS) $(LIB_DEFINES) $(LIB_INCLUDES) -std=c++20 -fPIC -g
 
 # Make a depdencny file (.d) so header changes can be detected
 CFLAGS += -MD
