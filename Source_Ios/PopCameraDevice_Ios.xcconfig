@@ -3,6 +3,7 @@
 
 #include "../Source/Version.xcconfig"
 
+CLANG_CXX_LANGUAGE_STANDARD = c++20
 
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) TARGET_IOS GLES_SILENCE_DEPRECATION 
 INFOPLIST_FILE = $(SRCROOT)/Info.plist

@@ -13,7 +13,7 @@
 #include "SoyOpenglContext.h"
 #include "Avf.h"
 #include "SoyFourcc.h"
-#include <magic_enum/include/magic_enum.hpp>
+#include <magic_enum/include/magic_enum/magic_enum.hpp>
 #include "PopCameraDevice.h"
 #include "JsonFunctions.h"
 
@@ -324,8 +324,7 @@ NSString* GetAVCaptureSessionQuality(TVideoQuality::Type Quality)
 			return AVCaptureSessionPresetHigh;
 			
 		default:
-			Soy::Assert( false, "Unhandled TVideoQuality Type" );
-			return AVCaptureSessionPresetHigh;
+			throw std::runtime_error("Unhandled TVideoQuality Type");
 	}
 }
 
@@ -660,7 +659,8 @@ void AvfVideoCapture::StartStream()
 		[ Session startRunning];
 	
 	bool IsRunning = Session.running;
-	Soy::Assert( IsRunning, "Failed tostart running") ;
+	if ( !IsRunning )
+		throw std::runtime_error("Failed tostart running");
 }
 
 void AvfVideoCapture::StopStream()

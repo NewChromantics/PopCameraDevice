@@ -1,6 +1,6 @@
 #include "TCameraDevice.h"
 #include <SoyMedia.h>
-#include <magic_enum/include/magic_enum.hpp>
+#include <magic_enum/include/magic_enum/magic_enum.hpp>
 #include "PopCameraDevice.h"
 
 

@@ -41,13 +41,11 @@
 		BF012B1E226A1FD3003AEB55 /* AvfPixelBuffer.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B1B226A1FD3003AEB55 /* AvfPixelBuffer.mm */; };
 		BF012B22226A218F003AEB55 /* SoyScope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B1F226A218F003AEB55 /* SoyScope.cpp */; };
 		BF012B29226A21C0003AEB55 /* SoyAvf.mm in Sources */ = {isa = PBXBuildFile; fileRef = BF012B26226A21C0003AEB55 /* SoyAvf.mm */; };
-		BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B2B226A2232003AEB55 /* SoyOpenglContext.cpp */; };
 		BF012B2F226A263E003AEB55 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B2E226A263E003AEB55 /* CoreMedia.framework */; };
 		BF012B31226A2665003AEB55 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B30226A2665003AEB55 /* VideoToolbox.framework */; };
 		BF012B33226A267B003AEB55 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B32226A267B003AEB55 /* OpenGL.framework */; };
 		BF012B35226A2696003AEB55 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B34226A2696003AEB55 /* CoreGraphics.framework */; };
 		BF012B37226A26B0003AEB55 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF012B36226A26AF003AEB55 /* CoreVideo.framework */; };
-		BF012B3B226A26E9003AEB55 /* SoyOpengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B38226A26E9003AEB55 /* SoyOpengl.cpp */; };
 		BF012B40226A26F1003AEB55 /* SoyH264.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B3D226A26F0003AEB55 /* SoyH264.cpp */; };
 		BF012B45226A26FB003AEB55 /* SoyThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B42226A26FB003AEB55 /* SoyThread.cpp */; };
 		BF012B4A226A270A003AEB55 /* SoyMedia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B47226A270A003AEB55 /* SoyMedia.cpp */; };
@@ -90,8 +88,6 @@
 		BF152030238559A200A70EBF /* SoyJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BFEE8DFC22B125AA00F89A39 /* SoyJson.cpp */; };
 		BF152031238559A200A70EBF /* SoyMedia.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B47226A270A003AEB55 /* SoyMedia.cpp */; };
 		BF152032238559A200A70EBF /* SoyMediaFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B52226A2FCF003AEB55 /* SoyMediaFormat.cpp */; };
-		BF152033238559A200A70EBF /* SoyOpengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B38226A26E9003AEB55 /* SoyOpengl.cpp */; };
-		BF152034238559A200A70EBF /* SoyOpenglContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B2B226A2232003AEB55 /* SoyOpenglContext.cpp */; };
 		BF152035238559A200A70EBF /* SoyPixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012AD82269FC83003AEB55 /* SoyPixels.cpp */; };
 		BF152036238559A200A70EBF /* SoyScope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B1F226A218F003AEB55 /* SoyScope.cpp */; };
 		BF152037238559A200A70EBF /* SoyShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF012B61226A30C7003AEB55 /* SoyShader.cpp */; };
@@ -112,6 +108,8 @@
 		BF15204F23855BDD00A70EBF /* SoyArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF15204C23855BD500A70EBF /* SoyArray.cpp */; };
 		BF15205123855D8300A70EBF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205023855D8200A70EBF /* CoreGraphics.framework */; };
 		BF15205323855F1F00A70EBF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF15205223855F1F00A70EBF /* UIKit.framework */; };
+		BF15BCD32CB2F0FA001D09DB /* TBitReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF15BCD22CB2F0FA001D09DB /* TBitReader.cpp */; };
+		BF15BCD52CB2F0FA001D09DB /* TBitReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF15BCD22CB2F0FA001D09DB /* TBitReader.cpp */; };
 		BF216EA024CA1B81003FD00B /* json11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF216E9E24CA1B7D003FD00B /* json11.cpp */; };
 		BF216EA124CA1B82003FD00B /* json11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF216E9E24CA1B7D003FD00B /* json11.cpp */; };
 		BF21AEA524D4831E0046A434 /* PopCameraDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = BF012AB22268DBF8003AEB55 /* PopCameraDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -284,6 +282,8 @@
 		BF15204C23855BD500A70EBF /* SoyArray.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SoyArray.cpp; sourceTree = "<group>"; };
 		BF15205023855D8200A70EBF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		BF15205223855F1F00A70EBF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.1.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		BF15BCD12CB2F0FA001D09DB /* TBitReader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = TBitReader.hpp; sourceTree = "<group>"; };
+		BF15BCD22CB2F0FA001D09DB /* TBitReader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TBitReader.cpp; sourceTree = "<group>"; };
 		BF216E9B24C99989003FD00B /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/ARKit.framework; sourceTree = DEVELOPER_DIR; };
 		BF216E9E24CA1B7D003FD00B /* json11.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = json11.cpp; path = Source/Json11/json11.cpp; sourceTree = SOURCE_ROOT; };
 		BF216E9F24CA1B7D003FD00B /* json11.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = json11.hpp; path = Source/Json11/json11.hpp; sourceTree = SOURCE_ROOT; };
@@ -421,6 +421,8 @@
 		BF012AD52269FC5C003AEB55 /* SoyLib */ = {
 			isa = PBXGroup;
 			children = (
+				BF15BCD12CB2F0FA001D09DB /* TBitReader.hpp */,
+				BF15BCD22CB2F0FA001D09DB /* TBitReader.cpp */,
 				BFE462BD24B1D92E00D04A4C /* magic_enum.hpp */,
 				BF012B1A226A1FD3003AEB55 /* AvfPixelBuffer.h */,
 				BF39C0C9240089E9000C7E56 /* Array.hpp */,
@@ -1022,7 +1024,6 @@
 				BF012B17226A1D7F003AEB55 /* AvfVideoCapture.mm in Sources */,
 				BFE8D7EC2868A8EF00249E8B /* io.c in Sources */,
 				BF012B45226A26FB003AEB55 /* SoyThread.cpp in Sources */,
-				BF012B2D226A2232003AEB55 /* SoyOpenglContext.cpp in Sources */,
 				BFE8D7EA2868A8EF00249E8B /* core.c in Sources */,
 				BF012B64226A30C7003AEB55 /* SoyShader.cpp in Sources */,
 				BFE8D7F22868A8EF00249E8B /* hotplug.c in Sources */,
@@ -1037,11 +1038,11 @@
 				BF012AFF226A0108003AEB55 /* SoyTime.cpp in Sources */,
 				BF012AD32269FAE2003AEB55 /* TCameraDevice.cpp in Sources */,
 				BF012B4A226A270A003AEB55 /* SoyMedia.cpp in Sources */,
+				BF15BCD32CB2F0FA001D09DB /* TBitReader.cpp in Sources */,
 				BF15204E23855BDC00A70EBF /* SoyArray.cpp in Sources */,
 				BF012AD12268DE24003AEB55 /* AvfCapture.mm in Sources */,
 				BF012B55226A2FCF003AEB55 /* SoyMediaFormat.cpp in Sources */,
 				BF8534E022B3FE370049C01B /* core.c in Sources */,
-				BF012B3B226A26E9003AEB55 /* SoyOpengl.cpp in Sources */,
 				BF012B40226A26F1003AEB55 /* SoyH264.cpp in Sources */,
 				BF012AD42269FAE2003AEB55 /* TestDevice.cpp in Sources */,
 				BF8534DA22B3FE370049C01B /* usb_libusb10.c in Sources */,
@@ -1093,7 +1094,6 @@
 				BF15202B238559A200A70EBF /* SoyDebug.mm in Sources */,
 				BF15201E2384863900A70EBF /* TestDevice.cpp in Sources */,
 				BF15202E238559A200A70EBF /* SoyGraphics.cpp in Sources */,
-				BF152034238559A200A70EBF /* SoyOpenglContext.cpp in Sources */,
 				BF15204623855B8C00A70EBF /* SoyDebug.cpp in Sources */,
 				BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */,
 				BF152028238559A200A70EBF /* memheap.cpp in Sources */,
@@ -1110,13 +1110,13 @@
 				BF15203A238559A200A70EBF /* SoyThread.cpp in Sources */,
 				BF15201A2384863900A70EBF /* AvfVideoCapture.mm in Sources */,
 				BF15203B238559A200A70EBF /* SoyTime.cpp in Sources */,
-				BF152033238559A200A70EBF /* SoyOpengl.cpp in Sources */,
 				BF152036238559A200A70EBF /* SoyScope.cpp in Sources */,
 				BF152045238559F100A70EBF /* SoyFourcc.cpp in Sources */,
 				BF15203E238559A200A70EBF /* SoyVector.cpp in Sources */,
 				BF152029238559A200A70EBF /* SoyAssert.cpp in Sources */,
 				BF15201C2384863900A70EBF /* PopCameraDevice.cpp in Sources */,
 				BF15202A238559A200A70EBF /* SoyAvf.mm in Sources */,
+				BF15BCD52CB2F0FA001D09DB /* TBitReader.cpp in Sources */,
 				BF51B8E7256AD94F004DE4C7 /* JsonFunctions.cpp in Sources */,
 				BF15204F23855BDD00A70EBF /* SoyArray.cpp in Sources */,
 			);
@@ -1384,7 +1384,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -1433,7 +1432,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
