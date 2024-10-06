@@ -18,9 +18,10 @@ jobs:
             type: linux
             arch: x86_64
 
-          - os: Nvidia
-            type: linux
-            arch: arm64
+          # disabled whilst no nvidia runner
+          #- os: Nvidia
+          #  type: linux
+          #  arch: arm64
 
           # disabled pi whilst pi build machine is offline.
           #- os: Pi4

@@ -24,9 +24,10 @@ jobs:
             type: linux
             arch: x86_64
 
-          - os: Nvidia
-            type: linux
-            arch: arm64
+          # disabled whilst not nvidia runner
+          #- os: Nvidia
+          #  type: linux
+          #  arch: arm64
 
           # tsdk: not compiling for the pi 
           # - os: Pi4
