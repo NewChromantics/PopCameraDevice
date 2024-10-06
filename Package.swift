@@ -23,7 +23,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
 		.binaryTarget(
 			name: "PopCameraDevice",
-			url: "https://github.com/NewChromantics/PopCameraDevice/releases/download/v2.2.22/PopCameraDevice.xcframework.zip",
+			url: "https://github.com/NewChromantics/PopCameraDevice/releases/download/v2.3.0/PopCameraDevice.xcframework.zip",
 			checksum: "753afa1da35eeda59049bb7f927a9d44cfa1b1c69d4c6e58413f6570542569f1"
 		),
         
