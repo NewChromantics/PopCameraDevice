@@ -19,15 +19,11 @@ LIBRARY_SEARCH_PATHS = $(LIBRARY_SEARCH_PATHS) $(inherited) $(LIBFREENECT2_BUILD
 
 //	this should add bitcode, but doesnt without BITCODE_GENERATION_MODE
 OTHER_CFLAGS = -Wno-ambiguous-macro -fembed-bitcode
-OTHER_LDFLAGS = -fembed-bitcode;
-
-//	need this to get rid of bitcode errors
-//	this should show bitcode sections
-//		otool -l binary_name | grep __bitcode
-//	but despite none showing, a build using this framework still succeeded
-//	with just -fenable_bitcode and enable bitcode, it failed
-BITCODE_GENERATION_MODE = bitcode
 
 // tsdk: Mirroring config from PopH264
 BUILD_LIBRARY_FOR_DISTRIBUTION = YES
 
+
+//	from 2022/xcode 14, bitcode is required to be OFF on IOS
+//	but with bitcode, we end up getting xcode12 bitcode vs xcode13 bitcode errors, which we want to avoid
+ENABLE_BITCODE = NO

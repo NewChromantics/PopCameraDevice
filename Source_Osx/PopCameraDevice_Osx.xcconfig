@@ -34,3 +34,7 @@ BUILD_LIBRARY_FOR_DISTRIBUTION = YES
 DYLIB_COMPATIBILITY_VERSION = 1
 
 //EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
+
+//	from 2022/xcode 14, bitcode is required to be OFF on IOS
+//	but with bitcode, we end up getting xcode12 bitcode vs xcode13 bitcode errors, which we want to avoid
+ENABLE_BITCODE = NO
