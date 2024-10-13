@@ -24,7 +24,7 @@ let package = Package(
 		.binaryTarget(
 			name: "PopCameraDevice",
 			url: "https://github.com/NewChromantics/PopCameraDevice/releases/download/v2.3.0/PopCameraDevice.xcframework.zip",
-			checksum: "753afa1da35eeda59049bb7f927a9d44cfa1b1c69d4c6e58413f6570542569f1"
+			checksum: "9ae79ab55d83eda553f78dbf5dd4cfeb24025b7bec61e0118a136bd04349ff92"
 		),
         
     ]
