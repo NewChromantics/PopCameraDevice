@@ -24,7 +24,7 @@ namespace PopCameraDevice
 	//	2.2.20	Freenect devices are now a single device which outputs multiple streams, adhering to the JSON params
 	//	2.2.21	Avf: Option to not output anchors in meta
 	//	2.2.22	Arkit camera can now output float frames of triangles for anchor geometry with .AnchorGeometryStream=true/POPCAMERADEVICE_KEY_ANCHORGEOMETRYSTREAM
-	const Soy::TVersion	Version(2, 3, 0);
+	const Soy::TVersion	Version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 	const int32_t		NoFrame = -1;
 	const int32_t		Error = -2;
 }
@@ -32,6 +32,17 @@ namespace PopCameraDevice
 __export int32_t PopCameraDevice_GetVersion()
 {
 	return PopCameraDevice::Version.GetMillion();
+}
+
+__export int32_t PopCameraDevice_GetVersionThousand()
+{
+	int Version = VERSION_PATCH;
+	Version += VERSION_MINOR * 1000;
+	Version += VERSION_MAJOR * 1000 * 1000;
+#if VERSION_MAJOR>15
+#error Version major over 15.x could have 32bit issues
+#endif
+	return Version;
 }
 
 #if defined(TARGET_IOS)

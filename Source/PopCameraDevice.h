@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+//	constant for invalid instance numbers, to avoid use of magic-number 0 around code bases
+enum { PopCameraDevice_NullInstance=0 };
 
 #if !defined(__export)
 
@@ -81,7 +83,10 @@ __export int32_t			PopCameraDevice_PeekNextFrame(int32_t Instance,char* MetaJson
 __export int32_t			PopCameraDevice_PopNextFrame(int32_t Instance, char* MetaJsonBuffer, int32_t MetaJsonBufferSize, uint8_t* Plane0, int32_t Plane0Size, uint8_t* Plane1, int32_t Plane1Size, uint8_t* Plane2, int32_t Plane2Size);
 
 //	returns	version integer as A.BBB.CCCCCC (major, minor, patch. Divide by 10's to split)
-__export int32_t			PopCameraDevice_GetVersion();
+//	deprecated for GetVersionThousand where the version is AA.BBB.CCC (A maxes out at ~15)
+//	A=(X/1000/1000)%1000 b=(X/1000)%1000 c=X%1000
+__deprecated __export int32_t			PopCameraDevice_GetVersion();
+__export int32_t			PopCameraDevice_GetVersionThousand();
 
 //	shouldn't need this, but cleans up explicitly
 __export void				PopCameraDevice_Cleanup();

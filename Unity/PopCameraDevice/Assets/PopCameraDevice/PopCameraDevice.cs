@@ -48,6 +48,10 @@ public static class PopCameraDevice
 	//	returns	version integer as A.BBB.CCCCCC
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
 	private static extern Int32 PopCameraDevice_GetVersion();
+	
+	//	A.BBB.CCC
+	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+	private static extern Int32 PopCameraDevice_GetVersionThousand();
 
 	//	DLL cleanup
 	[DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
