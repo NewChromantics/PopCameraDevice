@@ -17,7 +17,7 @@ namespace Freenect
 	class TCaptureParams;
 	class TFrameListener;
 	
-	void			EnumDeviceNames(std::function<void(const std::string&)> Enum);
+	void			EnumDevices(std::function<void(const std::string&,ArrayBridge<std::string>&& Formats)> Enum);
 	void			Shutdown(bool ProcessExit);
 }
 

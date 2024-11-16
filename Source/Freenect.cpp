@@ -56,6 +56,15 @@ namespace Freenect
 	auto 						DefaultDepthFormat = SoyPixelsFormat::Depth16mm;
 	auto 						DepthStreamName = "Depth";
 	auto 						ColourStreamName = "Colour";
+
+	freenect_resolution			GetResolution(SoyPixelsMeta Meta,bool AllowHighResolution);
+
+	auto LOW_WIDTH = 320;
+	auto LOW_HEIGHT = 240;
+	auto MEDIUM_WIDTH = 640;
+	auto MEDIUM_HEIGHT = 480;
+	auto HIGH_WIDTH = 1280;
+	auto HIGH_HEIGHT = 1024;
 }
 
 
@@ -107,7 +116,7 @@ Freenect::TCaptureParams::TCaptureParams(json11::Json& Options)
 	SetPixelFormat( POPCAMERADEVICE_KEY_FORMAT, mColourFormat );
 	
 	//	temp force colour format as its not a usual format
-	if ( mColourFormat != SoyPixelsFormat::Invalid )
+	if ( mColourFormat == SoyPixelsFormat::Invalid )
 		mColourFormat = DefaultColourFormat;
 }
 
@@ -183,7 +192,7 @@ public:
 	TFreenect();
 	~TFreenect();
 	
-	void				EnumDevices(std::function<void(const std::string&)>& Enum);
+	void				EnumDevices(std::function<void(const std::string&,ArrayBridge<std::string>&& Formats)> Enum);
 	TDevice&			OpenDevice(const std::string& Serial);
 	void				OnDepthFrame(freenect_device& Device,const uint8_t* Bytes,SoyTime Timestamp);
 	void				OnColourFrame(freenect_device& Device,const uint8_t* Bytes,SoyTime Timestamp);
@@ -306,17 +315,17 @@ void Freenect::Shutdown(bool ProcessExit)
 }
 
 
-void Freenect::EnumDeviceNames(std::function<void(const std::string&)> Enum)
+void Freenect::EnumDevices(std::function<void(const std::string&,ArrayBridge<std::string>&& Formats)> Enum)
 {
 	auto& Context = GetContext();
 	auto& Freenect = Context.GetFreenect();
 	
-	std::function<void(const std::string&)> EnumDeviceSerial = [&](const std::string& Serial)
+	std::function<void(const std::string&,ArrayBridge<std::string>&& Formats)> EnumDevice = [&](const std::string& Serial,ArrayBridge<std::string>&& Formats)
 	{
-		Enum( DeviceName_Prefix+Serial );
+		Enum( DeviceName_Prefix+Serial, GetArrayBridge(Formats) );
 	};
 	
-	Freenect.EnumDevices( EnumDeviceSerial );
+	Freenect.EnumDevices( EnumDevice );
 }
 
 
@@ -467,15 +476,8 @@ void Freenect::TDevice::Open()
 }
 
 
-freenect_resolution GetResolution(SoyPixelsMeta Meta,bool AllowHighResolution)
+freenect_resolution Freenect::GetResolution(SoyPixelsMeta Meta,bool AllowHighResolution)
 {
-#define LOW_WIDTH		320
-#define LOW_HEIGHT		240
-#define MEDIUM_WIDTH	640
-#define MEDIUM_HEIGHT	480
-#define HIGH_WIDTH		1280
-#define HIGH_HEIGHT		1024
-
 	if ( Meta.GetWidth() == LOW_WIDTH && Meta.GetHeight() == LOW_HEIGHT )
 		return FREENECT_RESOLUTION_LOW;
 
@@ -492,7 +494,7 @@ freenect_resolution GetResolution(SoyPixelsMeta Meta,bool AllowHighResolution)
 	Error << " Medium=" << MEDIUM_WIDTH << "x" << MEDIUM_HEIGHT;
 	if ( AllowHighResolution )
 		Error << " High=" << HIGH_WIDTH << "x" << HIGH_HEIGHT;
-	throw Soy::AssertException(Error);
+	throw std::runtime_error(Error.str());
 }
 
 void Freenect::TDevice::EnableDepthStream(SoyPixelsMeta Meta)
@@ -742,7 +744,7 @@ Freenect::TDevice& Freenect::TFreenect::GetDevice(freenect_device& DeviceRef)
 	throw Soy_AssertException("Couldn't find opened device matching ref");
 }
 
-void Freenect::TFreenect::EnumDevices(std::function<void (const std::string &)>& Enum)
+void Freenect::TFreenect::EnumDevices(std::function<void(const std::string&,ArrayBridge<std::string>&& Formats)> Enum)
 {
 	struct freenect_device_attributes* DeviceList = nullptr;
 	//	returns <0 on error, or number of devices.
@@ -753,10 +755,23 @@ void Freenect::TFreenect::EnumDevices(std::function<void (const std::string &)>&
 	try
 	{
 		auto Device = DeviceList;
+		Array<std::string> Formats;
+		
+		//	should be a proper function doing this
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(HIGH_WIDTH,HIGH_HEIGHT,GetFormat(FREENECT_VIDEO_YUV_RGB)), 30 ) );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(HIGH_WIDTH,HIGH_HEIGHT,GetFormat(FREENECT_VIDEO_YUV_RAW)), 30 ) );
+		//Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(LOW_WIDTH,LOW_HEIGHT,GetFormat(FREENECT_DEPTH_MM)), 30 );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(MEDIUM_WIDTH,MEDIUM_HEIGHT,GetFormat(FREENECT_VIDEO_YUV_RGB)), 30 ) );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(MEDIUM_WIDTH,MEDIUM_HEIGHT,GetFormat(FREENECT_VIDEO_YUV_RAW)), 30 ) );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(MEDIUM_WIDTH,MEDIUM_HEIGHT,GetFormat(FREENECT_DEPTH_MM)), 30 ) );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(LOW_WIDTH,LOW_HEIGHT, GetFormat(FREENECT_VIDEO_YUV_RGB) ), 30 ) );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(LOW_WIDTH,LOW_HEIGHT, GetFormat(FREENECT_VIDEO_YUV_RAW) ), 30 ) );
+		Formats.PushBack( PopCameraDevice::GetFormatString( SoyPixelsMeta(LOW_WIDTH,LOW_HEIGHT, GetFormat(FREENECT_DEPTH_MM) ), 30 ) );
+
 		while ( Device )
 		{
 			std::string Serial = Device->camera_serial;
-			Enum( Serial );
+			Enum( Serial, GetArrayBridge(Formats) );
 			Device = Device->next;
 		}
 		freenect_free_device_attributes( DeviceList );

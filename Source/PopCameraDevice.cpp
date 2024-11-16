@@ -312,7 +312,7 @@ void PopCameraDevice::EnumDevices(ArrayBridge<TDeviceAndFormats>&& DeviceAndForm
 #endif
 	
 #if defined(ENABLE_FREENECT)
-	Freenect::EnumDeviceNames(EnumDevice);
+	Freenect::EnumDevices(EnumDeviceAndFormats);
 #endif
 
 #if defined(ENABLE_KINECT2)
