@@ -130,7 +130,6 @@
 		BF8534E322B3FE370049C01B /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C422B3FE370049C01B /* tilt.c */; };
 		BF8534EA22B3FE370049C01B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = BF8534C722B3FE370049C01B /* loader.c */; };
 		BFC30C8226EE27310012EF3D /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFC30C8126EE27310012EF3D /* HomeKit.framework */; };
-		BFC30CBF26EE299C0012EF3D /* Homekit.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFC30CBD26EE299C0012EF3D /* Homekit.mm */; };
 		BFC30CC226EE922D0012EF3D /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BFC30C8126EE27310012EF3D /* HomeKit.framework */; };
 		BFDBAB8524B9C64F00E8BCE1 /* ArkitCapture.mm in Sources */ = {isa = PBXBuildFile; fileRef = BFDBAB8324B9C64F00E8BCE1 /* ArkitCapture.mm */; };
 		BFE73A3924FA7B33005D34D8 /* PopCameraDevice_TestApp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF108A9822970C92003DDC5F /* PopCameraDevice_TestApp.cpp */; };
@@ -1085,7 +1084,6 @@
 				BF152035238559A200A70EBF /* SoyPixels.cpp in Sources */,
 				BF15202F238559A200A70EBF /* SoyH264.cpp in Sources */,
 				BF152032238559A200A70EBF /* SoyMediaFormat.cpp in Sources */,
-				BFC30CBF26EE299C0012EF3D /* Homekit.mm in Sources */,
 				BF216EA124CA1B82003FD00B /* json11.cpp in Sources */,
 				BF152037238559A200A70EBF /* SoyShader.cpp in Sources */,
 				BF15203C238559A200A70EBF /* SoyTime.mm in Sources */,

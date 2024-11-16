@@ -46,7 +46,8 @@ __export int32_t PopCameraDevice_GetVersionThousand()
 }
 
 #if defined(TARGET_IOS)
-#define ENABLE_HOMEKIT
+//	now should be defined globally in xcconfig
+//#define ENABLE_HOMEKIT
 #endif
 
 #if defined(ENABLE_HOMEKIT)
