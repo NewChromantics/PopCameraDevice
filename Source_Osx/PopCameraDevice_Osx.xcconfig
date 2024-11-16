@@ -31,10 +31,18 @@ BUILD_LIBRARY_FOR_DISTRIBUTION = YES
 //	this sets the linker to compile with swift version X (default is blank, 0.0.0)
 //	this fixes "xyz" requires 1.0.0 and "this" is 0.0.0 error as apple cannot mix & match
 //	swift binaries any more from different frameworks
-DYLIB_COMPATIBILITY_VERSION = 1
+//	gr: removed this, poph264 doesnt have it... must be from some old swift requirement?
+//DYLIB_COMPATIBILITY_VERSION = 1
 
 //EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
 
 //	from 2022/xcode 14, bitcode is required to be OFF on IOS
 //	but with bitcode, we end up getting xcode12 bitcode vs xcode13 bitcode errors, which we want to avoid
 ENABLE_BITCODE = NO
+
+//	default project settings, but make consistent across framework & bundle
+COMBINE_HIDPI_IMAGES = YES
+DYLIB_INSTALL_NAME_BASE = @rpath
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @loader_path/Frameworks
+DEFINES_MODULE = YES
+FRAMEWORK_VERSION = A
